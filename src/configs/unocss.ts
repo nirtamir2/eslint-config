@@ -1,43 +1,36 @@
-import { ensurePackages, interopDefault } from '../utils'
-import type { OptionsUnoCSS, TypedFlatConfigItem } from '../types'
+import { ensurePackages, interopDefault } from "../utils";
+import type { OptionsUnoCSS, TypedFlatConfigItem } from "../types";
 
 export async function unocss(
-  options: OptionsUnoCSS = {},
-): Promise<TypedFlatConfigItem[]> {
-  const {
-    attributify = true,
-    strict = false,
-  } = options
+  options: OptionsUnoCSS = {}
+): Promise<Array<TypedFlatConfigItem>> {
+  const { attributify = true, strict = false } = options;
 
-  await ensurePackages([
-    '@unocss/eslint-plugin',
-  ])
+  await ensurePackages(["@unocss/eslint-plugin"]);
 
-  const [
-    pluginUnoCSS,
-  ] = await Promise.all([
-    interopDefault(import('@unocss/eslint-plugin')),
-  ] as const)
+  const [pluginUnoCSS] = await Promise.all([
+    interopDefault(import("@unocss/eslint-plugin")),
+  ] as const);
 
   return [
     {
-      name: 'antfu/unocss',
+      name: "antfu/unocss",
       plugins: {
         unocss: pluginUnoCSS,
       },
       rules: {
-        'unocss/order': 'warn',
-        ...attributify
+        "unocss/order": "warn",
+        ...(attributify
           ? {
-              'unocss/order-attributify': 'warn',
+              "unocss/order-attributify": "warn",
             }
-          : {},
-        ...strict
+          : {}),
+        ...(strict
           ? {
-              'unocss/blocklist': 'error',
+              "unocss/blocklist": "error",
             }
-          : {},
+          : {}),
       },
     },
-  ]
+  ];
 }

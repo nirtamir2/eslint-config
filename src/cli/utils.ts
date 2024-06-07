@@ -1,24 +1,23 @@
-import { execSync } from 'node:child_process'
+import { execSync } from "node:child_process";
 
 export function isGitClean() {
   try {
-    execSync('git diff-index --quiet HEAD --')
-    return true
-  }
-  catch (error) {
-    return false
+    execSync("git diff-index --quiet HEAD --");
+    return true;
+  } catch {
+    return false;
   }
 }
 
 export function getEslintConfigContent(
   mainConfig: string,
-  additionalConfigs?: string[],
+  additionalConfigs?: Array<string>
 ) {
   return `
-import antfu from '@antfu/eslint-config'
+import nirtamir2 from '@nirtamir2/eslint-config'
 
-export default antfu({
+export default nirtamir2({
 ${mainConfig}
-}${additionalConfigs?.map(config => `,{\n${config}\n}`)})
-`.trimStart()
+}${additionalConfigs?.map((config) => `,{\n${config}\n}`)})
+`.trimStart();
 }
