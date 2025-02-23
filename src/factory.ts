@@ -2,35 +2,7 @@ import type { Linter } from "eslint";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import fs from "node:fs";
-import {
-  astro,
-  command,
-  comments,
-  disables,
-  ignores,
-  imports,
-  javascript,
-  jsdoc,
-  jsonc,
-  jsx,
-  markdown,
-  node,
-  perfectionist,
-  react,
-  solid,
-  sortPackageJson,
-  sortTsconfig,
-  stylistic,
-  svelte,
-  test,
-  toml,
-  tsdoc,
-  typescript,
-  unicorn,
-  unocss,
-  vue,
-  yaml,
-} from "./configs";
+import { astro, command, comments, disables, ignores, imports, javascript, jsdoc, jsonc, jsx, markdown, node, perfectionist, react, solid, sortPackageJson, sortTsconfig, stylistic, svelte, test, toml, tsdoc, typescript, unicorn, unocss, vue, yaml } from "./configs";
 import { formatters } from "./configs/formatters";
 import { i18n } from "./configs/i18n";
 import { prettier } from "./configs/prettier";
@@ -39,13 +11,9 @@ import { regexp } from "./configs/regexp";
 import { security } from "./configs/security";
 import { storybook } from "./configs/storybook";
 import { tailwindcss } from "./configs/tailwindcss";
-import type {
-  Awaitable,
-  ConfigNames,
-  OptionsConfig,
-  TypedFlatConfigItem,
-} from "./types";
+import type { Awaitable, ConfigNames, OptionsConfig, TypedFlatConfigItem } from "./types";
 import { interopDefault, isInEditorEnv } from "./utils";
+
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "name",
@@ -407,12 +375,12 @@ export function nirtamir2(
         "test/no-only-tests",
         "prefer-const",
       ],
-      // {
-      //   builtinRules: () =>
-      //     import(["eslint", "use-at-your-own-risk"].join("/")).then(
-      //       (r) => r.builtinRules,
-      //     ),
-      // },
+      {
+        builtinRules: () =>
+          import(["eslint", "use-at-your-own-risk"].join("/")).then(
+            (r) => r.builtinRules,
+          ),
+      },
     );
   }
 
