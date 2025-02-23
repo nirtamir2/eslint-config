@@ -407,12 +407,12 @@ export function nirtamir2(
         "test/no-only-tests",
         "prefer-const",
       ],
-      {
-        builtinRules: () =>
-          import(["eslint", "use-at-your-own-risk"].join("/")).then(
-            (r) => r.builtinRules,
-          ),
-      },
+      // {
+      //   builtinRules: () =>
+      //     import(["eslint", "use-at-your-own-risk"].join("/")).then(
+      //       (r) => r.builtinRules,
+      //     ),
+      // },
     );
   }
 
