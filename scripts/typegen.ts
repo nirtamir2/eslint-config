@@ -1,5 +1,4 @@
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
-import { builtinRules } from "eslint/use-at-your-own-risk";
 import fs from "node:fs/promises";
 import {
   a11y,
@@ -41,7 +40,7 @@ const configs = await combine(
   {
     plugins: {
       "": {
-        rules: Object.fromEntries(builtinRules.entries()),
+        // rules: Object.fromEntries(builtinRules.entries()),
       },
     },
   },
