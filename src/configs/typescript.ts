@@ -114,8 +114,9 @@ export async function typescript(
           makeParser(false, files, filesTypeAware),
         ]
       : [makeParser(false, files)]),
-    ...tseslint.configs.strict,
-    ...(isTypeAware ? tseslint.configs.strictTypeChecked : []),
+    ...(isTypeAware
+      ? tseslint.configs.strictTypeChecked
+      : tseslint.configs.strict),
     {
       files,
       name: "antfu/typescript/rules",
@@ -183,30 +184,6 @@ export async function typescript(
           },
         ]
       : []),
-    {
-      files: ["**/*.d.?([cm])ts"],
-      name: "antfu/typescript/disables/dts",
-      rules: {
-        "eslint-comments/no-unlimited-disable": "off",
-        "import-x/no-duplicates": "off",
-        "no-restricted-syntax": "off",
-        "unused-imports/no-unused-vars": "off",
-      },
-    },
-    {
-      files: ["**/*.{test,spec}.ts?(x)"],
-      name: "antfu/typescript/disables/test",
-      rules: {
-        "no-unused-expressions": "off",
-      },
-    },
-    {
-      files: ["**/*.js", "**/*.cjs"],
-      name: "antfu/typescript/disables/cjs",
-      rules: {
-        "@typescript-eslint/no-require-imports": "off",
-      },
-    },
     isTypeAware
       ? {
           name: "nirtamir2/typescript/expect-type",
@@ -474,9 +451,9 @@ export async function typescript(
         // #endregion
 
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
+        ...(isTypeAware ? null : tseslint.configs.disableTypeChecked.rules),
       },
     },
-    isTypeAware ? [] : tseslint.configs.disableTypeChecked,
     {
       name: "nirtamir2/typescript/overrides",
       files,

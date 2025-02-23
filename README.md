@@ -1,3 +1,8 @@
+## TODO
+
+Use the ESLint config structure from https://github.com/tszhong0411/honghong.me/tree/main/packages/eslint-config
+used in this [Next.js starter](https://github.com/tszhong0411/nextjs-starter) because it's more simple.
+
 # @nirtamir2/eslint-config
 
 [![npm](https://img.shields.io/npm/v/@nirtamir2/eslint-config?color=444&label=)](https://npmjs.com/package/@nirtamir2/eslint-config)
