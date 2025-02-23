@@ -164,9 +164,9 @@ export interface OptionsStylistic {
 }
 
 export type StylisticConfig = Pick<
-    StylisticCustomizeOptions,
-    "indent" | "quotes" | "jsx" | "semi"
-  >
+  StylisticCustomizeOptions,
+  "indent" | "quotes" | "jsx" | "semi"
+>;
 
 export interface OptionsOverrides {
   overrides?: TypedFlatConfigItem["rules"];
@@ -253,6 +253,12 @@ export interface OptionsConfig extends OptionsComponentExts {
    * @default auto-detect based on the dependencies
    */
   vue?: boolean | OptionsVue;
+
+  /**
+   * Enable @tanstack/query support.
+   * @default auto-detect based on the dependencies
+   */
+  query?: boolean;
 
   /**
    * Enable JSONC support.
