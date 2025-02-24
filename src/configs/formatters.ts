@@ -251,35 +251,38 @@ export async function formatters(
   }
 
   if (options.astro) {
-    configs.push({
-      files: [GLOB_ASTRO],
-      languageOptions: {
-        parser: parserPlain,
+    configs.push(
+      {
+        files: [GLOB_ASTRO],
+        languageOptions: {
+          parser: parserPlain,
+        },
+        name: "antfu/formatter/astro",
+        rules: {
+          "format/prettier": [
+            "error",
+            {
+              ...prettierOptions,
+              parser: "astro",
+              plugins: ["prettier-plugin-astro"],
+            },
+          ],
+        },
       },
-      name: "antfu/formatter/astro",
-      rules: {
-        "format/prettier": [
-          "error",
-          {
-            ...prettierOptions,
-            parser: "astro",
-            plugins: ["prettier-plugin-astro"],
-          },
-        ],
+      {
+        files: [GLOB_ASTRO, GLOB_ASTRO_TS],
+        name: "antfu/formatter/astro/disables",
+        rules: {
+          "@stylistic/arrow-parens": "off",
+          "@stylistic/block-spacing": "off",
+          "@stylistic/comma-dangle": "off",
+          "@stylistic/indent": "off",
+          "@stylistic/no-multi-spaces": "off",
+          "@stylistic/quotes": "off",
+          "@stylistic/semi": "off",
+        },
       },
-    }, {
-      files: [GLOB_ASTRO, GLOB_ASTRO_TS],
-      name: "antfu/formatter/astro/disables",
-      rules: {
-        "@stylistic/arrow-parens": "off",
-        "@stylistic/block-spacing": "off",
-        "@stylistic/comma-dangle": "off",
-        "@stylistic/indent": "off",
-        "@stylistic/no-multi-spaces": "off",
-        "@stylistic/quotes": "off",
-        "@stylistic/semi": "off",
-      },
-    });
+    );
   }
 
   if (options.graphql) {
