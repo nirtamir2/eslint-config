@@ -1,6 +1,10 @@
 import { compat } from "../compat";
-import type { OptionsComponentExts, OptionsFiles, OptionsOverrides, TypedFlatConfigItem } from "../types";
-
+import type {
+  OptionsComponentExts,
+  OptionsFiles,
+  OptionsOverrides,
+  TypedFlatConfigItem,
+} from "../types";
 
 export async function tsdoc(
   options: OptionsFiles & OptionsComponentExts & OptionsOverrides = {},

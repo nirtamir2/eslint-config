@@ -172,10 +172,7 @@ export async function typescript(
     },
     ...(isTypeAware
       ? [
-          {
-            ...sortDestructureKeysTypescriptConfig(),
-            files,
-          },
+           sortDestructureKeysTypescriptConfig(),
           {
             files: filesTypeAware,
             ignores: ignoresTypeAware,

@@ -31,6 +31,7 @@ import {
   vue,
   yaml,
 } from "./configs";
+import { defaultImportName } from "./configs/default-import-name";
 import { formatters } from "./configs/formatters";
 import { i18n } from "./configs/i18n";
 import { prettier } from "./configs/prettier";
@@ -183,6 +184,7 @@ export function nirtamir2(
       stylistic: stylisticOptions,
     }),
     unicorn(),
+    defaultImportName(),
     command(),
 
     // Optional plugins (installed but not enabled by default)
