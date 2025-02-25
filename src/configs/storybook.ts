@@ -9,6 +9,12 @@ export async function storybook(): Promise<Array<TypedFlatConfigItem>> {
   ] as const);
 
   return [
+    {
+      name: "nirtamir2/storybook/init",
+      plugins: {
+        storybook: storybookPlugin,
+      },
+    },
     ...storybookPlugin.configs["flat/recommended"],
     ...storybookPlugin.configs["flat/csf-strict"],
     ...storybookPlugin.configs["flat/addon-interactions"],
