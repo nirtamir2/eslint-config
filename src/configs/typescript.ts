@@ -1,6 +1,5 @@
 import expectType from "eslint-plugin-expect-type/configs/recommended";
 import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
-import tseslint from "typescript-eslint";
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
 import { pluginAntfu } from "../plugins";
 import type {
@@ -512,7 +511,7 @@ export async function typescript(
         // #endregion
 
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
-        ...(isTypeAware ? {} : tseslint.configs.disableTypeChecked.rules),
+        ...(isTypeAware ? {} : pluginTs.configs["disable-type-checked"].rules),
       },
     },
     {
