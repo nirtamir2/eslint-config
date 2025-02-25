@@ -106,7 +106,7 @@ export default nirtamir2(
   `,
       );
 
-      await execa("npx", ["eslint", ".", "--fix"], {
+      await execa("npx", ["eslint", "--fix"], {
         cwd: target,
         stdio: "pipe",
       });
