@@ -7,7 +7,9 @@ export default nirtamir2(
     solid: true,
     svelte: true,
     astro: true,
-    typescript: true,
+    typescript: {
+      tsconfigPath: "tsconfig.json",
+    },
     formatters: false,
     stylistic: false,
   },

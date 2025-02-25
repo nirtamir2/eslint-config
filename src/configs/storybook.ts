@@ -1,16 +1,19 @@
-import storybookPlugin from "eslint-plugin-storybook"
 import type { TypedFlatConfigItem } from "../types";
-import { ensurePackages } from "../utils";
+import { ensurePackages, interopDefault } from "../utils";
 
 export async function storybook(): Promise<Array<TypedFlatConfigItem>> {
   await ensurePackages(["eslint-plugin-storybook"]);
 
+  const [storybookPlugin] = await Promise.all([
+    interopDefault(import("eslint-plugin-storybook")),
+  ] as const);
+
   return [
-    ...storybookPlugin.configs['flat/recommended'],
-    ...storybookPlugin.configs['flat/csf-strict'],
-    ...storybookPlugin.configs['flat/addon-interactions'],
+    ...storybookPlugin.configs["flat/recommended"],
+    ...storybookPlugin.configs["flat/csf-strict"],
+    ...storybookPlugin.configs["flat/addon-interactions"],
     {
-      name:"nirtamir2/storybook/ignore-patterns",
+      name: "nirtamir2/storybook/ignore-patterns",
       ignores: ["!.storybook", "storybook-static"],
     },
   ];

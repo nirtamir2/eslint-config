@@ -42,7 +42,6 @@ export async function typescript(
     "dot-notation": "off",
     "no-implied-eval": "off",
     "no-throw-literal": "off",
-    "sort-destructure-keys-typescript/sort-destructure-keys-by-type": "error",
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/dot-notation": ["error", { allowKeywords: true }],
     "@typescript-eslint/no-floating-promises": "error",
@@ -114,8 +113,9 @@ export async function typescript(
           makeParser(false, files, filesTypeAware),
         ]
       : [makeParser(false, files)]),
-    ...tseslint.configs.strict,
-    ...(isTypeAware ? tseslint.configs.strictTypeChecked : []),
+    ...(isTypeAware
+      ? tseslint.configs.strictTypeChecked
+      : tseslint.configs.strict),
     {
       files,
       name: "antfu/typescript/rules",
@@ -217,6 +217,7 @@ export async function typescript(
         }
       : [],
     {
+      name: "nirtamir-typescript-rules",
       files,
       ignores: [".storybook/**"],
       rules: {
