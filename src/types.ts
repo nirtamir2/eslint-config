@@ -136,7 +136,7 @@ export interface OptionsComponentExts {
    * @example ['vue']
    * @default []
    */
-  componentExts?: string[];
+  componentExts?: Array<string>;
 }
 
 export interface OptionsUnicorn {

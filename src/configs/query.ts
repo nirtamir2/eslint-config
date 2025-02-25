@@ -8,5 +8,8 @@ export async function query(): Promise<Array<TypedFlatConfigItem>> {
     interopDefault(import("@tanstack/eslint-plugin-query")),
   ] as const);
 
-  return pluginTanstackQuery.configs["flat/recommended"];
+  return [
+    { name: "@nirtamir2/query" },
+    ...pluginTanstackQuery.configs["flat/recommended"],
+  ];
 }
