@@ -158,19 +158,8 @@ export function nirtamir2(
       : undefined;
 
   // Base configs
-  configs.push(ignores());
-
-  if (enableTypeScript) {
-    configs.push(
-      typescript({
-        ...typescriptOptions,
-        componentExts,
-        overrides: getOverrides(options, "typescript"),
-      }),
-    );
-  }
-
   configs.push(
+    ignores(),
     javascript({
       isInEditor,
       overrides: getOverrides(options, "javascript"),
@@ -194,6 +183,16 @@ export function nirtamir2(
 
   if (enableJsx) {
     configs.push(jsx());
+  }
+
+  if (enableTypeScript) {
+    configs.push(
+      typescript({
+        ...typescriptOptions,
+        componentExts,
+        overrides: getOverrides(options, "typescript"),
+      }),
+    );
   }
 
   if (stylisticOptions) {
