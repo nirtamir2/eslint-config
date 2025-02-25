@@ -374,10 +374,13 @@ export function nirtamir2(
 
   // User can optionally pass a flat config item to the first argument
   // We pick the known keys as ESLint would do schema validation
-  const fusedConfig = flatConfigProps.reduce((acc, key) => {
-    if (key in options) acc[key] = options[key] as any;
-    return acc;
-  }, {} as TypedFlatConfigItem);
+  const fusedConfig = flatConfigProps.reduce<TypedFlatConfigItem>(
+    (acc, key) => {
+      if (key in options) acc[key] = options[key] as never;
+      return acc;
+    },
+    {},
+  );
   if (Object.keys(fusedConfig).length > 0) configs.push([fusedConfig]);
 
   let composer = new FlatConfigComposer<TypedFlatConfigItem, ConfigNames>();

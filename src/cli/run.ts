@@ -46,25 +46,25 @@ export async function run(options: CliRunOptions = {}) {
 
   // Set default value for promptResult if `argSkipPrompt` is enabled
   let result: PromptResult = {
-    extra: argExtra ?? [],
-    frameworks: argTemplate ?? [],
     uncommittedConfirmed: false,
+    frameworks: argTemplate ?? [],
+    extra: argExtra ?? [],
     updateVscodeSettings: true,
   };
 
   if (!argSkipPrompt) {
     result = (await p.group(
       {
-        uncommittedConfirmed: () => {
-          if (argSkipPrompt || isGitClean()) return Promise.resolve(true);
+        uncommittedConfirmed: async () => {
+          if (argSkipPrompt || isGitClean()) return true;
 
-          return p.confirm({
+          return await p.confirm({
             initialValue: false,
             message:
               "There are uncommitted changes in the current repository, are you sure to continue?",
           });
         },
-        frameworks: ({ results }) => {
+        frameworks: async ({ results }) => {
           const isArgTemplateValid =
             typeof argTemplate === "string" &&
             Boolean(frameworks.includes(argTemplate as FrameworkOption));
@@ -76,18 +76,16 @@ export async function run(options: CliRunOptions = {}) {
               ? `"${argTemplate}" isn't a valid template. Please choose from below: `
               : "Select a framework:";
 
-          return p.multiselect<FrameworkOption>({
+          return await p.multiselect<FrameworkOption>({
             message: c.reset(message),
             options: frameworkOptions,
             required: false,
           });
         },
-        extra: ({ results }) => {
+        extra: async ({ results }) => {
           const isArgExtraValid =
-            argExtra?.length &&
-            argExtra.filter(
-              (element) => !extra.includes(element as ExtraLibrariesOption),
-            ).length === 0;
+            argExtra.length > 0 &&
+            argExtra.filter((element) => !extra.includes(element)).length === 0;
 
           if (!results.uncommittedConfirmed || isArgExtraValid) return;
 
@@ -96,17 +94,17 @@ export async function run(options: CliRunOptions = {}) {
               ? `"${argExtra}" isn't a valid extra util. Please choose from below: `
               : "Select a extra utils:";
 
-          return p.multiselect<ExtraLibrariesOption>({
+          return await p.multiselect<ExtraLibrariesOption>({
             message: c.reset(message),
             options: extraOptions,
             required: false,
           });
         },
 
-        updateVscodeSettings: ({ results }) => {
+        updateVscodeSettings: async ({ results }) => {
           if (!results.uncommittedConfirmed) return;
 
-          return p.confirm({
+          return await p.confirm({
             initialValue: true,
             message:
               "Update .vscode/settings.json for better VS Code experience?",

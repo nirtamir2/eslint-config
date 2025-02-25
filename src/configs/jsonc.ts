@@ -12,8 +12,8 @@ export async function jsonc(
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
     files = [GLOB_JSON, GLOB_JSON5, GLOB_JSONC],
-    overrides = {},
     stylistic = false,
+    overrides = {},
   } = options;
 
   const { indent = 2 } = typeof stylistic === "boolean" ? {} : stylistic;

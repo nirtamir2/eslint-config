@@ -24,7 +24,7 @@ const NextJsPackages = ["next"];
 export async function react(
   options: OptionsTypeScriptWithTypes & OptionsOverrides & OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const { files = [GLOB_SRC], overrides = {} } = options;
+  const { overrides = {}, files = [GLOB_SRC] } = options;
 
   await ensurePackages([
     "@eslint-react/eslint-plugin",
@@ -39,7 +39,7 @@ export async function react(
     await ensurePackages(["@next/eslint-plugin-next"]);
   }
 
-  const tsconfigPath = options?.tsconfigPath
+  const tsconfigPath = options.tsconfigPath
     ? toArray(options.tsconfigPath)
     : undefined;
   const isTypeAware = Boolean(tsconfigPath);

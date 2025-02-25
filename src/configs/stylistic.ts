@@ -8,8 +8,8 @@ import { interopDefault } from "../utils";
 
 export const StylisticConfigDefaults: StylisticConfig = {
   indent: 2,
-  jsx: true,
   quotes: "double",
+  jsx: true,
   semi: true,
 };
 
@@ -21,12 +21,12 @@ export async function stylistic(
   options: StylisticOptions = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    indent,
-    jsx,
     lessOpinionated = false,
-    overrides = {},
+    indent,
     quotes,
+    jsx,
     semi,
+    overrides = {},
   } = {
     ...StylisticConfigDefaults,
     ...options,

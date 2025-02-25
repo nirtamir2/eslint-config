@@ -10,7 +10,7 @@ import { interopDefault } from "../utils";
 export async function toml(
   options: OptionsOverrides & OptionsStylistic & OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const { files = [GLOB_TOML], overrides = {}, stylistic = false } = options;
+  const { overrides = {}, stylistic = false, files = [GLOB_TOML] } = options;
 
   const { indent = 2 } = typeof stylistic === "boolean" ? {} : stylistic;
 

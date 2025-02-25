@@ -19,7 +19,7 @@ async function run(
     NO_COLOR: "1",
   },
 ) {
-  return execa("node", [CLI_PATH, ...params], {
+  return await execa("node", [CLI_PATH, ...params], {
     cwd: genPath,
     env: {
       ...process.env,
@@ -41,8 +41,8 @@ async function createMockDir() {
   ]);
 }
 
-beforeEach(async () => await createMockDir());
-afterAll(async () => await fs.rm(genPath, { recursive: true, force: true }));
+beforeEach(async () => { await createMockDir(); });
+afterAll(async () => { await fs.rm(genPath, { recursive: true, force: true }); });
 
 it("package.json updated", async () => {
   const { stdout } = await run();

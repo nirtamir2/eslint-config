@@ -62,13 +62,13 @@ export async function updateEslintFiles(result: PromptResult) {
   const files = fs.readdirSync(cwd);
   const legacyConfig: Array<string> = [];
   for (const file of files) {
-    if (/eslint|prettier/.test(file) && !/eslint\.config\./.test(file))
+    if (/eslint|prettier/.test(file) && !file.includes('eslint.config.'))
       legacyConfig.push(file);
   }
 
   if (legacyConfig.length > 0)
     p.note(
-      `${c.dim(legacyConfig.join(", "))}`,
+      c.dim(legacyConfig.join(", ")),
       "You can now remove those files manually",
     );
 }

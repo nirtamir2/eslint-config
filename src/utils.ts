@@ -113,7 +113,7 @@ export async function interopDefault<T>(
 }
 
 export async function ensurePackages(packages: Array<string | undefined>) {
-  if (process.env.CI || process.stdout.isTTY === false) return;
+  if (process.env.CI || !process.stdout.isTTY) return;
 
   const nonExistingPackages = packages.filter(
     (i) => i && !isPackageExists(i),

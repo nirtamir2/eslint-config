@@ -1,6 +1,5 @@
 import expectType from "eslint-plugin-expect-type/configs/recommended";
 import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
-import tseslint from "typescript-eslint";
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
 import { pluginAntfu } from "../plugins";
 import type {
@@ -11,7 +10,7 @@ import type {
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
-import { interopDefault, toArray } from "../utils";
+import { interopDefault } from "../utils";
 
 export async function typescript(
   options: OptionsFiles &
@@ -33,9 +32,8 @@ export async function typescript(
     `${GLOB_MARKDOWN}/**`,
     GLOB_ASTRO_TS,
   ];
-  const tsconfigPath = options?.tsconfigPath
-    ? toArray(options.tsconfigPath)
-    : undefined;
+  const tsconfigPath = options.tsconfigPath ?? undefined;
+
   const isTypeAware = Boolean(tsconfigPath);
 
   const typeAwareRules: TypedFlatConfigItem["rules"] = {
@@ -90,7 +88,7 @@ export async function typescript(
                 tsconfigRootDir: process.cwd(),
               }
             : {}),
-          ...(parserOptions as any),
+          ...parserOptions,
         },
       },
       name: `antfu/typescript/${typeAware ? "type-aware-parser" : "parser"}`,
@@ -103,7 +101,7 @@ export async function typescript(
       name: "antfu/typescript/setup",
       plugins: {
         antfu: pluginAntfu,
-        // "@typescript-eslint": pluginTs as any,
+        "@typescript-eslint": pluginTs,
       },
     },
     // assign type-aware parser for type-aware files and type-unaware parser for the rest
@@ -113,14 +111,10 @@ export async function typescript(
           makeParser(false, files, filesTypeAware),
         ]
       : [makeParser(false, files)]),
-    ...(isTypeAware
-      ? tseslint.configs.strictTypeChecked
-      : tseslint.configs.strict),
     {
       files,
       name: "antfu/typescript/rules",
       rules: {
-        ...pluginTs.configs["eslint-recommended"].overrides![0].rules,
         ...pluginTs.configs.strict.rules,
         "no-dupe-class-members": "off",
         "no-loss-of-precision": "off",
@@ -172,13 +166,24 @@ export async function typescript(
     },
     ...(isTypeAware
       ? [
-          sortDestructureKeysTypescriptConfig(),
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            rules: {
+              ...pluginTs.configs["strict-type-checked"].rules,
+            },
+          },
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            ...sortDestructureKeysTypescriptConfig(),
+          },
           {
             files: filesTypeAware,
             ignores: ignoresTypeAware,
             name: "antfu/typescript/rules-type-aware",
             rules: {
-              ...(tsconfigPath ? typeAwareRules : {}),
+              ...(tsconfigPath == null ? {} : typeAwareRules),
               ...overrides,
             },
           },
@@ -478,7 +483,7 @@ export async function typescript(
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
       },
     },
-    isTypeAware ? [] : tseslint.configs.disableTypeChecked,
+    isTypeAware ? [] : pluginTs.configs.disableTypeChecked,
     {
       name: "nirtamir2/typescript/overrides",
       files,
