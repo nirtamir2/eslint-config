@@ -79,20 +79,6 @@ const StorybookPackages = [
   "@storybook/test",
 ];
 
-export const defaultPluginRenaming = {
-  "@eslint-react": "react",
-  "@eslint-react/dom": "react-dom",
-  "@eslint-react/hooks-extra": "react-hooks-extra",
-  "@eslint-react/naming-convention": "react-naming-convention",
-
-  "@stylistic": "style",
-  "@typescript-eslint": "ts",
-  "import-x": "import",
-  n: "node",
-  vitest: "test",
-  yml: "yaml",
-};
-
 /**
  * Construct an array of ESLint flat config items.
  * @param {OptionsConfig & TypedFlatConfigItem} options

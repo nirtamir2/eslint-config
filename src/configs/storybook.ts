@@ -1,5 +1,4 @@
-import { fixupConfigRules } from "@eslint/compat";
-import { compat } from "../compat";
+import storybookPlugin from "eslint-plugin-storybook"
 import type { TypedFlatConfigItem } from "../types";
 import { ensurePackages } from "../utils";
 
@@ -7,23 +6,12 @@ export async function storybook(): Promise<Array<TypedFlatConfigItem>> {
   await ensurePackages(["eslint-plugin-storybook"]);
 
   return [
-    ...fixupConfigRules(
-      compat.config({
-        extends: [
-          "plugin:storybook/recommended",
-          "plugin:storybook/csf-strict",
-          "plugin:storybook/addon-interactions",
-        ],
-        // .eslintignore is not supported with flat config, make sure to ignore also other build and test folders
-        ignorePatterns: ["!.storybook", "storybook-static"],
-      }),
-    ),
+    ...storybookPlugin.configs['flat/recommended'],
+    ...storybookPlugin.configs['flat/csf-strict'],
+    ...storybookPlugin.configs['flat/addon-interactions'],
     {
-      name: "nirtamir2/storybook/i18n",
-      files: ["**.stories.tsx"],
-      rules: {
-        "i18next/no-string-literal": "off",
-      },
+      name:"nirtamir2/storybook/ignore-patterns",
+      ignores: ["!.storybook", "storybook-static"],
     },
   ];
 }

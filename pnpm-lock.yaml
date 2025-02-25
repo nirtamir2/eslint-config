@@ -75,8 +75,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0(eslint@9.21.0(jiti@2.4.2))
       eslint-plugin-default-import-name:
-        specifier: ^0.2.0
-        version: 0.2.0(eslint@9.21.0(jiti@2.4.2))
+        specifier: ^0.3.0
+        version: 0.3.0(eslint@9.21.0(jiti@2.4.2))
       eslint-plugin-eslint-comments:
         specifier: ^3.2.0
         version: 3.2.0(eslint@9.21.0(jiti@2.4.2))
@@ -1967,8 +1967,8 @@ packages:
     peerDependencies:
       eslint: ^9.13.0
 
-  eslint-plugin-default-import-name@0.2.0:
-    resolution: {integrity: sha512-oL9rXT3MLsjY6x2dZ51/u7mDi0vsDELzIkS3jvlk2IemMmEKKfLU6Z5HXX7XFMifFQ6kuKK4F+uqN1r1HxZ1Mw==}
+  eslint-plugin-default-import-name@0.3.0:
+    resolution: {integrity: sha512-hROvgzUG/k3VnvYtRddTBnCOj5Cl2js7g0/BR3WUJGyyzsh15dPL9MxCo6X469/om0LiVOGuQDeulW3XanHPGA==}
     peerDependencies:
       eslint: ^9.13.0
 
@@ -6230,7 +6230,7 @@ snapshots:
       '@es-joy/jsdoccomment': 0.50.0
       eslint: 9.21.0(jiti@2.4.2)
 
-  eslint-plugin-default-import-name@0.2.0(eslint@9.21.0(jiti@2.4.2)):
+  eslint-plugin-default-import-name@0.3.0(eslint@9.21.0(jiti@2.4.2)):
     dependencies:
       eslint: 9.21.0(jiti@2.4.2)
       scule: 1.3.0

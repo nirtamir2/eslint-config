@@ -1,7 +1,7 @@
 import expectType from "eslint-plugin-expect-type/configs/recommended";
+import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
 import tseslint from "typescript-eslint";
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
-import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
 import { pluginAntfu } from "../plugins";
 import type {
   OptionsComponentExts,
@@ -172,7 +172,7 @@ export async function typescript(
     },
     ...(isTypeAware
       ? [
-           sortDestructureKeysTypescriptConfig(),
+          sortDestructureKeysTypescriptConfig(),
           {
             files: filesTypeAware,
             ignores: ignoresTypeAware,

@@ -3,6 +3,7 @@ import path from "node:path";
 import { compat } from "../compat";
 import type { TypedFlatConfigItem } from "../types";
 import { ensurePackages } from "../utils";
+import i18next from 'eslint-plugin-i18next';
 
 export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
   await ensurePackages([
@@ -14,10 +15,10 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
   ]);
 
   return [
+    i18next.configs['flat/recommended'],
     ...fixupConfigRules(
       compat.config({
         extends: [
-          "plugin:i18n-prefix/recommended",
           "plugin:i18next/recommended",
         ],
         plugins: ["@naturacosmeticos/i18n-checker"],
@@ -66,5 +67,12 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
         ],
       }),
     ),
+    {
+      name: "nirtamir2/i18n/storybook",
+      files: ["**.stories.tsx"],
+      rules: {
+        "i18next/no-string-literal": "off",
+      },
+    }
   ];
 }
