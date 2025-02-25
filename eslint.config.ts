@@ -7,6 +7,8 @@ export default nirtamir2(
     solid: true,
     svelte: true,
     astro: true,
+    storybook: true,
+    query: true,
     typescript: {
       tsconfigPath: "tsconfig.json",
     },
