@@ -106,6 +106,9 @@
     "eslint-plugin-solid": {
       "optional": true
     },
+    "eslint-plugin-storybook": {
+      "optional": true
+    },
     "eslint-plugin-svelte": {
       "optional": true
     },

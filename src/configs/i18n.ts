@@ -9,7 +9,6 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
     "eslint-plugin-i18n-checker",
     "eslint-plugin-i18n-json",
     "eslint-plugin-i18n-prefix",
-    "",
     "@naturacosmeticos/eslint-plugin-i18n-checker",
   ]);
 
