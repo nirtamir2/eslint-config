@@ -18,10 +18,10 @@ export async function vue(
     OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    files = [GLOB_VUE],
+    vueVersion = 3,
     overrides = {},
     stylistic = false,
-    vueVersion = 3,
+    files = [GLOB_VUE],
   } = options;
 
   const sfcBlocks = options.sfcBlocks === true ? {} : (options.sfcBlocks ?? {});

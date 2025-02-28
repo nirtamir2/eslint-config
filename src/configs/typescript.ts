@@ -1,26 +1,33 @@
 import expectType from "eslint-plugin-expect-type/configs/recommended";
-import tseslint from "typescript-eslint";
-import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
 import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
+import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
 import { pluginAntfu } from "../plugins";
 import type {
   OptionsComponentExts,
   OptionsFiles,
   OptionsOverrides,
+  OptionsProjectType,
   OptionsTypeScriptParserOptions,
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
-import { interopDefault, toArray } from "../utils";
+import { interopDefault } from "../utils";
 
 export async function typescript(
   options: OptionsFiles &
     OptionsComponentExts &
     OptionsOverrides &
     OptionsTypeScriptWithTypes &
-    OptionsTypeScriptParserOptions = {},
+    OptionsTypeScriptParserOptions &
+    OptionsProjectType = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const { componentExts = [], overrides = {}, parserOptions = {} } = options;
+  const {
+    componentExts = [],
+    overrides = {},
+    overridesTypeAware = {},
+    parserOptions = {},
+    type = "app",
+  } = options;
 
   const files = options.files ?? [
     GLOB_TS,
@@ -33,16 +40,13 @@ export async function typescript(
     `${GLOB_MARKDOWN}/**`,
     GLOB_ASTRO_TS,
   ];
-  const tsconfigPath = options?.tsconfigPath
-    ? toArray(options.tsconfigPath)
-    : undefined;
-  const isTypeAware = Boolean(tsconfigPath);
+  const tsconfigPath =
+    options?.tsconfigPath == null ? undefined : options.tsconfigPath;
+  const isTypeAware = tsconfigPath != null;
 
   const typeAwareRules: TypedFlatConfigItem["rules"] = {
     "dot-notation": "off",
     "no-implied-eval": "off",
-    "no-throw-literal": "off",
-    "sort-destructure-keys-typescript/sort-destructure-keys-by-type": "error",
     "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/dot-notation": ["error", { allowKeywords: true }],
     "@typescript-eslint/no-floating-promises": "error",
@@ -55,11 +59,14 @@ export async function typescript(
     "@typescript-eslint/no-unsafe-call": "error",
     "@typescript-eslint/no-unsafe-member-access": "error",
     "@typescript-eslint/no-unsafe-return": "error",
-    "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/promise-function-async": "error",
+    "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/restrict-template-expressions": "error",
-    "@typescript-eslint/return-await": "error",
-    "@typescript-eslint/strict-boolean-expressions": "error",
+    "@typescript-eslint/return-await": ["error", "in-try-catch"],
+    "@typescript-eslint/strict-boolean-expressions": [
+      "error",
+      { allowNullableBoolean: true, allowNullableObject: true },
+    ],
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/unbound-method": "error",
   };
@@ -91,7 +98,7 @@ export async function typescript(
                 tsconfigRootDir: process.cwd(),
               }
             : {}),
-          ...(parserOptions as any),
+          ...parserOptions,
         },
       },
       name: `antfu/typescript/${typeAware ? "type-aware-parser" : "parser"}`,
@@ -104,38 +111,28 @@ export async function typescript(
       name: "antfu/typescript/setup",
       plugins: {
         antfu: pluginAntfu,
-        // "@typescript-eslint": pluginTs as any,
+        "@typescript-eslint": pluginTs,
       },
     },
     // assign type-aware parser for type-aware files and type-unaware parser for the rest
     ...(isTypeAware
       ? [
+          makeParser(false, files),
           makeParser(true, filesTypeAware, ignoresTypeAware),
-          makeParser(false, files, filesTypeAware),
         ]
       : [makeParser(false, files)]),
-    ...tseslint.configs.strict,
-    ...(isTypeAware ? tseslint.configs.strictTypeChecked : []),
     {
       files,
       name: "antfu/typescript/rules",
       rules: {
-        ...pluginTs.configs["eslint-recommended"].overrides![0].rules,
         ...pluginTs.configs.strict.rules,
         "no-dupe-class-members": "off",
-        "no-loss-of-precision": "off",
         "no-redeclare": "off",
         "no-use-before-define": "off",
         "no-useless-constructor": "off",
         "@typescript-eslint/ban-ts-comment": [
           "error",
-          {
-            "ts-expect-error": "allow-with-description",
-            "ts-ignore": true,
-            "ts-nocheck": true,
-            "ts-check": false,
-            minimumDescriptionLength: 3,
-          },
+          { "ts-expect-error": "allow-with-description" },
         ],
         "@typescript-eslint/consistent-type-definitions": [
           "error",
@@ -149,16 +146,29 @@ export async function typescript(
             prefer: "type-imports",
           },
         ],
+
         "@typescript-eslint/method-signature-style": ["error", "property"], // https://www.totaltypescript.com/method-shorthand-syntax-considered-harmful
         "@typescript-eslint/no-dupe-class-members": "error",
         "@typescript-eslint/no-dynamic-delete": "off",
+        "@typescript-eslint/no-empty-object-type": [
+          "error",
+          { allowInterfaces: "always" },
+        ],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-extraneous-class": "off",
         "@typescript-eslint/no-import-type-side-effects": "error",
         "@typescript-eslint/no-invalid-void-type": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-redeclare": "error",
+        "@typescript-eslint/no-redeclare": ["error", { builtinGlobals: false }],
         "@typescript-eslint/no-require-imports": "error",
+        "@typescript-eslint/no-unused-expressions": [
+          "error",
+          {
+            allowShortCircuit: true,
+            allowTaggedTemplates: true,
+            allowTernary: true,
+          },
+        ],
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-use-before-define": [
           "error",
@@ -168,18 +178,43 @@ export async function typescript(
         "@typescript-eslint/no-wrapper-object-types": "error",
         "@typescript-eslint/triple-slash-reference": "off",
         "@typescript-eslint/unified-signatures": "off",
+
+        ...(type === "lib"
+          ? {
+              "@typescript-eslint/explicit-function-return-type": [
+                "error",
+                {
+                  allowExpressions: true,
+                  allowHigherOrderFunctions: true,
+                  allowIIFEs: true,
+                },
+              ],
+            }
+          : {}),
+        ...overrides,
       },
     },
     ...(isTypeAware
       ? [
-           sortDestructureKeysTypescriptConfig(),
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            rules: {
+              ...pluginTs.configs["strict-type-checked"].rules,
+            },
+          },
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            ...sortDestructureKeysTypescriptConfig(),
+          },
           {
             files: filesTypeAware,
             ignores: ignoresTypeAware,
             name: "antfu/typescript/rules-type-aware",
             rules: {
-              ...(tsconfigPath ? typeAwareRules : {}),
-              ...overrides,
+              ...typeAwareRules,
+              ...overridesTypeAware,
             },
           },
         ]
@@ -217,6 +252,7 @@ export async function typescript(
         }
       : [],
     {
+      name: "nirtamir-typescript-rules",
       files,
       ignores: [".storybook/**"],
       rules: {
@@ -475,9 +511,9 @@ export async function typescript(
         // #endregion
 
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
+        ...(isTypeAware ? {} : pluginTs.configs["disable-type-checked"].rules),
       },
     },
-    isTypeAware ? [] : tseslint.configs.disableTypeChecked,
     {
       name: "nirtamir2/typescript/overrides",
       files,

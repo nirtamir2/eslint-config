@@ -17,14 +17,14 @@ export async function solid(
     OptionsTypeScriptWithTypes = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    files = [GLOB_JSX, GLOB_TSX],
-    overrides = {},
     typescript = true,
+    overrides = {},
+    files = [GLOB_JSX, GLOB_TSX],
   } = options;
 
   await ensurePackages(["eslint-plugin-solid"]);
 
-  const tsconfigPath = options?.tsconfigPath
+  const tsconfigPath = options.tsconfigPath
     ? toArray(options.tsconfigPath)
     : undefined;
   const isTypeAware = Boolean(tsconfigPath);

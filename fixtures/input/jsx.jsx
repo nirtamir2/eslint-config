@@ -15,7 +15,7 @@ export function HelloWorld({
 
   return (
     <div
-      className="HelloWorld"
+      className="border"
       title={`You are visitor number ${num}`}
       onMouseOver={onMouseOver}
     >

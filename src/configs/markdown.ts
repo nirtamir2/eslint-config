@@ -16,8 +16,8 @@ export async function markdown(
   options: OptionsFiles & OptionsComponentExts & OptionsOverrides = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    componentExts = [],
     files = [GLOB_MARKDOWN],
+    componentExts = [],
     overrides = {},
   } = options;
 

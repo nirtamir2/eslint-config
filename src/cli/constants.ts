@@ -89,9 +89,9 @@ export const frameworks: Array<FrameworkOption> = frameworkOptions.map(
 
 export const extraOptions: Array<PromItem<ExtraLibrariesOption>> = [
   {
-    hint: "Use external formatters (Prettier and/or dprint) to format files that ESLint cannot handle yet (.css, .html, etc)",
     label: c.red("Formatter"),
     value: "formatter",
+    hint: "Use external formatters (Prettier and/or dprint) to format files that ESLint cannot handle yet (.css, .html, etc)",
   },
   {
     label: c.cyan("UnoCSS"),

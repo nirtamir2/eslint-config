@@ -19,7 +19,7 @@ async function run(
     NO_COLOR: "1",
   },
 ) {
-  return execa("node", [CLI_PATH, ...params], {
+  return await execa("node", [CLI_PATH, ...params], {
     cwd: genPath,
     env: {
       ...process.env,
@@ -34,15 +34,15 @@ async function createMockDir() {
 
   await Promise.all([
     fs.writeFile(join(genPath, "package.json"), JSON.stringify({}, null, 2)),
-    fs.writeFile(join(genPath, ".eslintrc.yaml"), ""),
+    fs.writeFile(join(genPath, ".eslintrc.yml"), ""),
     fs.writeFile(join(genPath, ".eslintignore"), "some-path\nsome-file"),
     fs.writeFile(join(genPath, ".prettierc"), ""),
     fs.writeFile(join(genPath, ".prettierignore"), "some-path\nsome-file"),
   ]);
 }
 
-beforeEach(async () => await createMockDir());
-afterAll(async () => await fs.rm(genPath, { recursive: true, force: true }));
+beforeEach(async () => { await createMockDir(); });
+afterAll(async () => { await fs.rm(genPath, { recursive: true, force: true }); });
 
 it("package.json updated", async () => {
   const { stdout } = await run();
@@ -57,7 +57,7 @@ it("package.json updated", async () => {
   expect(stdout).toContain("Changes wrote to package.json");
 });
 
-it("esm eslint.config.ts", async () => {
+it("esm eslint.config.js", async () => {
   const pkgContent = await fs.readFile("package.json", "utf8");
   await fs.writeFile(
     join(genPath, "package.json"),
@@ -67,32 +67,21 @@ it("esm eslint.config.ts", async () => {
   const { stdout } = await run();
 
   const eslintConfigContent = await fs.readFile(
-    join(genPath, "eslint.config.ts"),
+    join(genPath, "eslint.config.js"),
     "utf8",
   );
   expect(eslintConfigContent.includes("export default")).toBeTruthy();
-  expect(stdout).toContain("Created eslint.config.ts");
+  expect(stdout).toContain("Created eslint.config.js");
 });
 
-it("cjs eslint.config.ts", async () => {
-  const { stdout } = await run();
-
-  const eslintConfigContent = await fs.readFile(
-    join(genPath, "eslint.config.ts"),
-    "utf8",
-  );
-  expect(eslintConfigContent.includes("export default")).toBeTruthy();
-  expect(stdout).toContain("Created eslint.config.ts");
-});
-
-it("ignores files added in eslint.config.ts", async () => {
+it("ignores files added in eslint.config.js", async () => {
   const { stdout } = await run();
 
   const eslintConfigContent = (
-    await fs.readFile(join(genPath, "eslint.config.ts"), "utf8")
-  ).replaceAll("\\", "/");
+    await fs.readFile(join(genPath, "eslint.config.mjs"), "utf8")
+  ).replaceAll('\\', "/");
 
-  expect(stdout).toContain("Created eslint.config.ts");
+  expect(stdout).toContain("Created eslint.config.mjs");
   expect(eslintConfigContent).toMatchInlineSnapshot(`
       "import nirtamir2 from '@nirtamir2/eslint-config'
 
@@ -108,6 +97,6 @@ it("suggest remove unnecessary files", async () => {
 
   expect(stdout).toContain("You can now remove those files manually");
   expect(stdout).toContain(
-    ".eslintignore, .eslintrc.yaml, .prettierc, .prettierignore",
+    ".eslintignore, .eslintrc.yml, .prettierc, .prettierignore",
   );
 });

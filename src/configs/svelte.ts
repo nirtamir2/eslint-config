@@ -14,7 +14,7 @@ export async function svelte(
     OptionsStylistic &
     OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const { files = [GLOB_SVELTE], overrides = {}, stylistic = false } = options;
+  const { overrides = {}, stylistic = false, files = [GLOB_SVELTE] } = options;
 
   const { indent = 2, quotes = "single" } =
     typeof stylistic === "boolean" ? {} : stylistic;

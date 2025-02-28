@@ -17,6 +17,7 @@ export type TypedFlatConfigItem = Omit<
   // Relax plugins type limitation, as most of the plugins did not have correct type info yet.
   /**
    * An object containing a name-value mapping of plugin names to plugin objects. When `files` is specified, these plugins are only available to the matching files.
+   *
    * @see [Using plugins in your configuration](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#using-plugins-in-your-configuration)
    */
   plugins?: Record<string, any>;
@@ -32,6 +33,7 @@ export interface OptionsFiles {
 export interface OptionsVue extends OptionsOverrides {
   /**
    * Create virtual files for Vue SFC blocks to enable linting.
+   *
    * @see https://github.com/antfu/eslint-processor-vue-blocks
    * @default true
    */
@@ -39,6 +41,7 @@ export interface OptionsVue extends OptionsOverrides {
 
   /**
    * Vue version. Apply different rules set from `eslint-plugin-vue`.
+   *
    * @default 3
    */
   vueVersion?: 2 | 3;
@@ -69,6 +72,13 @@ export interface OptionsFormatters {
    * Currently only support Prettier.
    */
   xml?: "prettier" | boolean;
+
+  /**
+   * Enable formatting support for SVG.
+   *
+   * Currently only support Prettier.
+   */
+  svg?: "prettier" | boolean;
 
   tailwindcss?: "prettier" | boolean;
 
@@ -122,10 +132,20 @@ export interface OptionsFormatters {
 export interface OptionsComponentExts {
   /**
    * Additional extensions for components.
+   *
    * @example ['vue']
    * @default []
    */
   componentExts?: Array<string>;
+}
+
+export interface OptionsUnicorn {
+  /**
+   * Include all rules recommended by `eslint-plugin-unicorn`, instead of only ones picked by Anthony.
+   *
+   * @default false
+   */
+  allRecommended?: boolean;
 }
 
 export interface OptionsTypeScriptParserOptions {
@@ -153,6 +173,11 @@ export interface OptionsTypeScriptWithTypes {
    * @see https://typescript-eslint.io/linting/typed-linting/
    */
   tsconfigPath?: string;
+
+  /**
+   * Override type aware rules.
+   */
+  overridesTypeAware?: TypedFlatConfigItem["rules"];
 }
 
 export interface OptionsHasTypeScript {
@@ -163,13 +188,23 @@ export interface OptionsStylistic {
   stylistic?: boolean | StylisticConfig;
 }
 
-export type StylisticConfig = Pick<
-  StylisticCustomizeOptions,
-  "indent" | "quotes" | "jsx" | "semi"
->;
+export interface StylisticConfig
+  extends Pick<
+    StylisticCustomizeOptions,
+    "indent" | "quotes" | "jsx" | "semi"
+  > {}
 
 export interface OptionsOverrides {
   overrides?: TypedFlatConfigItem["rules"];
+}
+
+export interface OptionsProjectType {
+  /**
+   * Type of the project. `lib` will enable more strict rules for libraries.
+   *
+   * @default 'app'
+   */
+  type?: "app" | "lib";
 }
 
 export interface OptionsRegExp {
@@ -196,11 +231,14 @@ export interface OptionsUnoCSS extends OptionsOverrides {
   strict?: boolean;
 }
 
-export interface OptionsConfig extends OptionsComponentExts {
+export interface OptionsConfig
+  extends OptionsComponentExts,
+    OptionsProjectType {
   /**
    * Enable gitignore support.
    *
    * Passing an object to configure the options.
+   *
    * @see https://github.com/antfu/eslint-config-flat-gitignore
    * @default true
    */
@@ -212,6 +250,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    * Including:
    * - `antfu/top-level-function`
    * - `antfu/if-newline`
+   *
    * @default false
    */
   lessOpinionated?: boolean;
@@ -230,6 +269,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    * Enable TypeScript support.
    *
    * Passing an object to enable TypeScript Language Server support.
+   *
    * @default auto-detect based on the dependencies
    */
   typescript?: boolean | OptionsTypescript;
@@ -238,18 +278,28 @@ export interface OptionsConfig extends OptionsComponentExts {
    * Enable JSX related rules.
    *
    * Currently only stylistic rules are included.
+   *
    * @default true
    */
   jsx?: boolean;
 
   /**
+   * Options for eslint-plugin-unicorn.
+   *
+   * @default true
+   */
+  unicorn?: boolean | OptionsUnicorn;
+
+  /**
    * Enable test support.
+   *
    * @default true
    */
   test?: boolean | OptionsOverrides;
 
   /**
    * Enable Vue support.
+   *
    * @default auto-detect based on the dependencies
    */
   vue?: boolean | OptionsVue;
@@ -262,6 +312,7 @@ export interface OptionsConfig extends OptionsComponentExts {
 
   /**
    * Enable JSONC support.
+   *
    * @default true
    */
   jsonc?: boolean | OptionsOverrides;
@@ -280,12 +331,14 @@ export interface OptionsConfig extends OptionsComponentExts {
 
   /**
    * Enable YAML support.
+   *
    * @default true
    */
   yaml?: boolean | OptionsOverrides;
 
   /**
    * Enable TOML support.
+   *
    * @default true
    */
   toml?: boolean | OptionsOverrides;
@@ -298,6 +351,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    *
    * Requires installing for formatting .astro:
    * - `prettier-plugin-astro`
+   *
    * @default false
    */
   astro?: boolean | OptionsOverrides;
@@ -306,12 +360,14 @@ export interface OptionsConfig extends OptionsComponentExts {
    * Enable linting for **code snippets** in Markdown.
    *
    * For formatting Markdown content, enable also `formatters.markdown`.
+   *
    * @default true
    */
   markdown?: boolean | OptionsOverrides;
 
   /**
    * Enable stylistic rules.
+   *
    * @see https://eslint.style/
    * @default true
    */
@@ -319,6 +375,7 @@ export interface OptionsConfig extends OptionsComponentExts {
 
   /**
    * Enable regexp rules.
+   *
    * @see https://ota-meshi.github.io/eslint-plugin-regexp/
    * @default true
    */
@@ -331,6 +388,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    * - `@eslint-react/eslint-plugin`
    * - `eslint-plugin-react-hooks`
    * - `eslint-plugin-react-refresh`
+   *
    * @default false
    */
   react?: boolean | OptionsOverrides;
@@ -339,6 +397,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    *
    * Requires installing:
    * - `eslint-plugin-solid`
+   *
    * @default false
    */
   solid?: boolean | OptionsOverrides;
@@ -348,6 +407,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    *
    * Requires installing:
    * - `eslint-plugin-svelte`
+   *
    * @default false
    */
   svelte?: boolean;
@@ -357,6 +417,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    *
    * Requires installing:
    * - `@unocss/eslint-plugin`
+   *
    * @default false
    */
   unocss?: boolean | OptionsUnoCSS;
@@ -368,6 +429,7 @@ export interface OptionsConfig extends OptionsComponentExts {
    * - `eslint-plugin-format`
    *
    * When set to `true`, it will enable all formatters.
+   *
    * @default false
    */
   formatters?: boolean | OptionsFormatters;
@@ -387,6 +449,7 @@ export interface OptionsConfig extends OptionsComponentExts {
 
   /**
    * Provide overrides for rules for each integration.
+   *
    * @deprecated use `overrides` option in each integration key instead
    */
   overrides?: {
@@ -404,4 +467,4 @@ export interface OptionsConfig extends OptionsComponentExts {
   };
 }
 
-export { type ConfigNames } from "./typegen.d";
+export { type ConfigNames } from "./typegen";

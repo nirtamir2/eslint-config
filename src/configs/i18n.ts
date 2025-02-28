@@ -2,24 +2,25 @@ import { fixupConfigRules } from "@eslint/compat";
 import path from "node:path";
 import { compat } from "../compat";
 import type { TypedFlatConfigItem } from "../types";
-import { ensurePackages } from "../utils";
+import { ensurePackages, interopDefault } from "../utils";
 
 export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
   await ensurePackages([
     "eslint-plugin-i18n-checker",
     "eslint-plugin-i18n-json",
     "eslint-plugin-i18n-prefix",
-    "eslint-plugin-i18next",
     "@naturacosmeticos/eslint-plugin-i18n-checker",
   ]);
 
+  const [i18next] = await Promise.all([
+    interopDefault(import("eslint-plugin-i18next")),
+  ] as const);
+
   return [
+    i18next.configs["flat/recommended"],
     ...fixupConfigRules(
       compat.config({
-        extends: [
-          "plugin:i18n-prefix/recommended",
-          "plugin:i18next/recommended",
-        ],
+        extends: ["plugin:i18next/recommended"],
         plugins: ["@naturacosmeticos/i18n-checker"],
         rules: {
           /**
@@ -66,5 +67,12 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
         ],
       }),
     ),
+    {
+      name: "nirtamir2/i18n/storybook",
+      files: ["**.stories.tsx"],
+      rules: {
+        "i18next/no-string-literal": "off",
+      },
+    },
   ];
 }

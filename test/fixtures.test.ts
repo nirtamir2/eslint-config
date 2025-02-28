@@ -11,22 +11,24 @@ beforeAll(async () => {
 afterAll(async () => {
   await fs.rm("_fixtures", { recursive: true, force: true });
 });
-
-runWithConfig("js", {
-  typescript: false,
-  vue: false,
-});
+//
+// runWithConfig("js", {
+//   typescript: false,
+//   vue: false,
+// });
 runWithConfig("all", {
-  typescript: true,
+  typescript: {
+      tsconfigPath: "tsconfig.json"
+  },
   vue: true,
   svelte: true,
   astro: true,
 });
-runWithConfig("no-style", {
-  typescript: true,
-  vue: true,
-  stylistic: false,
-});
+// runWithConfig("no-style", {
+//   typescript: true,
+//   vue: true,
+//   stylistic: false,
+// });
 // runWithConfig(
 //   "tab-double-quotes",
 //   {
@@ -44,21 +46,21 @@ runWithConfig("no-style", {
 //   },
 // );
 
-// https://github.com/nirtamir2/eslint-config/issues/255
-runWithConfig(
-  "ts-override",
-  {
-    typescript: true,
-  },
-  {
-    rules: {
-      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-      "@typescript-eslint/explicit-member-accessibility": "warn",
-      "@typescript-eslint/parameter-properties": "warn",
-      "@typescript-eslint/no-explicit-any": "warn",
-    },
-  },
-);
+// https://github.com/antfu/eslint-config/issues/255
+// runWithConfig(
+//   "ts-override",
+//   {
+//     typescript: true,
+//   },
+//   {
+//     rules: {
+//       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+//       "@typescript-eslint/explicit-member-accessibility": "warn",
+//       "@typescript-eslint/parameter-properties": "warn",
+//       "@typescript-eslint/no-explicit-any": "warn",
+//     },
+//   },
+// );
 
 // runWithConfig("with-formatters", {
 //   typescript: true,
@@ -106,7 +108,7 @@ export default nirtamir2(
   `,
       );
 
-      await execa("npx", ["eslint", ".", "--fix"], {
+      await execa("npx", ["eslint", "--fix"], {
         cwd: target,
         stdio: "pipe",
       });

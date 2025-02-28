@@ -1,4 +1,5 @@
 import { fixupConfigRules } from "@eslint/compat";
+import github from "eslint-plugin-github";
 import sonarjs from "eslint-plugin-sonarjs";
 import globals from "globals";
 import { compat } from "../compat";
@@ -105,33 +106,29 @@ export async function javascript(
       rules: {
         "array-func/prefer-array-from": 0, // conflicts with unicorn/prefer-spread
       },
+    }, {
+      name: "nirtamir2/javascript/github",
+      rules: {
+        "github/array-foreach": 2,
+        "github/async-currenttarget": 2,
+        "github/async-preventdefault": 2,
+        "github/authenticity-token": 2,
+        "github/get-attribute": 2,
+        "github/js-class-name": 2,
+        "github/no-blur": 2,
+        "github/no-d-none": 2,
+        "github/no-dataset": 2,
+        "github/no-implicit-buggy-globals": 2,
+        "github/no-inner-html": 2,
+        "github/no-innerText": 2,
+        "github/no-dynamic-script-tag": 2,
+        "github/no-then": 2,
+        "github/no-useless-passive": 2,
+        "github/prefer-observers": 2,
+        "github/require-passive-events": 2,
+        "github/unescaped-html-literal": 2,
+      },
     },
-    ...fixupConfigRules(
-      compat.config({
-        plugins: ["github"],
-        rules: {
-          "github/a11y-no-generic-link-text": 2,
-          "github/array-foreach": 2,
-          "github/async-currenttarget": 2,
-          "github/async-preventdefault": 2,
-          "github/authenticity-token": 2,
-          "github/get-attribute": 2,
-          "github/js-class-name": 2,
-          "github/no-blur": 2,
-          "github/no-d-none": 2,
-          "github/no-dataset": 2,
-          "github/no-implicit-buggy-globals": 2,
-          "github/no-inner-html": 2,
-          "github/no-innerText": 2,
-          "github/no-dynamic-script-tag": 2,
-          "github/no-then": 2,
-          "github/no-useless-passive": 2,
-          "github/prefer-observers": 2,
-          "github/require-passive-events": 2,
-          "github/unescaped-html-literal": 2,
-        },
-      }),
-    ),
     {
       files: [".prettierrc.mjs"],
       rules: {
@@ -168,6 +165,7 @@ export async function javascript(
       plugins: {
         antfu: pluginAntfu,
         "unused-imports": pluginUnusedImports,
+        "github": github,
       },
       rules: {
         "accessor-pairs": [
@@ -414,6 +412,8 @@ export async function javascript(
     {
       name: "nirtami2/javascript/sonar/disables",
       rules: {
+        "sonarjs/prefer-read-only-props": "off",
+        "sonarjs/deprecation": "off", // I have it in @typescript-eslint/no-deprecated
         "sonarjs/new-cap": "off", // sometimes I want api.GET()
         "sonarjs/todo-tag": "off", // somtimes I want TODO: stuff
 

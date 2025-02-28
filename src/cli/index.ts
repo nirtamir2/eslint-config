@@ -55,4 +55,4 @@ const instance = yargs(hideBin(process.argv))
   .version("version", pkgJson.version)
   .alias("v", "version");
 
-instance.help().argv;
+void instance.help().argv;

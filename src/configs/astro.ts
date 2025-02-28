@@ -11,10 +11,9 @@ export async function astro(
   options: OptionsOverrides & OptionsStylistic & OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    files = [GLOB_ASTRO],
     overrides = {},
-
     stylistic = false,
+    files = [GLOB_ASTRO],
   } = options;
 
   await ensurePackages(["eslint-plugin-astro"]);
