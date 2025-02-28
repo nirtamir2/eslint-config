@@ -26,7 +26,7 @@
     "build:inspector": "pnpm build && npx @eslint/config-inspector build",
     "dev": "npx @eslint/config-inspector --config eslint.config.ts",
     "format": "prettier \"**/*\" --write --ignore-unknown",
-    "lint": "eslint --fix",
+    "lint": "eslint . --fix",
     "prepack": "nr build",
     "prepare": "simple-git-hooks",
     "release": "bumpp && pnpm publish",
