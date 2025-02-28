@@ -413,7 +413,7 @@ export async function javascript(
       name: "nirtami2/javascript/sonar/disables",
       rules: {
         "sonarjs/prefer-read-only-props": "off",
-        "sonarjs/deprecation": "warn",
+        "sonarjs/deprecation": "off", // I have it in @typescript-eslint/no-deprecated
         "sonarjs/new-cap": "off", // sometimes I want api.GET()
         "sonarjs/todo-tag": "off", // somtimes I want TODO: stuff
 
