@@ -9,7 +9,12 @@ export async function query(): Promise<Array<TypedFlatConfigItem>> {
   );
 
   return [
-    { name: "@nirtamir2/query" },
+    {
+      name: "@nirtamir2/query",
+      plugins: {
+        "@tanstack/query": pluginTanstackQuery,
+      },
+    },
     ...pluginTanstackQuery.configs["flat/recommended"],
   ];
 }
