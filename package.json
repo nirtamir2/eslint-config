@@ -1,16 +1,15 @@
 {
   "name": "@nirtamir2/eslint-config",
-  "type": "module",
   "version": "0.0.2-beta.20",
-  "packageManager": "pnpm@10.4.1",
   "description": "Nir Tamir's ESLint config",
-  "author": "Nir Tami <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/nirtamir2",
-  "homepage": "https://github.com/nirtamir2/eslint-config",
   "keywords": [
     "eslint-config"
   ],
+  "homepage": "https://github.com/nirtamir2/eslint-config",
+  "funding": "https://github.com/sponsors/nirtamir2",
+  "license": "MIT",
+  "author": "Nir Tami <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
+  "type": "module",
   "exports": {
     ".": "./dist/index.js"
   },
@@ -32,104 +31,22 @@
     "release": "bumpp && pnpm publish",
     "stub": "tsup",
     "test": "vitest",
-    "typecheck": "tsc --noEmit",
     "type-check": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "typegen": "esno scripts/typegen.ts",
     "watch": "tsup --watch"
   },
-  "peerDependencies": {
-    "@eslint-react/eslint-plugin": "^1.15.0",
-    "@prettier/plugin-xml": "^3.4.1",
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@unocss/eslint-plugin": "^0.63.4",
-    "astro-eslint-parser": "^1.0.3",
-    "eslint": "^9.13.0",
-    "eslint-plugin-astro": "^1.3.0",
-    "eslint-plugin-format": "^0.1.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.13",
-    "eslint-plugin-solid": "^0.14.3",
-    "eslint-plugin-svelte": "^2.46.0",
-    "eslint-plugin-tailwindcss": "^3.17.5",
-    "prettier-plugin-astro": "^0.14.1",
-    "prettier-plugin-packagejson": "^2.5.3",
-    "prettier-plugin-slidev": "^1.0.5",
-    "prettier-plugin-tailwindcss": "^0.6.8",
-    "svelte-eslint-parser": "^0.43.0"
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
   },
-  "peerDependenciesMeta": {
-    "@eslint-react/eslint-plugin": {
-      "optional": true
-    },
-    "@next/eslint-plugin-next": {
-      "optional": true
-    },
-    "@prettier/plugin-xml": {
-      "optional": true
-    },
-    "@stylistic/eslint-plugin-js": {
-      "optional": true
-    },
-    "@stylistic/eslint-plugin-jsx": {
-      "optional": true
-    },
-    "@tanstack/eslint-plugin-query": {
-      "optional": true
-    },
-    "@trivago/prettier-plugin-sort-imports": {
-      "optional": true
-    },
-    "@unocss/eslint-plugin": {
-      "optional": true
-    },
-    "astro-eslint-parser": {
-      "optional": true
-    },
-    "eslint-plugin-astro": {
-      "optional": true
-    },
-    "eslint-plugin-format": {
-      "optional": true
-    },
-    "eslint-plugin-react": {
-      "optional": true
-    },
-    "eslint-plugin-react-hooks": {
-      "optional": true
-    },
-    "eslint-plugin-react-refresh": {
-      "optional": true
-    },
-    "eslint-plugin-security": {
-      "optional": true
-    },
-    "eslint-plugin-solid": {
-      "optional": true
-    },
-    "eslint-plugin-storybook": {
-      "optional": true
-    },
-    "eslint-plugin-svelte": {
-      "optional": true
-    },
-    "eslint-plugin-tailwindcss": {
-      "optional": true
-    },
-    "prettier-plugin-astro": {
-      "optional": true
-    },
-    "prettier-plugin-packagejson": {
-      "optional": true
-    },
-    "prettier-plugin-slidev": {
-      "optional": true
-    },
-    "prettier-plugin-tailwindcss": {
-      "optional": true
-    },
-    "svelte-eslint-parser": {
-      "optional": true
-    }
+  "lint-staged": {
+    "*": "eslint --fix"
+  },
+  "resolutions": {
+    "@eslint-community/eslint-utils": "^4.4.0",
+    "@typescript-eslint/utils": "^8.10.0",
+    "eslint": "^9.13.0",
+    "tsx": "^4.19.1"
   },
   "dependencies": {
     "@antfu/install-pkg": "^1.0.0",
@@ -244,16 +161,101 @@
     "vitest": "^3.0.6",
     "vue": "^3.5.13"
   },
-  "resolutions": {
-    "@eslint-community/eslint-utils": "^4.4.0",
-    "@typescript-eslint/utils": "^8.10.0",
+  "peerDependencies": {
+    "@eslint-react/eslint-plugin": "^1.15.0",
+    "@prettier/plugin-xml": "^3.4.1",
+    "@tanstack/eslint-plugin-query": "^5.66.1",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@unocss/eslint-plugin": "^0.63.4",
+    "astro-eslint-parser": "^1.0.3",
     "eslint": "^9.13.0",
-    "tsx": "^4.19.1"
+    "eslint-plugin-astro": "^1.3.0",
+    "eslint-plugin-format": "^0.1.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.13",
+    "eslint-plugin-solid": "^0.14.3",
+    "eslint-plugin-storybook": "^0.11.3",
+    "eslint-plugin-svelte": "^2.46.0",
+    "eslint-plugin-tailwindcss": "^3.17.5",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-packagejson": "^2.5.3",
+    "prettier-plugin-slidev": "^1.0.5",
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "svelte-eslint-parser": "^0.43.0"
   },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
+  "peerDependenciesMeta": {
+    "@eslint-react/eslint-plugin": {
+      "optional": true
+    },
+    "@next/eslint-plugin-next": {
+      "optional": true
+    },
+    "@prettier/plugin-xml": {
+      "optional": true
+    },
+    "@stylistic/eslint-plugin-js": {
+      "optional": true
+    },
+    "@stylistic/eslint-plugin-jsx": {
+      "optional": true
+    },
+    "@tanstack/eslint-plugin-query": {
+      "optional": true
+    },
+    "@trivago/prettier-plugin-sort-imports": {
+      "optional": true
+    },
+    "@unocss/eslint-plugin": {
+      "optional": true
+    },
+    "astro-eslint-parser": {
+      "optional": true
+    },
+    "eslint-plugin-astro": {
+      "optional": true
+    },
+    "eslint-plugin-format": {
+      "optional": true
+    },
+    "eslint-plugin-react": {
+      "optional": true
+    },
+    "eslint-plugin-react-hooks": {
+      "optional": true
+    },
+    "eslint-plugin-react-refresh": {
+      "optional": true
+    },
+    "eslint-plugin-security": {
+      "optional": true
+    },
+    "eslint-plugin-solid": {
+      "optional": true
+    },
+    "eslint-plugin-storybook": {
+      "optional": true
+    },
+    "eslint-plugin-svelte": {
+      "optional": true
+    },
+    "eslint-plugin-tailwindcss": {
+      "optional": true
+    },
+    "prettier-plugin-astro": {
+      "optional": true
+    },
+    "prettier-plugin-packagejson": {
+      "optional": true
+    },
+    "prettier-plugin-slidev": {
+      "optional": true
+    },
+    "prettier-plugin-tailwindcss": {
+      "optional": true
+    },
+    "svelte-eslint-parser": {
+      "optional": true
+    }
   },
-  "lint-staged": {
-    "*": "eslint --fix"
-  }
+  "packageManager": "pnpm@10.4.1"
 }
