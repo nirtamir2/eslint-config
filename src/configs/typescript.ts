@@ -252,9 +252,9 @@ export async function typescript(
         }
       : [],
     {
-      name: "nirtamir-typescript-rules",
+      name: "nirtamir2/typescript-rules",
       files,
-      ignores: [".storybook/**"],
+      ignores: ignoresTypeAware,
       rules: {
         // #region @typescript-eslint off - too strict
         "no-magic-numbers": "off",
