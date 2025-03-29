@@ -89,7 +89,7 @@ export async function javascript(
         "block-scoped-var": "error",
         "consistent-return": "off",
         complexity: ["off", 11],
-        eqeqeq: ["error", "always", { null: "ignore" }],
+        eqeqeq: ["error", "always", { null: "never" }],
         "no-alert": "warn",
         "no-case-declarations": "error",
         "no-multi-str": "error",
@@ -106,7 +106,8 @@ export async function javascript(
       rules: {
         "array-func/prefer-array-from": 0, // conflicts with unicorn/prefer-spread
       },
-    }, {
+    },
+    {
       name: "nirtamir2/javascript/github",
       rules: {
         "github/array-foreach": 2,
@@ -165,7 +166,7 @@ export async function javascript(
       plugins: {
         antfu: pluginAntfu,
         "unused-imports": pluginUnusedImports,
-        "github": github,
+        github,
       },
       rules: {
         "accessor-pairs": [
@@ -179,7 +180,7 @@ export async function javascript(
         "constructor-super": "error",
         "default-case-last": "error",
         "dot-notation": ["error", { allowKeywords: true }],
-        eqeqeq: ["error", "smart"],
+        eqeqeq: ["error", "always", { null: "never" }],
         "new-cap": [
           "error",
           { capIsNew: false, newIsCap: true, properties: true },
