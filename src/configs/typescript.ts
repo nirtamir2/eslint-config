@@ -65,7 +65,7 @@ export async function typescript(
     "@typescript-eslint/return-await": ["error", "in-try-catch"],
     "@typescript-eslint/strict-boolean-expressions": [
       "error",
-      { allowNullableBoolean: true, allowNullableObject: true },
+      { allowString: false, allowNumber: false, allowNullableObject: false },
     ],
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "@typescript-eslint/unbound-method": "error",
@@ -502,7 +502,14 @@ export async function typescript(
         "@typescript-eslint/restrict-plus-operands": "error",
         "@typescript-eslint/restrict-template-expressions": "error",
         "@typescript-eslint/return-await": ["error", "always"],
-        "@typescript-eslint/strict-boolean-expressions": "error",
+        "@typescript-eslint/strict-boolean-expressions": [
+          "error",
+          {
+            allowString: false,
+            allowNumber: false,
+            allowNullableObject: false,
+          },
+        ],
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         "@typescript-eslint/triple-slash-reference": "error",
         "@typescript-eslint/typedef": "error",
