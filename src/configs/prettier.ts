@@ -6,5 +6,5 @@ import type { TypedFlatConfigItem } from "../types";
  * @see https://github.com/prettier/eslint-config-prettier
  */
 export async function prettier(): Promise<Array<TypedFlatConfigItem>> {
-  return eslintConfigPrettier;
+  return [eslintConfigPrettier];
 }
