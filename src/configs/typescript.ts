@@ -489,7 +489,10 @@ export async function typescript(
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/prefer-literal-enum-member": "error",
         "@typescript-eslint/prefer-namespace-keyword": "error",
-        "@typescript-eslint/prefer-nullish-coalescing": "error",
+        "@typescript-eslint/prefer-nullish-coalescing": [
+          "error",
+          { ignoreIfStatements: true },
+        ],
         "@typescript-eslint/prefer-optional-chain": "error",
         "@typescript-eslint/prefer-reduce-type-parameter": "error",
         "@typescript-eslint/prefer-regexp-exec": "error",
