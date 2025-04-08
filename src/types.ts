@@ -8,7 +8,7 @@ import type { VendoredPrettierOptions } from "./vender/prettier-types";
 
 export type Awaitable<T> = T | Promise<T>;
 
-export interface Rules extends RuleOptions {}
+export type Rules = RuleOptions;
 
 export type TypedFlatConfigItem = Omit<
   Linter.Config<Linter.RulesRecord & Rules>,
