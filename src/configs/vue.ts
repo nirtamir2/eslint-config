@@ -8,7 +8,7 @@ import type {
   OptionsVue,
   TypedFlatConfigItem,
 } from "../types";
-import { interopDefault } from "../utils";
+import { ensurePackages, interopDefault } from "../utils";
 
 export async function vue(
   options: OptionsVue &
@@ -19,8 +19,9 @@ export async function vue(
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
     vueVersion = 3,
+    a11y = false,
     overrides = {},
-    stylistic = false,
+    stylistic = true,
     files = [GLOB_VUE],
   } = options;
 
@@ -28,11 +29,19 @@ export async function vue(
 
   const { indent = 2 } = typeof stylistic === "boolean" ? {} : stylistic;
 
-  const [pluginVue, parserVue, processorVueBlocks] = await Promise.all([
-    interopDefault(import("eslint-plugin-vue")),
-    interopDefault(import("vue-eslint-parser")),
-    interopDefault(import("eslint-processor-vue-blocks")),
-  ] as const);
+  if (a11y) {
+    await ensurePackages(["eslint-plugin-vuejs-accessibility"]);
+  }
+
+  const [pluginVue, parserVue, processorVueBlocks, pluginVueA11y] =
+    await Promise.all([
+      interopDefault(import("eslint-plugin-vue")),
+      interopDefault(import("vue-eslint-parser")),
+      interopDefault(import("eslint-processor-vue-blocks")),
+      ...(a11y
+        ? [interopDefault(import("eslint-plugin-vuejs-accessibility"))]
+        : []),
+    ] as const);
 
   return [
     {
@@ -59,6 +68,7 @@ export async function vue(
       name: "antfu/vue/setup",
       plugins: {
         vue: pluginVue,
+        ...(a11y ? { "vue-a11y": pluginVueA11y } : {}),
       },
     },
     {
@@ -97,17 +107,26 @@ export async function vue(
 
         ...(vueVersion === 2
           ? {
-              ...(pluginVue.configs.essential.rules as any),
-              ...(pluginVue.configs["strongly-recommended"].rules as any),
-              ...(pluginVue.configs.recommended.rules as any),
+              ...(pluginVue.configs["vue2-essential"].rules as any),
+              ...(pluginVue.configs["vue2-strongly-recommended"].rules as any),
+              ...(pluginVue.configs["vue2-recommended"].rules as any),
             }
           : {
-              ...(pluginVue.configs["vue3-essential"].rules as any),
-              ...(pluginVue.configs["vue3-strongly-recommended"].rules as any),
-              ...(pluginVue.configs["vue3-recommended"].rules as any),
+              ...(pluginVue.configs["flat/essential"]
+                .map((c) => c.rules)
+                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
+              ...(pluginVue.configs["flat/strongly-recommended"]
+                .map((c) => c.rules)
+                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
+              ...(pluginVue.configs["flat/recommended"]
+                .map((c) => c.rules)
+                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
             }),
 
+        "antfu/no-top-level-await": "off",
         "n/prefer-global/process": "off",
+        "ts/explicit-function-return-type": "off",
+
         "vue/block-order": [
           "error",
           {
@@ -213,6 +232,33 @@ export async function vue(
               "vue/quote-props": ["error", "consistent-as-needed"],
               "vue/space-in-parens": ["error", "never"],
               "vue/template-curly-spacing": "error",
+            }
+          : {}),
+
+        ...(a11y
+          ? {
+              "vue-a11y/alt-text": "error",
+              "vue-a11y/anchor-has-content": "error",
+              "vue-a11y/aria-props": "error",
+              "vue-a11y/aria-role": "error",
+              "vue-a11y/aria-unsupported-elements": "error",
+              "vue-a11y/click-events-have-key-events": "error",
+              "vue-a11y/form-control-has-label": "error",
+              "vue-a11y/heading-has-content": "error",
+              "vue-a11y/iframe-has-title": "error",
+              "vue-a11y/interactive-supports-focus": "error",
+              "vue-a11y/label-has-for": "error",
+              "vue-a11y/media-has-caption": "warn",
+              "vue-a11y/mouse-events-have-key-events": "error",
+              "vue-a11y/no-access-key": "error",
+              "vue-a11y/no-aria-hidden-on-focusable": "error",
+              "vue-a11y/no-autofocus": "warn",
+              "vue-a11y/no-distracting-elements": "error",
+              "vue-a11y/no-redundant-roles": "error",
+              "vue-a11y/no-role-presentation-on-focusable": "error",
+              "vue-a11y/no-static-element-interactions": "error",
+              "vue-a11y/role-has-required-aria-props": "error",
+              "vue-a11y/tabindex-no-positive": "warn",
             }
           : {}),
 
