@@ -170,7 +170,6 @@ export function nirtamir2(
       stylistic: stylisticOptions,
     }),
     unicorn(),
-    defaultImportName(),
     command(),
 
     // Optional plugins (installed but not enabled by default)
@@ -306,6 +305,8 @@ export function nirtamir2(
       sortTsconfig(),
     );
   }
+
+  configs.push(defaultImportName());
 
   if (options.jsdoc ?? false) {
     configs.push(

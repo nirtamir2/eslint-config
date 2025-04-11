@@ -75,8 +75,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(eslint@9.24.0(jiti@2.4.2))
       eslint-plugin-default-import-name:
-        specifier: ^0.5.0
-        version: 0.5.0(eslint@9.24.0(jiti@2.4.2))
+        specifier: ^0.5.1
+        version: 0.5.1(eslint@9.24.0(jiti@2.4.2))
       eslint-plugin-eslint-comments:
         specifier: ^3.2.0
         version: 3.2.0(eslint@9.24.0(jiti@2.4.2))
@@ -2113,8 +2113,8 @@ packages:
     peerDependencies:
       eslint: ^9.24.0
 
-  eslint-plugin-default-import-name@0.5.0:
-    resolution: {integrity: sha512-YwvAaMcqHtDN82JYBvbzJ9grUJipo6rVBAr1hf16x+JKqJjY+ac0NJvc+trwUKU0FQOPIMXOSPPmaNqsO2W+Pg==}
+  eslint-plugin-default-import-name@0.5.1:
+    resolution: {integrity: sha512-aT1edGn/5AVmimFQngyRA60R6DQQuaXcmyoKmq+1Sa12s8pONsnwkwg5N2G1BjZRozvtyuGgXZyS92wsG/fpOQ==}
     peerDependencies:
       eslint: ^9.24.0
 
@@ -4130,9 +4130,6 @@ packages:
   string-argv@0.3.2:
     resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
     engines: {node: '>=0.6.19'}
-
-  string-template-parser@1.2.6:
-    resolution: {integrity: sha512-GsSNOkzaupvBRDKtO8j7limAd0DStJUHy+iQ0rBVaPJO9Jt+lfCVN0eJJEqqr/oBtZ5t29QhVTo9HREAdY1YxQ==}
 
   string-ts@2.2.1:
     resolution: {integrity: sha512-Q2u0gko67PLLhbte5HmPfdOjNvUKbKQM+mCNQae6jE91DmoFHY6HH9GcdqCeNx87DZ2KKjiFxmA0R/42OneGWw==}
@@ -6554,11 +6551,10 @@ snapshots:
       '@es-joy/jsdoccomment': 0.50.0
       eslint: 9.24.0(jiti@2.4.2)
 
-  eslint-plugin-default-import-name@0.5.0(eslint@9.24.0(jiti@2.4.2)):
+  eslint-plugin-default-import-name@0.5.1(eslint@9.24.0(jiti@2.4.2)):
     dependencies:
       eslint: 9.24.0(jiti@2.4.2)
       scule: 1.3.0
-      string-template-parser: 1.2.6
 
   eslint-plugin-es-x@7.8.0(eslint@9.24.0(jiti@2.4.2)):
     dependencies:
@@ -9003,8 +8999,6 @@ snapshots:
   std-env@3.9.0: {}
 
   string-argv@0.3.2: {}
-
-  string-template-parser@1.2.6: {}
 
   string-ts@2.2.1: {}
 
