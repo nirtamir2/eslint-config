@@ -3,9 +3,8 @@ import type { TypedFlatConfigItem } from "../types";
 import { interopDefault } from "../utils";
 
 export async function jsx(): Promise<Array<TypedFlatConfigItem>> {
-  const [pluginJsStylistic, pluginJsxStylistic] = await Promise.all([
-    interopDefault(import("@stylistic/eslint-plugin-js")),
-    interopDefault(import("@stylistic/eslint-plugin-jsx")),
+  const [pluginStylistic] = await Promise.all([
+    interopDefault(import("@stylistic/eslint-plugin")),
   ] as const);
 
   return [
@@ -23,13 +22,12 @@ export async function jsx(): Promise<Array<TypedFlatConfigItem>> {
     {
       files: [GLOB_JSX, GLOB_TSX],
       plugins: {
-        "@stylistic/js": pluginJsStylistic,
-        "@stylistic/jsx": pluginJsxStylistic,
+        "@stylistic": pluginStylistic,
       },
       name: "nirtamir/jsx/stylistic",
       rules: {
-        "@stylistic/js/jsx-quotes": "warn",
-        "@stylistic/jsx/jsx-self-closing-comp": "warn",
+        "@stylistic/jsx-quotes": "warn",
+        "@stylistic/jsx-self-closing-comp": "warn",
       },
     },
   ];
