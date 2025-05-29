@@ -273,6 +273,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.19
         version: 0.4.19(eslint@9.24.0(jiti@2.4.2))
+      eslint-plugin-react-you-might-not-need-an-effect:
+        specifier: ^0.0.34
+        version: 0.0.34(eslint@9.24.0(jiti@2.4.2))
       eslint-plugin-security:
         specifier: ^3.0.1
         version: 3.0.1
@@ -2339,6 +2342,12 @@ packages:
       typescript:
         optional: true
 
+  eslint-plugin-react-you-might-not-need-an-effect@0.0.34:
+    resolution: {integrity: sha512-Wx85LWakoD4WhGydpL8TELc3tlRBVLLbKKOH8GqV+PmhcvRMNjo+7b269GBXRBMePHtnNMOvaEczDnpvA5uILQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      eslint: ^9.24.0
+
   eslint-plugin-react@7.37.5:
     resolution: {integrity: sha512-Qteup0SqU15kdocexFNAJMvCJEfa2xUKNV4CC1xsVMrIIqEy3SQ/rqyxCWNzfrd3/ldy6HMlD2e0JDVpDg2qIA==}
     engines: {node: '>=4'}
@@ -2471,6 +2480,16 @@ packages:
     resolution: {integrity: sha512-tY9TTx07InS+mQ/+zYnCMHkdsS00GPaQy84PwHiQd2XWwXIptRExKcz1kI8eG1CGg1sBs9mONwSfbGMbvI4fNA==}
     peerDependencies:
       eslint: ^9.24.0
+
+  eslint-utils@3.0.0:
+    resolution: {integrity: sha512-uuQC43IGctw68pJA1RgbQS8/NP7rch6Cwd4j3ZBtgo4/8Flj4eGE7ZYSZRN3iq5pVUv6GPdW5Z1RFleo84uLDA==}
+    engines: {node: ^10.0.0 || ^12.0.0 || >= 14.0.0}
+    peerDependencies:
+      eslint: ^9.24.0
+
+  eslint-visitor-keys@2.1.0:
+    resolution: {integrity: sha512-0rSmRBzXgDzIsD6mGdJgevzgezI534Cer5L/vyMX0kHzT/jiB43jRhd9YUlMGYLQy2zprNmoT8qasCGtY+QaKw==}
+    engines: {node: '>=10'}
 
   eslint-visitor-keys@3.4.3:
     resolution: {integrity: sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag==}
@@ -6955,6 +6974,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  eslint-plugin-react-you-might-not-need-an-effect@0.0.34(eslint@9.24.0(jiti@2.4.2)):
+    dependencies:
+      eslint: 9.24.0(jiti@2.4.2)
+      eslint-utils: 3.0.0(eslint@9.24.0(jiti@2.4.2))
+
   eslint-plugin-react@7.37.5(eslint@9.24.0(jiti@2.4.2)):
     dependencies:
       array-includes: 3.1.8
@@ -7168,6 +7192,13 @@ snapshots:
       eslint: 9.24.0(jiti@2.4.2)
       json-schema-to-typescript-lite: 14.1.0
       ohash: 2.0.11
+
+  eslint-utils@3.0.0(eslint@9.24.0(jiti@2.4.2)):
+    dependencies:
+      eslint: 9.24.0(jiti@2.4.2)
+      eslint-visitor-keys: 2.1.0
+
+  eslint-visitor-keys@2.1.0: {}
 
   eslint-visitor-keys@3.4.3: {}
 

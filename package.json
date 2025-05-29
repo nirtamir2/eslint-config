@@ -4,7 +4,7 @@
   "version": "0.1.13",
   "packageManager": "pnpm@10.8.0",
   "description": "Nir Tamir's ESLint config",
-  "author": "Nir Tami <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
+  "author": "Nir Tamir <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
   "license": "MIT",
   "funding": "https://github.com/sponsors/nirtamir2",
   "homepage": "https://github.com/nirtamir2/eslint-config",
@@ -49,6 +49,7 @@
     "eslint-plugin-format": "^0.1.2",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^0.0.34",
     "eslint-plugin-solid": "^0.14.3",
     "eslint-plugin-storybook": "^0.11.3",
     "eslint-plugin-svelte": "^2.46.0",
@@ -101,6 +102,9 @@
       "optional": true
     },
     "eslint-plugin-react-refresh": {
+      "optional": true
+    },
+    "eslint-plugin-react-you-might-not-need-an-effect": {
       "optional": true
     },
     "eslint-plugin-security": {
@@ -226,6 +230,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "eslint-plugin-react-you-might-not-need-an-effect": "^0.0.34",
     "eslint-plugin-security": "^3.0.1",
     "eslint-plugin-solid": "^0.14.5",
     "eslint-plugin-storybook": "^0.12.0",
