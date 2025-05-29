@@ -28,6 +28,7 @@ export async function react(
 
   await ensurePackages([
     "@eslint-react/eslint-plugin",
+    "eslint-plugin-react-you-might-not-need-an-effect",
     "eslint-plugin-react-hooks",
     "eslint-plugin-react-refresh",
     "eslint-plugin-react",
@@ -44,12 +45,13 @@ export async function react(
     : undefined;
   const isTypeAware = Boolean(tsconfigPath);
 
-  const [pluginReact, pluginReactHooks, pluginReactRefresh, parserTs] =
+  const [pluginReact,pluginReactHooks, pluginReactRefresh, parserTs, pluginReactYouMightNotNeedAnEffect] =
     await Promise.all([
       interopDefault(import("@eslint-react/eslint-plugin")),
       interopDefault(import("eslint-plugin-react-hooks")),
       interopDefault(import("eslint-plugin-react-refresh")),
       interopDefault(import("@typescript-eslint/parser")),
+      interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
     ] as const);
 
   const isAllowConstantExport = ReactRefreshAllowConstantExportPackages.some(
@@ -70,6 +72,7 @@ export async function react(
         "@eslint-react/naming-convention":
           plugins["@eslint-react/naming-convention"],
         "react-refresh": pluginReactRefresh,
+        "react-you-might-not-need-an-effect": pluginReactYouMightNotNeedAnEffect,
       },
       settings: { react: { version: "detect" } },
     },
@@ -180,6 +183,23 @@ export async function react(
 
         // overrides
         ...overrides,
+      },
+    },
+    isUsingNext
+      ? {
+          name: "nirtamir2/next/middleware",
+          files: ["**/src/middleware.ts"],
+          rules: {
+            // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
+            "unicorn/prefer-string-raw": "off",
+          },
+        }
+      : {},
+    {
+      name: "nirtamir2/react/use-effect",
+      rules: {
+        "react-you-might-not-need-an-effect/you-might-not-need-an-effect":
+          "error",
       },
     },
     ...fixupConfigRules(

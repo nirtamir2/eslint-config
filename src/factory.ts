@@ -363,7 +363,7 @@ export function nirtamir2(
 
   configs.push(prettier());
 
-  // eslint-disable-next-line unicorn/no-array-push-push
+  // eslint-disable-next-line unicorn/prefer-single-call
   configs.push(disables());
 
   if ("files" in options) {
