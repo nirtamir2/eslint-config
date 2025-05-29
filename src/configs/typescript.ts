@@ -515,7 +515,6 @@ export async function typescript(
         ],
         "@typescript-eslint/switch-exhaustiveness-check": "error",
         "@typescript-eslint/triple-slash-reference": "error",
-        "@typescript-eslint/typedef": "error",
         "@typescript-eslint/unbound-method": "error",
         "@typescript-eslint/unified-signatures": "error",
         // #endregion
