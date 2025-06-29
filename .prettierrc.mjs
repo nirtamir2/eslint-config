@@ -6,7 +6,7 @@ const config = {
   // trailingComma: "es5",
 
   plugins: [
-    "prettier-plugin-packagejson",
+    // "prettier-plugin-packagejson",
     "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-slidev",
     "prettier-plugin-astro",
