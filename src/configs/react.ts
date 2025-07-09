@@ -28,10 +28,10 @@ export async function react(
 
   await ensurePackages([
     "@eslint-react/eslint-plugin",
-    "eslint-plugin-react-you-might-not-need-an-effect",
     "eslint-plugin-react-hooks",
     "eslint-plugin-react-refresh",
-    "eslint-plugin-react",
+    "@typescript-eslint/parser",
+    "eslint-plugin-react-you-might-not-need-an-effect",
   ]);
 
   const isUsingNext = NextJsPackages.some((i) => isPackageExists(i));

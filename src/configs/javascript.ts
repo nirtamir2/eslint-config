@@ -100,17 +100,11 @@ export async function javascript(
         "no-return-assign": "off",
       },
     },
+    arrayFunc.configs.recommended,
     {
-      name: "nirtamir2/javascript/arrayFunc",
-      // ...arrayFunc.configs.recommended,
-      plugins: {
-        "array-func": arrayFunc,
-      },
+      name: "nirtamir2/javascript/arrayFunc/overrides",
       rules: {
-        "array-func/from-map": "error",
-        "array-func/no-unnecessary-this-arg": "error",
-        "array-func/avoid-reverse": "error",
-        "array-func/prefer-array-from": "off", // conflicts with unicorn/prefer-spread
+        "array-func/prefer-array-from": 0, // conflicts with unicorn/prefer-spread
       },
     },
     {
