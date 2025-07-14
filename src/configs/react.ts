@@ -195,13 +195,7 @@ export async function react(
           },
         }
       : {},
-    {
-      name: "nirtamir2/react/use-effect",
-      rules: {
-        "react-you-might-not-need-an-effect/you-might-not-need-an-effect":
-          "error",
-      },
-    },
+    pluginReactYouMightNotNeedAnEffect.configs.recommended,
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:ssr-friendly/recommended"],
