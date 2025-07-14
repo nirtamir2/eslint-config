@@ -28,10 +28,10 @@ export async function react(
 
   await ensurePackages([
     "@eslint-react/eslint-plugin",
+    "eslint-plugin-react-you-might-not-need-an-effect",
     "eslint-plugin-react-hooks",
     "eslint-plugin-react-refresh",
-    "@typescript-eslint/parser",
-    "eslint-plugin-react-you-might-not-need-an-effect",
+    "eslint-plugin-react",
   ]);
 
   const isUsingNext = NextJsPackages.some((i) => isPackageExists(i));
@@ -45,19 +45,14 @@ export async function react(
     : undefined;
   const isTypeAware = Boolean(tsconfigPath);
 
-  const [
-    pluginReact,
-    pluginReactHooks,
-    pluginReactRefresh,
-    parserTs,
-    pluginReactYouMightNotNeedAnEffect,
-  ] = await Promise.all([
-    interopDefault(import("@eslint-react/eslint-plugin")),
-    interopDefault(import("eslint-plugin-react-hooks")),
-    interopDefault(import("eslint-plugin-react-refresh")),
-    interopDefault(import("@typescript-eslint/parser")),
-    interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
-  ] as const);
+  const [pluginReact,pluginReactHooks, pluginReactRefresh, parserTs, pluginReactYouMightNotNeedAnEffect] =
+    await Promise.all([
+      interopDefault(import("@eslint-react/eslint-plugin")),
+      interopDefault(import("eslint-plugin-react-hooks")),
+      interopDefault(import("eslint-plugin-react-refresh")),
+      interopDefault(import("@typescript-eslint/parser")),
+      interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
+    ] as const);
 
   const isAllowConstantExport = ReactRefreshAllowConstantExportPackages.some(
     (i) => isPackageExists(i),
@@ -77,8 +72,7 @@ export async function react(
         "@eslint-react/naming-convention":
           plugins["@eslint-react/naming-convention"],
         "react-refresh": pluginReactRefresh,
-        "react-you-might-not-need-an-effect":
-          pluginReactYouMightNotNeedAnEffect,
+        "react-you-might-not-need-an-effect": pluginReactYouMightNotNeedAnEffect,
       },
       settings: { react: { version: "detect" } },
     },
@@ -202,13 +196,6 @@ export async function react(
         }
       : {},
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
-    {
-      name: "nirtamir2/react/use-effect",
-      rules: {
-        "react-you-might-not-need-an-effect/you-might-not-need-an-effect":
-          "error",
-      },
-    },
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:ssr-friendly/recommended"],
