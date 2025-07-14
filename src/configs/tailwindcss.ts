@@ -15,13 +15,22 @@ export async function tailwindcss(): Promise<Array<TypedFlatConfigItem>> {
         "better-tailwindcss": pluginTailwindCSS,
       },
     },
-    pluginTailwindCSS.configs["stylistic-warn"],
-    pluginTailwindCSS.configs["correctness-warn"],
+    // {
+    //   name: "tailwindcss/settings",
+    //   settings: {
+    //     "better-tailwindcss": {
+    //       // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+    //       entryPoint: "src/globals.css",
+    //     },
+    //   },
+    // },
     {
       name: "tailwindcss/overrides",
       rules: {
-        "better-tailwindcss/enforce-consistent-line-wrapping": "off"
-      }
-    }
+        ...pluginTailwindCSS.configs["stylistic-warn"].rules,
+        ...pluginTailwindCSS.configs["correctness-warn"].rules,
+        "better-tailwindcss/enforce-consistent-line-wrapping": "off",
+      },
+    },
   ];
 }
