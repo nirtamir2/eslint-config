@@ -1,7 +1,10 @@
-import type { TypedFlatConfigItem } from "../types";
+import type { TailwindCSSOptions, TypedFlatConfigItem } from "../types";
 import { ensurePackages, interopDefault } from "../utils";
 
-export async function tailwindcss(): Promise<Array<TypedFlatConfigItem>> {
+export async function tailwindcss(
+  options: TailwindCSSOptions = {},
+): Promise<Array<TypedFlatConfigItem>> {
+  const { entryPoint = "src/globals.css" } = options;
   await ensurePackages(["eslint-plugin-better-tailwindcss"]);
 
   const [pluginTailwindCSS] = await Promise.all([
@@ -15,15 +18,15 @@ export async function tailwindcss(): Promise<Array<TypedFlatConfigItem>> {
         "better-tailwindcss": pluginTailwindCSS,
       },
     },
-    // {
-    //   name: "tailwindcss/settings",
-    //   settings: {
-    //     "better-tailwindcss": {
-    //       // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
-    //       entryPoint: "src/globals.css",
-    //     },
-    //   },
-    // },
+    {
+      name: "tailwindcss/settings",
+      settings: {
+        "better-tailwindcss": {
+          // tailwindcss 4: the path to the entry file of the css based tailwind config (eg: `src/global.css`)
+          entryPoint,
+        },
+      },
+    },
     {
       name: "tailwindcss/overrides",
       rules: {

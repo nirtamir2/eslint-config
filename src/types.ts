@@ -226,6 +226,14 @@ export interface OptionsIsInEditor {
   isInEditor?: boolean;
 }
 
+export interface TailwindCSSOptions {
+  /**
+   * CSS entry path passed to eslint-plugin-better-tailwindcss
+   * @default "src/globals.css"
+   */
+  entryPoint?: string;
+}
+
 export interface OptionsUnoCSS extends OptionsOverrides {
   /**
    * Enable attributify support.
@@ -263,7 +271,7 @@ export interface OptionsConfig
    */
   lessOpinionated?: boolean;
 
-  tailwindcss?: boolean;
+  tailwindcss?: TailwindCSSOptions;
   storybook?: boolean;
   i18n?: boolean;
   security?: boolean;

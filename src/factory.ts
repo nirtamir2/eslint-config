@@ -275,7 +275,7 @@ export function nirtamir2(
   }
 
   if (enableTailwindCSS) {
-    configs.push(tailwindcss());
+    configs.push(tailwindcss(options.tailwindcss));
 
     if (enableQuery) {
       configs.push(query());
