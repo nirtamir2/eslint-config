@@ -30,6 +30,7 @@ import {
   unocss,
   vue,
   yaml,
+  zod,
 } from "./configs";
 import { defaultImportName } from "./configs/default-import-name";
 import { formatters } from "./configs/formatters";
@@ -47,6 +48,7 @@ import type {
   TypedFlatConfigItem,
 } from "./types";
 import { interopDefault, isInEditorEnv } from "./utils";
+import { config } from "yargs";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "name",
@@ -110,6 +112,7 @@ export function nirtamir2(
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
+    zod: enableZod = isPackageExists("zod"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
     typescript: enableTypeScript = isPackageExists("typescript"),
     unocss: enableUnoCSS = false,
@@ -235,6 +238,12 @@ export function nirtamir2(
         tsconfigPath,
       }),
     );
+  }
+
+  if (enableZod) {
+    configs.push(
+      zod()
+    )
   }
 
   if (enableSolid) {

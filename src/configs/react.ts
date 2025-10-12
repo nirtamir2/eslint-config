@@ -148,7 +148,6 @@ export async function react(
         "@eslint-react/no-children-prop": "warn",
         "@eslint-react/no-children-to-array": "warn",
         "@eslint-react/no-clone-element": "warn",
-        "@eslint-react/no-comment-textnodes": "warn",
         "@eslint-react/no-component-will-mount": "error",
         "@eslint-react/no-component-will-receive-props": "error",
         "@eslint-react/no-component-will-update": "error",
@@ -185,6 +184,7 @@ export async function react(
         ...overrides,
       },
     },
+    pluginReactHooks.configs.flat.recommended,
     isUsingNext
       ? {
           name: "nirtamir2/next/middleware",
@@ -242,6 +242,7 @@ export async function react(
         "react/jsx-no-useless-fragment": 2,
         "react/jsx-handler-names": 2,
         "react/jsx-no-duplicate-props": 2,
+        "@eslint-react/jsx-no-comment-textnodes": "warn",
         "react/jsx-curly-brace-presence": [
           2,
           { props: "never", children: "never" },
