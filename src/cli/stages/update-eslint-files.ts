@@ -62,7 +62,7 @@ export async function updateEslintFiles(result: PromptResult) {
   const files = fs.readdirSync(cwd);
   const legacyConfig: Array<string> = [];
   for (const file of files) {
-    if (/eslint|prettier/.test(file) && !file.includes('eslint.config.'))
+    if (/eslint|prettier/.test(file) && !file.includes("eslint.config."))
       legacyConfig.push(file);
   }
 

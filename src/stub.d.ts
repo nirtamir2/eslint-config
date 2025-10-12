@@ -1,3 +1,3 @@
 declare module "eslint-plugin-github";
 declare module "eslint-plugin-react-refresh";
-declare module 'eslint-plugin-react-you-might-not-need-an-effect';
+declare module "eslint-plugin-react-you-might-not-need-an-effect";

@@ -2,6 +2,7 @@ import type { Linter } from "eslint";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import fs from "node:fs";
+import { config } from "yargs";
 import {
   astro,
   command,
@@ -48,7 +49,6 @@ import type {
   TypedFlatConfigItem,
 } from "./types";
 import { interopDefault, isInEditorEnv } from "./utils";
-import { config } from "yargs";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "name",
@@ -241,9 +241,7 @@ export function nirtamir2(
   }
 
   if (enableZod) {
-    configs.push(
-      zod()
-    )
+    configs.push(zod());
   }
 
   if (enableSolid) {

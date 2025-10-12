@@ -79,12 +79,12 @@ export async function sortPackageJson(): Promise<Array<TypedFlatConfigItem>> {
             pathPattern: "^(?:resolutions|overrides|pnpm.overrides)$",
           },
           {
-            order: { type: 'asc' },
-            pathPattern: '^workspaces\\.catalog$',
+            order: { type: "asc" },
+            pathPattern: "^workspaces\\.catalog$",
           },
           {
-            order: { type: 'asc' },
-            pathPattern: '^workspaces\\.catalogs\\.[^.]+$',
+            order: { type: "asc" },
+            pathPattern: "^workspaces\\.catalogs\\.[^.]+$",
           },
           {
             order: ["types", "import", "require", "default"],
