@@ -2,7 +2,6 @@ import type { Linter } from "eslint";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import fs from "node:fs";
-import { config } from "yargs";
 import {
   astro,
   command,
