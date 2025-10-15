@@ -77,7 +77,6 @@ export async function react(
       settings: { react: { version: "detect" } },
     },
     {
-      name: "nirtamir2/react/rules-eslint-react",
       files,
       languageOptions: {
         parser: parserTs,
@@ -89,7 +88,8 @@ export async function react(
         },
         sourceType: "module",
       },
-      ...isTypeAware ? pluginReact.configs["recommended-type-checked"].rules : pluginReact.configs["recommended-typescript"],
+      ...isTypeAware ? pluginReact.configs["recommended-type-checked"] : pluginReact.configs["recommended-typescript"],
+      name: "nirtamir2/react/rules-eslint-react",
 
       // // recommended ru
       // les from @eslint-react/dom
