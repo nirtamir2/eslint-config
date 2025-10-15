@@ -112,7 +112,7 @@ export function nirtamir2(
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
-    zod: enableZod = isPackageExists("zod"),
+    zod: enableZod = isPackageExists("zod") && isPackageExists("next"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
     typescript: enableTypeScript = isPackageExists("typescript"),
     unocss: enableUnoCSS = false,
