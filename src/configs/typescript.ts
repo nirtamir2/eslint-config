@@ -92,12 +92,12 @@ export async function typescript(
           sourceType: "module",
           ...(typeAware
             ? {
-              projectService: {
-                allowDefaultProject: ["./*.js"],
-                defaultProject: tsconfigPath,
-              },
-              tsconfigRootDir: process.cwd(),
-            }
+                projectService: {
+                  allowDefaultProject: ["./*.js"],
+                  defaultProject: tsconfigPath,
+                },
+                tsconfigRootDir: process.cwd(),
+              }
             : {}),
           ...parserOptions,
         },
@@ -118,9 +118,9 @@ export async function typescript(
     // assign type-aware parser for type-aware files and type-unaware parser for the rest
     ...(isTypeAware
       ? [
-        makeParser(false, files),
-        makeParser(true, filesTypeAware, ignoresTypeAware),
-      ]
+          makeParser(false, files),
+          makeParser(true, filesTypeAware, ignoresTypeAware),
+        ]
       : [makeParser(false, files)]),
     {
       files,
@@ -182,43 +182,43 @@ export async function typescript(
 
         ...(type === "lib"
           ? {
-            "@typescript-eslint/explicit-function-return-type": [
-              "error",
-              {
-                allowExpressions: true,
-                allowHigherOrderFunctions: true,
-                allowIIFEs: true,
-              },
-            ],
-          }
+              "@typescript-eslint/explicit-function-return-type": [
+                "error",
+                {
+                  allowExpressions: true,
+                  allowHigherOrderFunctions: true,
+                  allowIIFEs: true,
+                },
+              ],
+            }
           : {}),
         ...overrides,
       },
     },
     ...(isTypeAware
       ? [
-        {
-          files: filesTypeAware,
-          ignores: ignoresTypeAware,
-          rules: {
-            ...pluginTs.configs["strict-type-checked"].rules,
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            rules: {
+              ...pluginTs.configs["strict-type-checked"].rules,
+            },
           },
-        },
-        {
-          files: filesTypeAware,
-          ignores: ignoresTypeAware,
-          ...sortDestructureKeysTypescriptConfig(),
-        },
-        {
-          files: filesTypeAware,
-          ignores: ignoresTypeAware,
-          name: "antfu/typescript/rules-type-aware",
-          rules: {
-            ...typeAwareRules,
-            ...overridesTypeAware,
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            ...sortDestructureKeysTypescriptConfig(),
           },
-        },
-      ]
+          {
+            files: filesTypeAware,
+            ignores: ignoresTypeAware,
+            name: "antfu/typescript/rules-type-aware",
+            rules: {
+              ...typeAwareRules,
+              ...overridesTypeAware,
+            },
+          },
+        ]
       : []),
     {
       files: ["**/*.d.?([cm])ts"],
@@ -258,11 +258,11 @@ export async function typescript(
     },
     isTypeAware
       ? {
-        name: "nirtamir2/typescript/expect-type",
-        ...expectType,
-        files,
-        ignores: [".storybook/**"],
-      }
+          name: "nirtamir2/typescript/expect-type",
+          ...expectType,
+          files,
+          ignores: [".storybook/**"],
+        }
       : [],
     {
       name: "nirtamir2/typescript-rules",
