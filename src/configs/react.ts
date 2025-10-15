@@ -64,14 +64,18 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const reactPluginConfig = isTypeAware
-    ? pluginReact.configs["recommended-type-checked"]
-    : pluginReact.configs["recommended-typescript"];
+  const plugins = (pluginReact.configs.all as any).plugins
+
   return [
     {
       name: "antfu/react/setup",
       plugins: {
-        ...reactPluginConfig.plugins,
+        'react': plugins['@eslint-react'],
+        'react-dom': plugins['@eslint-react/dom'],
+        'react-hooks-extra': plugins['@eslint-react/hooks-extra'],
+        'react-naming-convention': plugins['@eslint-react/naming-convention'],
+        'react-web-api': plugins['@eslint-react/web-api'],
+
         "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,
         "react-you-might-not-need-an-effect":
@@ -93,7 +97,9 @@ export async function react(
       },
       name: "nirtamir2/react/rules-eslint-react",
       rules: {
-        ...reactPluginConfig.rules,
+        ...isTypeAware
+          ? pluginReact.configs["recommended-type-checked"].rules
+          : pluginReact.configs["recommended-typescript"].rules,
         // // recommended ru
         // les from @eslint-react/dom
         //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
@@ -166,9 +172,6 @@ export async function react(
         sourceType: "module",
       },
       rules: {
-        // recommended rules react-hooks
-        "react-hooks/exhaustive-deps": "warn",
-        "react-hooks/rules-of-hooks": "error",
 
         // react refresh
         "react-refresh/only-export-components": [
@@ -178,20 +181,20 @@ export async function react(
             allowExportNames: [
               ...(isUsingNext
                 ? [
-                    "dynamic",
-                    "dynamicParams",
-                    "revalidate",
-                    "fetchCache",
-                    "runtime",
-                    "preferredRegion",
-                    "maxDuration",
-                    "config",
-                    "generateStaticParams",
-                    "metadata",
-                    "generateMetadata",
-                    "viewport",
-                    "generateViewport",
-                  ]
+                  "dynamic",
+                  "dynamicParams",
+                  "revalidate",
+                  "fetchCache",
+                  "runtime",
+                  "preferredRegion",
+                  "maxDuration",
+                  "config",
+                  "generateStaticParams",
+                  "metadata",
+                  "generateMetadata",
+                  "viewport",
+                  "generateViewport",
+                ]
                 : []),
               ...(isUsingRemix
                 ? ["meta", "links", "headers", "loader", "action"]
@@ -207,13 +210,13 @@ export async function react(
     pluginReactHooks.configs.flat.recommended,
     isUsingNext
       ? {
-          name: "nirtamir2/next/middleware",
-          files: ["**/src/middleware.ts"],
-          rules: {
-            // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
-            "unicorn/prefer-string-raw": "off",
-          },
-        }
+        name: "nirtamir2/next/middleware",
+        files: ["**/src/middleware.ts"],
+        rules: {
+          // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
+          "unicorn/prefer-string-raw": "off",
+        },
+      }
       : {},
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
     ...fixupConfigRules(
