@@ -290,6 +290,8 @@ export interface OptionsConfig
    */
   typescript?: boolean | OptionsTypescript;
 
+  zod?: boolean | OptionsOverrides;
+
   /**
    * Enable JSX related rules.
    *

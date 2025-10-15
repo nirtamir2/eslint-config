@@ -18,7 +18,7 @@ afterAll(async () => {
 // });
 runWithConfig("all", {
   typescript: {
-      tsconfigPath: "tsconfig.json"
+    tsconfigPath: "tsconfig.json",
   },
   vue: true,
   svelte: true,

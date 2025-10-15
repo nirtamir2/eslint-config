@@ -30,6 +30,7 @@ import {
   unocss,
   vue,
   yaml,
+  zod,
 } from "./configs";
 import { defaultImportName } from "./configs/default-import-name";
 import { formatters } from "./configs/formatters";
@@ -110,6 +111,7 @@ export function nirtamir2(
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
+    zod: enableZod = isPackageExists("zod") && isPackageExists("next"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
     typescript: enableTypeScript = isPackageExists("typescript"),
     unocss: enableUnoCSS = false,
@@ -235,6 +237,10 @@ export function nirtamir2(
         tsconfigPath,
       }),
     );
+  }
+
+  if (enableZod) {
+    configs.push(zod());
   }
 
   if (enableSolid) {

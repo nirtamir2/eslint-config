@@ -257,6 +257,7 @@ export async function typescript(
       ignores: ignoresTypeAware,
       rules: {
         // #region @typescript-eslint off - too strict
+        "no-undef": "off",
         "no-magic-numbers": "off",
         "@typescript-eslint/no-magic-numbers": "off",
         "no-shadow": "off",

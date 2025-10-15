@@ -10,11 +10,7 @@ import { ensurePackages, interopDefault } from "../utils";
 export async function astro(
   options: OptionsOverrides & OptionsStylistic & OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const {
-    overrides = {},
-    stylistic = false,
-    files = [GLOB_ASTRO],
-  } = options;
+  const { overrides = {}, stylistic = false, files = [GLOB_ASTRO] } = options;
 
   await ensurePackages(["eslint-plugin-astro"]);
 

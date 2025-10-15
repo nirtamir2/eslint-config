@@ -138,7 +138,7 @@ export async function javascript(
     },
     {
       languageOptions: {
-        ecmaVersion: 2022,
+        ecmaVersion: "latest",
         globals: {
           ...globals.browser,
           ...globals.es2021,
@@ -151,7 +151,7 @@ export async function javascript(
           ecmaFeatures: {
             jsx: true,
           },
-          ecmaVersion: 2022,
+          ecmaVersion: "latest",
           sourceType: "module",
         },
         sourceType: "module",

@@ -45,34 +45,37 @@ export async function react(
     : undefined;
   const isTypeAware = Boolean(tsconfigPath);
 
-  const [pluginReact,pluginReactHooks, pluginReactRefresh, parserTs, pluginReactYouMightNotNeedAnEffect] =
-    await Promise.all([
-      interopDefault(import("@eslint-react/eslint-plugin")),
-      interopDefault(import("eslint-plugin-react-hooks")),
-      interopDefault(import("eslint-plugin-react-refresh")),
-      interopDefault(import("@typescript-eslint/parser")),
-      interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
-    ] as const);
+  const [
+    pluginReact,
+    pluginReactHooks,
+    pluginReactRefresh,
+    parserTs,
+    pluginReactYouMightNotNeedAnEffect,
+  ] = await Promise.all([
+    interopDefault(import("@eslint-react/eslint-plugin")),
+    interopDefault(import("eslint-plugin-react-hooks")),
+    interopDefault(import("eslint-plugin-react-refresh")),
+    interopDefault(import("@typescript-eslint/parser")),
+    interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
+  ] as const);
 
   const isAllowConstantExport = ReactRefreshAllowConstantExportPackages.some(
     (i) => isPackageExists(i),
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const { plugins } = pluginReact.configs.all;
-
+  const reactPluginConfig = isTypeAware
+    ? pluginReact.configs["recommended-type-checked"]
+    : pluginReact.configs["recommended-typescript"];
   return [
     {
       name: "antfu/react/setup",
       plugins: {
-        "@eslint-react": plugins["@eslint-react"],
-        "@eslint-react/dom": plugins["@eslint-react/dom"],
+        ...reactPluginConfig.plugins,
         "react-hooks": pluginReactHooks,
-        "@eslint-react/hooks-extra": plugins["@eslint-react/hooks-extra"],
-        "@eslint-react/naming-convention":
-          plugins["@eslint-react/naming-convention"],
         "react-refresh": pluginReactRefresh,
-        "react-you-might-not-need-an-effect": pluginReactYouMightNotNeedAnEffect,
+        "react-you-might-not-need-an-effect":
+          pluginReactYouMightNotNeedAnEffect,
       },
       settings: { react: { version: "detect" } },
     },
@@ -88,21 +91,81 @@ export async function react(
         },
         sourceType: "module",
       },
-      name: "antfu/react/rules",
+      name: "nirtamir2/react/rules-eslint-react",
       rules: {
-        // recommended rules from @eslint-react/dom
-        "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
-        "@eslint-react/dom/no-dangerously-set-innerhtml": "warn",
-        "@eslint-react/dom/no-dangerously-set-innerhtml-with-children": "error",
-        "@eslint-react/dom/no-find-dom-node": "error",
-        "@eslint-react/dom/no-missing-button-type": "warn",
-        "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-        "@eslint-react/dom/no-namespace": "error",
-        "@eslint-react/dom/no-render-return-value": "error",
-        "@eslint-react/dom/no-script-url": "warn",
-        "@eslint-react/dom/no-unsafe-iframe-sandbox": "warn",
-        "@eslint-react/dom/no-unsafe-target-blank": "warn",
+        ...reactPluginConfig.rules,
+        // // recommended ru
+        // les from @eslint-react/dom
+        //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
+        //         "@eslint-react/dom/no-dangerously-set-innerhtml": "warn",
+        //         "@eslint-react/dom/no-dangerously-set-innerhtml-with-children": "error",
+        //         "@eslint-react/dom/no-find-dom-node": "error",
+        //         "@eslint-react/dom/no-missing-button-type": "warn",
+        //         "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
+        //         "@eslint-react/dom/no-namespace": "error",
+        //         "@eslint-react/dom/no-render-return-value": "error",
+        //         "@eslint-react/dom/no-script-url": "warn",
+        //         "@eslint-react/dom/no-unsafe-iframe-sandbox": "warn",
+        //         "@eslint-react/dom/no-unsafe-target-blank": "warn",
 
+        //         "@eslint-react/jsx-no-comment-textnodes": "warn",      // // recommended rules from @eslint-react
+        //         "@eslint-react/ensure-forward-ref-using-ref": "warn",
+        //         "@eslint-react/no-access-state-in-setstate": "error",
+        //         "@eslint-react/no-array-index-key": "warn",
+        //         "@eslint-react/no-children-count": "warn",
+        //         "@eslint-react/no-children-for-each": "warn",
+        //         "@eslint-react/no-children-map": "warn",
+        //         "@eslint-react/no-children-only": "warn",
+        //         "@eslint-react/no-children-prop": "warn",
+        //         "@eslint-react/no-children-to-array": "warn",
+        //         "@eslint-react/no-clone-element": "warn",
+        //         "@eslint-react/no-component-will-mount": "error",
+        //         "@eslint-react/no-component-will-receive-props": "error",
+        //         "@eslint-react/no-component-will-update": "error",
+        //         "@eslint-react/no-create-ref": "error",
+        //         "@eslint-react/no-direct-mutation-state": "error",
+        //         "@eslint-react/no-duplicate-key": "error",
+        //         "@eslint-react/no-implicit-key": "error",
+        //         "@eslint-react/no-missing-key": "error",
+        //         "@eslint-react/no-nested-components": "warn",
+        //         "@eslint-react/no-redundant-should-component-update": "error",
+        //         "@eslint-react/no-set-state-in-component-did-mount": "warn",
+        //         "@eslint-react/no-set-state-in-component-did-update": "warn",
+        //         "@eslint-react/no-set-state-in-component-will-update": "warn",
+        //         "@eslint-react/no-string-refs": "error",
+        //         "@eslint-react/no-unsafe-component-will-mount": "warn",
+        //         "@eslint-react/no-unsafe-component-will-receive-props": "warn",
+        //         "@eslint-react/no-unsafe-component-will-update": "warn",
+        //         "@eslint-react/no-unstable-context-value": "error",
+        //         "@eslint-react/no-unstable-default-props": "error",
+        //         "@eslint-react/no-unused-class-component-members": "warn",
+        //         "@eslint-react/no-unused-state": "warn",
+        //         "@eslint-react/no-useless-fragment": "warn",
+        //         "@eslint-react/prefer-destructuring-assignment": "warn",
+        //         "@eslint-react/prefer-shorthand-boolean": "warn",
+        //         "@eslint-react/prefer-shorthand-fragment": "warn",
+
+        //         ...(isTypeAware
+        //           ? {
+        //             "@eslint-react/no-leaked-conditional-rendering": "warn",
+        //           }
+        //           : {}),
+      },
+    },
+    {
+      name: "antfu/react/rules",
+      files,
+      languageOptions: {
+        parser: parserTs,
+        parserOptions: {
+          ecmaFeatures: {
+            jsx: true,
+          },
+          ...(isTypeAware ? { project: tsconfigPath } : {}),
+        },
+        sourceType: "module",
+      },
+      rules: {
         // recommended rules react-hooks
         "react-hooks/exhaustive-deps": "warn",
         "react-hooks/rules-of-hooks": "error",
@@ -137,54 +200,11 @@ export async function react(
           },
         ],
 
-        // recommended rules from @eslint-react
-        "@eslint-react/ensure-forward-ref-using-ref": "warn",
-        "@eslint-react/no-access-state-in-setstate": "error",
-        "@eslint-react/no-array-index-key": "warn",
-        "@eslint-react/no-children-count": "warn",
-        "@eslint-react/no-children-for-each": "warn",
-        "@eslint-react/no-children-map": "warn",
-        "@eslint-react/no-children-only": "warn",
-        "@eslint-react/no-children-prop": "warn",
-        "@eslint-react/no-children-to-array": "warn",
-        "@eslint-react/no-clone-element": "warn",
-        "@eslint-react/no-comment-textnodes": "warn",
-        "@eslint-react/no-component-will-mount": "error",
-        "@eslint-react/no-component-will-receive-props": "error",
-        "@eslint-react/no-component-will-update": "error",
-        "@eslint-react/no-create-ref": "error",
-        "@eslint-react/no-direct-mutation-state": "error",
-        "@eslint-react/no-duplicate-key": "error",
-        "@eslint-react/no-implicit-key": "error",
-        "@eslint-react/no-missing-key": "error",
-        "@eslint-react/no-nested-components": "warn",
-        "@eslint-react/no-redundant-should-component-update": "error",
-        "@eslint-react/no-set-state-in-component-did-mount": "warn",
-        "@eslint-react/no-set-state-in-component-did-update": "warn",
-        "@eslint-react/no-set-state-in-component-will-update": "warn",
-        "@eslint-react/no-string-refs": "error",
-        "@eslint-react/no-unsafe-component-will-mount": "warn",
-        "@eslint-react/no-unsafe-component-will-receive-props": "warn",
-        "@eslint-react/no-unsafe-component-will-update": "warn",
-        "@eslint-react/no-unstable-context-value": "error",
-        "@eslint-react/no-unstable-default-props": "error",
-        "@eslint-react/no-unused-class-component-members": "warn",
-        "@eslint-react/no-unused-state": "warn",
-        "@eslint-react/no-useless-fragment": "warn",
-        "@eslint-react/prefer-destructuring-assignment": "warn",
-        "@eslint-react/prefer-shorthand-boolean": "warn",
-        "@eslint-react/prefer-shorthand-fragment": "warn",
-
-        ...(isTypeAware
-          ? {
-              "@eslint-react/no-leaked-conditional-rendering": "warn",
-            }
-          : {}),
-
         // overrides
         ...overrides,
       },
     },
+    pluginReactHooks.configs.flat.recommended,
     isUsingNext
       ? {
           name: "nirtamir2/next/middleware",

@@ -41,8 +41,12 @@ async function createMockDir() {
   ]);
 }
 
-beforeEach(async () => { await createMockDir(); });
-afterAll(async () => { await fs.rm(genPath, { recursive: true, force: true }); });
+beforeEach(async () => {
+  await createMockDir();
+});
+afterAll(async () => {
+  await fs.rm(genPath, { recursive: true, force: true });
+});
 
 it("package.json updated", async () => {
   const { stdout } = await run();
@@ -79,7 +83,7 @@ it("ignores files added in eslint.config.js", async () => {
 
   const eslintConfigContent = (
     await fs.readFile(join(genPath, "eslint.config.mjs"), "utf8")
-  ).replaceAll('\\', "/");
+  ).replaceAll("\\", "/");
 
   expect(stdout).toContain("Created eslint.config.mjs");
   expect(eslintConfigContent).toMatchInlineSnapshot(`
