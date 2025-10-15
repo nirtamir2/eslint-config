@@ -64,7 +64,9 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const reactPluginConfig = isTypeAware ? pluginReact.configs["recommended-type-checked"] : pluginReact.configs["recommended-typescript"];
+  const reactPluginConfig = isTypeAware
+    ? pluginReact.configs["recommended-type-checked"]
+    : pluginReact.configs["recommended-typescript"];
   return [
     {
       name: "antfu/react/setup",
@@ -105,7 +107,6 @@ export async function react(
         //         "@eslint-react/dom/no-script-url": "warn",
         //         "@eslint-react/dom/no-unsafe-iframe-sandbox": "warn",
         //         "@eslint-react/dom/no-unsafe-target-blank": "warn",
-
 
         //         "@eslint-react/jsx-no-comment-textnodes": "warn",      // // recommended rules from @eslint-react
         //         "@eslint-react/ensure-forward-ref-using-ref": "warn",
@@ -177,20 +178,20 @@ export async function react(
             allowExportNames: [
               ...(isUsingNext
                 ? [
-                  "dynamic",
-                  "dynamicParams",
-                  "revalidate",
-                  "fetchCache",
-                  "runtime",
-                  "preferredRegion",
-                  "maxDuration",
-                  "config",
-                  "generateStaticParams",
-                  "metadata",
-                  "generateMetadata",
-                  "viewport",
-                  "generateViewport",
-                ]
+                    "dynamic",
+                    "dynamicParams",
+                    "revalidate",
+                    "fetchCache",
+                    "runtime",
+                    "preferredRegion",
+                    "maxDuration",
+                    "config",
+                    "generateStaticParams",
+                    "metadata",
+                    "generateMetadata",
+                    "viewport",
+                    "generateViewport",
+                  ]
                 : []),
               ...(isUsingRemix
                 ? ["meta", "links", "headers", "loader", "action"]
@@ -199,7 +200,6 @@ export async function react(
           },
         ],
 
-
         // overrides
         ...overrides,
       },
@@ -207,13 +207,13 @@ export async function react(
     pluginReactHooks.configs.flat.recommended,
     isUsingNext
       ? {
-        name: "nirtamir2/next/middleware",
-        files: ["**/src/middleware.ts"],
-        rules: {
-          // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
-          "unicorn/prefer-string-raw": "off",
-        },
-      }
+          name: "nirtamir2/next/middleware",
+          files: ["**/src/middleware.ts"],
+          rules: {
+            // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
+            "unicorn/prefer-string-raw": "off",
+          },
+        }
       : {},
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
     ...fixupConfigRules(
