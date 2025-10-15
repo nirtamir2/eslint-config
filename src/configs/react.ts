@@ -64,11 +64,12 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
+  const reactPluginConfig = isTypeAware ? pluginReact.configs["recommended-type-checked"] : pluginReact.configs["recommended-typescript"];
   return [
     {
       name: "antfu/react/setup",
       plugins: {
-        "@eslint-react": pluginReact,
+        ...reactPluginConfig.plugins,
         "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,
         "react-you-might-not-need-an-effect":
@@ -90,7 +91,7 @@ export async function react(
       },
       name: "nirtamir2/react/rules-eslint-react",
       rules: {
-        ...isTypeAware ? pluginReact.configs["recommended-type-checked"].rules : pluginReact.configs["recommended-typescript"].rules,
+        ...reactPluginConfig.rules,
         // // recommended ru
         // les from @eslint-react/dom
         //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
