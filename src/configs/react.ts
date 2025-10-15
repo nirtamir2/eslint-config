@@ -91,7 +91,8 @@ export async function react(
       },
       ...isTypeAware ? pluginReact.configs["recommended-type-checked"].rules : pluginReact.configs["recommended-typescript"],
 
-      // // recommended rules from @eslint-react/dom
+      // // recommended ru
+      // les from @eslint-react/dom
       //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
       //         "@eslint-react/dom/no-dangerously-set-innerhtml": "warn",
       //         "@eslint-react/dom/no-dangerously-set-innerhtml-with-children": "error",
@@ -104,7 +105,8 @@ export async function react(
       //         "@eslint-react/dom/no-unsafe-iframe-sandbox": "warn",
       //         "@eslint-react/dom/no-unsafe-target-blank": "warn",
 
-      // // recommended rules from @eslint-react
+
+      //         "@eslint-react/jsx-no-comment-textnodes": "warn",      // // recommended rules from @eslint-react
       //         "@eslint-react/ensure-forward-ref-using-ref": "warn",
       //         "@eslint-react/no-access-state-in-setstate": "error",
       //         "@eslint-react/no-array-index-key": "warn",
@@ -258,7 +260,6 @@ export async function react(
         "react/jsx-no-useless-fragment": 2,
         "react/jsx-handler-names": 2,
         "react/jsx-no-duplicate-props": 2,
-        "@eslint-react/jsx-no-comment-textnodes": "warn",
         "react/jsx-curly-brace-presence": [
           2,
           { props: "never", children: "never" },
