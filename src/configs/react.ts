@@ -64,7 +64,7 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const {plugins} = (pluginReact.configs.all as any);
+  const { plugins } = pluginReact.configs.all as any;
 
   return [
     {
@@ -73,7 +73,8 @@ export async function react(
         "@eslint-react": plugins["@eslint-react"],
         "@eslint-react/dom": plugins["@eslint-react/dom"],
         "@eslint-react/hooks-extra": plugins["@eslint-react/hooks-extra"],
-        "@eslint-react/naming-convention": plugins["@eslint-react/naming-convention"],
+        "@eslint-react/naming-convention":
+          plugins["@eslint-react/naming-convention"],
         "@eslint-react/web-api": plugins["@eslint-react/web-api"],
 
         "react-hooks": pluginReactHooks,

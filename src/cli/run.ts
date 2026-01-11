@@ -66,7 +66,8 @@ export async function run(options: CliRunOptions = {}) {
         },
         frameworks: async ({ results }) => {
           const isArgTemplateValid =
-            typeof argTemplate === "string" && frameworks.includes(argTemplate as FrameworkOption);
+            typeof argTemplate === "string" &&
+            frameworks.includes(argTemplate as FrameworkOption);
 
           if (!results.uncommittedConfirmed || isArgTemplateValid) return;
 
