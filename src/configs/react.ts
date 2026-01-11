@@ -64,17 +64,17 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const plugins = (pluginReact.configs.all as any).plugins;
+  const {plugins} = (pluginReact.configs.all as any);
 
   return [
     {
       name: "antfu/react/setup",
       plugins: {
-        react: plugins["@eslint-react"],
-        "react-dom": plugins["@eslint-react/dom"],
-        "react-hooks-extra": plugins["@eslint-react/hooks-extra"],
-        "react-naming-convention": plugins["@eslint-react/naming-convention"],
-        "react-web-api": plugins["@eslint-react/web-api"],
+        "@eslint-react": plugins["@eslint-react"],
+        "@eslint-react/dom": plugins["@eslint-react/dom"],
+        "@eslint-react/hooks-extra": plugins["@eslint-react/hooks-extra"],
+        "@eslint-react/naming-convention": plugins["@eslint-react/naming-convention"],
+        "@eslint-react/web-api": plugins["@eslint-react/web-api"],
 
         "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,

@@ -2,9 +2,10 @@ import { GLOB_JSX, GLOB_TSX } from "../globs";
 import type { TypedFlatConfigItem } from "../types";
 import { ensurePackages, interopDefault } from "../utils";
 
-export async function jsx(): Promise<TypedFlatConfigItem[]> {
+export async function jsx(): Promise<Array<TypedFlatConfigItem>> {
   // Base JSX configuration without a11y
   const baseConfig: TypedFlatConfigItem = {
+    name: "antfu/jsx/setup",
     files: [GLOB_JSX, GLOB_TSX],
     languageOptions: {
       parserOptions: {
@@ -13,9 +14,8 @@ export async function jsx(): Promise<TypedFlatConfigItem[]> {
         },
       },
     },
-    name: "antfu/jsx/setup",
-    plugins: {},
     rules: {},
+    plugins: {},
   };
 
   await ensurePackages(["eslint-plugin-jsx-a11y", "@stylistic/eslint-plugin"]);

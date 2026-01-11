@@ -80,11 +80,11 @@ export async function sortPackageJson(): Promise<Array<TypedFlatConfigItem>> {
           },
           {
             order: { type: "asc" },
-            pathPattern: "^workspaces\\.catalog$",
+            pathPattern: String.raw`^workspaces\.catalog$`,
           },
           {
             order: { type: "asc" },
-            pathPattern: "^workspaces\\.catalogs\\.[^.]+$",
+            pathPattern: String.raw`^workspaces\.catalogs\.[^.]+$`,
           },
           {
             order: ["types", "import", "require", "default"],
