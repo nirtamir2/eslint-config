@@ -1,3 +1,4 @@
+import { fixupConfigRules } from "@eslint/compat";
 import { isPackageExists } from "local-pkg";
 import { compat } from "../compat";
 import { GLOB_SRC } from "../globs";
@@ -217,12 +218,14 @@ export async function react(
         }
       : {},
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
-    compat.config({
-      extends: ["plugin:ssr-friendly/recommended"],
-      rules: {
-        "ssr-friendly/no-dom-globals-in-react-cc-render": "off", // I don't use class components
-      },
-    }),
+    ...fixupConfigRules(
+      compat.config({
+        extends: ["plugin:ssr-friendly/recommended"],
+        rules: {
+          "ssr-friendly/no-dom-globals-in-react-cc-render": "off", // I don't use class components
+        },
+      }) as never,
+    ),
     ...compat.config({
       extends: "plugin:react/recommended",
       rules: {
