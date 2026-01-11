@@ -64,14 +64,19 @@ export async function react(
   );
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
-  const reactPluginConfig = isTypeAware
-    ? pluginReact.configs["recommended-type-checked"]
-    : pluginReact.configs["recommended-typescript"];
+  const { plugins } = pluginReact.configs.all as any;
+
   return [
     {
       name: "antfu/react/setup",
       plugins: {
-        ...reactPluginConfig.plugins,
+        "@eslint-react": plugins["@eslint-react"],
+        "@eslint-react/dom": plugins["@eslint-react/dom"],
+        "@eslint-react/hooks-extra": plugins["@eslint-react/hooks-extra"],
+        "@eslint-react/naming-convention":
+          plugins["@eslint-react/naming-convention"],
+        "@eslint-react/web-api": plugins["@eslint-react/web-api"],
+
         "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,
         "react-you-might-not-need-an-effect":
@@ -87,13 +92,15 @@ export async function react(
           ecmaFeatures: {
             jsx: true,
           },
-          ...(isTypeAware ? { project: tsconfigPath } : {}),
+          projectService: true,
         },
         sourceType: "module",
       },
       name: "nirtamir2/react/rules-eslint-react",
       rules: {
-        ...reactPluginConfig.rules,
+        ...(isTypeAware
+          ? pluginReact.configs["recommended-type-checked"].rules
+          : pluginReact.configs["recommended-typescript"].rules),
         // // recommended ru
         // les from @eslint-react/dom
         //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
@@ -161,15 +168,11 @@ export async function react(
           ecmaFeatures: {
             jsx: true,
           },
-          ...(isTypeAware ? { project: tsconfigPath } : {}),
+          projectService: true,
         },
         sourceType: "module",
       },
       rules: {
-        // recommended rules react-hooks
-        "react-hooks/exhaustive-deps": "warn",
-        "react-hooks/rules-of-hooks": "error",
-
         // react refresh
         "react-refresh/only-export-components": [
           "warn",
@@ -222,7 +225,7 @@ export async function react(
         rules: {
           "ssr-friendly/no-dom-globals-in-react-cc-render": "off", // I don't use class components
         },
-      }),
+      }) as never,
     ),
     ...compat.config({
       extends: "plugin:react/recommended",

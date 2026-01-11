@@ -4,4 +4,5 @@ export default defineConfig({
   entry: ["src/index.ts", "src/cli.ts"],
   shims: true,
   format: ["esm"],
+  exports: true,
 });

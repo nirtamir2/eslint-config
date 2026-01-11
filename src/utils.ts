@@ -141,6 +141,6 @@ export function isInEditorEnv(): boolean {
       process.env.JETBRAINS_IDE ||
       process.env.VIM ||
       process.env.NVIM) &&
-      !process.env.CI,
+    !process.env.CI,
   );
 }

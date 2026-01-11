@@ -1,3 +1,4 @@
+import erasableSyntaxOnlyPlugin from "eslint-plugin-erasable-syntax-only";
 import expectType from "eslint-plugin-expect-type/configs/recommended";
 import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
@@ -227,6 +228,18 @@ export async function typescript(
         "import-x/no-duplicates": "off",
         "no-restricted-syntax": "off",
         "unused-imports/no-unused-vars": "off",
+      },
+    },
+    {
+      name: "antfu/typescript/erasable-syntax-only",
+      plugins: {
+        "erasable-syntax-only": erasableSyntaxOnlyPlugin,
+      },
+      rules: {
+        "erasable-syntax-only/enums": "error",
+        "erasable-syntax-only/import-aliases": "error",
+        "erasable-syntax-only/namespaces": "error",
+        "erasable-syntax-only/parameter-properties": "error",
       },
     },
     {

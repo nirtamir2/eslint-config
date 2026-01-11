@@ -196,11 +196,10 @@ export interface OptionsStylistic {
   stylistic?: boolean | StylisticConfig;
 }
 
-export interface StylisticConfig
-  extends Pick<
-    StylisticCustomizeOptions,
-    "indent" | "quotes" | "jsx" | "semi"
-  > {}
+export interface StylisticConfig extends Pick<
+  StylisticCustomizeOptions,
+  "indent" | "quotes" | "jsx" | "semi"
+> {}
 
 export interface OptionsOverrides {
   overrides?: TypedFlatConfigItem["rules"];
@@ -248,8 +247,7 @@ export interface OptionsUnoCSS extends OptionsOverrides {
 }
 
 export interface OptionsConfig
-  extends OptionsComponentExts,
-    OptionsProjectType {
+  extends OptionsComponentExts, OptionsProjectType {
   /**
    * Enable gitignore support.
    *
