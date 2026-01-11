@@ -241,7 +241,7 @@ importers:
         specifier: ^10.3.2
         version: 10.3.2
       eslint:
-        specifier: ^9.39.2
+        specifier: ^9.31.0
         version: 9.39.2(jiti@2.6.1)
       eslint-plugin-astro:
         specifier: ^1.5.0
@@ -340,7 +340,7 @@ importers:
         specifier: ^0.19.0
         version: 0.19.0(synckit@0.11.11)(typescript@5.9.3)
       tsx:
-        specifier: ^4.21.0
+        specifier: ^4.19.3
         version: 4.21.0
       typescript:
         specifier: ^5.9.3
