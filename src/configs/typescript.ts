@@ -476,7 +476,19 @@ export async function typescript(
         "@typescript-eslint/no-restricted-imports": "error",
         "@typescript-eslint/no-this-alias": "error",
         "no-throw-literal": "off",
-        "@typescript-eslint/only-throw-error": "error",
+        "@typescript-eslint/only-throw-error": ["error", {
+          allow: [
+            {
+              from: "package",
+              package: "@tanstack/router-core",
+              name: "Redirect",
+            },
+            {
+              from: "package",
+              package: "@tanstack/react-router",
+              name: "Redirect",
+            }],
+        }],
         // "@typescript-eslint/no-type-alias": "off", // A & B, type AppRouter = typeof appRouter, Merge<A,B>
         "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
         "@typescript-eslint/no-unnecessary-condition": "error",
