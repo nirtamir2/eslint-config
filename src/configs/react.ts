@@ -76,6 +76,7 @@ export async function react(
         "@eslint-react/naming-convention":
           plugins["@eslint-react/naming-convention"],
         "@eslint-react/web-api": plugins["@eslint-react/web-api"],
+        "@eslint-react/rsc": plugins["@eslint-react/rsc"],
 
         "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,

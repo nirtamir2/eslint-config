@@ -14,8 +14,8 @@ export async function jsx(): Promise<Array<TypedFlatConfigItem>> {
         },
       },
     },
-    rules: {},
     plugins: {},
+    rules: {},
   };
 
   await ensurePackages(["eslint-plugin-jsx-a11y", "@stylistic/eslint-plugin"]);
