@@ -19,7 +19,6 @@ const RemixPackages = [
   "@remix-run/serve",
   "@remix-run/dev",
 ];
-const NextJsPackages = ["next"];
 
 export async function react(
   options: OptionsTypeScriptWithTypes & OptionsOverrides & OptionsFiles = {},
@@ -33,12 +32,6 @@ export async function react(
     "eslint-plugin-react-refresh",
     "eslint-plugin-react",
   ]);
-
-  const isUsingNext = NextJsPackages.some((i) => isPackageExists(i));
-
-  if (isUsingNext) {
-    await ensurePackages(["@next/eslint-plugin-next"]);
-  }
 
   const tsconfigPath = options.tsconfigPath
     ? toArray(options.tsconfigPath)
@@ -59,9 +52,10 @@ export async function react(
     interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
   ] as const);
 
+  const isUsingNext = isPackageExists("next");
   const isAllowConstantExport = ReactRefreshAllowConstantExportPackages.some(
     (i) => isPackageExists(i),
-  );
+  ) && !isUsingNext;
   const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
 
   const { plugins } = pluginReact.configs.all as any;
@@ -180,23 +174,6 @@ export async function react(
           {
             allowConstantExport: isAllowConstantExport,
             allowExportNames: [
-              ...(isUsingNext
-                ? [
-                    "dynamic",
-                    "dynamicParams",
-                    "revalidate",
-                    "fetchCache",
-                    "runtime",
-                    "preferredRegion",
-                    "maxDuration",
-                    "config",
-                    "generateStaticParams",
-                    "metadata",
-                    "generateMetadata",
-                    "viewport",
-                    "generateViewport",
-                  ]
-                : []),
               ...(isUsingRemix
                 ? ["meta", "links", "headers", "loader", "action"]
                 : []),
@@ -209,16 +186,6 @@ export async function react(
       },
     },
     pluginReactHooks.configs.flat.recommended,
-    isUsingNext
-      ? {
-          name: "nirtamir2/next/middleware",
-          files: ["**/src/middleware.ts"],
-          rules: {
-            // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
-            "unicorn/prefer-string-raw": "off",
-          },
-        }
-      : {},
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
     ...fixupConfigRules(
       compat.config({

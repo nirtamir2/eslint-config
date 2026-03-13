@@ -22,9 +22,12 @@ export async function nextjs(
 ): Promise<Array<TypedFlatConfigItem>> {
   const { overrides = {}, files = [GLOB_SRC] } = options;
 
-  await ensurePackages(["@next/eslint-plugin-next"]);
+  await ensurePackages(["@next/eslint-plugin-next", "eslint-plugin-react-refresh"]);
 
-  const pluginNextJS = await interopDefault(import("@next/eslint-plugin-next"));
+  const [pluginNextJS, pluginReactRefresh] = await Promise.all([
+    interopDefault(import("@next/eslint-plugin-next")),
+    interopDefault(import("eslint-plugin-react-refresh")),
+  ] as const);
 
   function getRules(name: keyof typeof pluginNextJS.configs) {
     const rules = pluginNextJS.configs?.[name]?.rules;
@@ -36,11 +39,15 @@ export async function nextjs(
     return normalizeRules(rules);
   }
 
+  const reactRefreshRule =
+    pluginReactRefresh.configs.next.rules["react-refresh/only-export-components"];
+
   return [
     {
       name: "antfu/nextjs/setup",
       plugins: {
         "@next/next": pluginNextJS,
+        "react-refresh": pluginReactRefresh,
       },
     },
     {
@@ -57,12 +64,24 @@ export async function nextjs(
       rules: {
         ...getRules("recommended"),
         ...getRules("core-web-vitals"),
+        "react-refresh/only-export-components": [
+          "warn",
+          ...(Array.isArray(reactRefreshRule) ? reactRefreshRule.slice(1) : []),
+        ],
         ...overrides,
       },
       settings: {
         react: {
           version: "detect",
         },
+      },
+    },
+    {
+      name: "nirtamir2/next/middleware",
+      files: ["**/src/middleware.ts"],
+      rules: {
+        // Next.js does not allow to use TaggedTemplateExpression syntax in middleware
+        "unicorn/prefer-string-raw": "off",
       },
     },
   ];

@@ -113,7 +113,7 @@ export function nirtamir2(
     ignores: userIgnores = [],
     isInEditor = isInEditorEnv(),
     jsx: enableJsx = true,
-    nextjs: enableNextjs = false,
+    nextjs: enableNextjs = isPackageExists("next"),
     pnpm: enablePnpm = Boolean(findUpSync("pnpm-workspace.yaml")),
     react: enableReact = false,
     regexp: enableRegexp = true,
