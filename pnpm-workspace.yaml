@@ -1,13 +1,13 @@
-strictPeerDependencies: false
-catalogMode: prefer
-
-ignoreWorkspaceRootCheck: true
-shamefullyHoist: true
-shellEmulator: true
-trustPolicy: no-downgrade
 
 packages:
   - "fixtures/*"
+catalog:
+  '@next/eslint-plugin-next': 16.1.6
+  '@unocss/eslint-plugin': 66.6.6
+  '@vitest/eslint-plugin': 1.6.12
+  eslint-plugin-default-import-name: ^0.6.1
+  eslint-plugin-storybook: ^10.2.19
+catalogMode: prefer
 
 catalogs:
   dev:
@@ -134,3 +134,9 @@ catalogs:
     vue-eslint-parser: ^10.4.0
     yaml-eslint-parser: ^2.0.0
     yargs: ^18.0.0
+
+ignoreWorkspaceRootCheck: true
+shamefullyHoist: true
+shellEmulator: true
+strictPeerDependencies: false
+trustPolicy: no-downgrade
