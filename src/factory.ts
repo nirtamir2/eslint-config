@@ -1,17 +1,13 @@
 import type { Linter } from "eslint";
-import type {
-  Awaitable,
-  ConfigNames,
-  OptionsConfig,
-  TypedFlatConfigItem,
-} from "./types";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import {
+  angular,
   astro,
   command,
   comments,
   disables,
+  e18e,
   ignores,
   imports,
   javascript,
@@ -19,8 +15,10 @@ import {
   jsonc,
   jsx,
   markdown,
+  nextjs,
   node,
   perfectionist,
+  pnpm,
   react,
   solid,
   sortPackageJson,
@@ -46,7 +44,13 @@ import { regexp } from "./configs/regexp";
 import { security } from "./configs/security";
 import { storybook } from "./configs/storybook";
 import { tailwindcss } from "./configs/tailwindcss";
-import { interopDefault, isInEditorEnv } from "./utils";
+import type {
+  Awaitable,
+  ConfigNames,
+  OptionsConfig,
+  TypedFlatConfigItem,
+} from "./types";
+import { findUpSync, interopDefault, isInEditorEnv } from "./utils";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "name",
@@ -100,17 +104,22 @@ export function nirtamir2(
   >
 ): FlatConfigComposer<TypedFlatConfigItem, ConfigNames> {
   const {
+    angular: enableAngular = false,
     astro: enableAstro = false,
     // autoRenamePlugins = true,
     componentExts = [],
+    e18e: enableE18e = true,
     gitignore: enableGitignore = true,
     ignores: userIgnores = [],
     isInEditor = isInEditorEnv(),
     jsx: enableJsx = true,
+    nextjs: enableNextjs = false,
+    pnpm: enablePnpm = Boolean(findUpSync("pnpm-workspace.yaml")),
     react: enableReact = false,
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
+    type: appType = "app",
     zod: enableZod = isPackageExists("zod") && isPackageExists("next"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
     typescript: enableTypeScript = isPackageExists("typescript"),
@@ -197,6 +206,17 @@ export function nirtamir2(
         ...typescriptOptions,
         componentExts,
         overrides: getOverrides(options, "typescript"),
+        type: appType,
+      }),
+    );
+  }
+
+  if (enableE18e) {
+    configs.push(
+      e18e({
+        ...(typeof enableE18e === "boolean" ? {} : enableE18e),
+        isInEditor,
+        type: appType,
       }),
     );
   }
@@ -240,6 +260,14 @@ export function nirtamir2(
       react({
         overrides: getOverrides(options, "react"),
         tsconfigPath,
+      }),
+    );
+  }
+
+  if (enableNextjs) {
+    configs.push(
+      nextjs({
+        overrides: getOverrides(options, "nextjs"),
       }),
     );
   }
@@ -302,6 +330,14 @@ export function nirtamir2(
     );
   }
 
+  if (enableAngular) {
+    configs.push(
+      angular({
+        overrides: getOverrides(options, "angular"),
+      }),
+    );
+  }
+
   if (enableStorybook) {
     configs.push(storybook());
   }
@@ -314,6 +350,17 @@ export function nirtamir2(
       }),
       sortPackageJson(),
       sortTsconfig(),
+    );
+  }
+
+  if (enablePnpm) {
+    configs.push(
+      pnpm({
+        isInEditor,
+        json: options.jsonc !== false,
+        yaml: options.yaml !== false,
+        ...(typeof enablePnpm === "boolean" ? {} : enablePnpm),
+      }),
     );
   }
 

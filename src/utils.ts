@@ -1,7 +1,10 @@
-import type { Awaitable, TypedFlatConfigItem } from "./types";
+import { isPackageExists } from "local-pkg";
+import fs from "node:fs";
+import fsPromises from "node:fs/promises";
+import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { isPackageExists } from "local-pkg";
+import type { Awaitable, TypedFlatConfigItem } from "./types";
 
 export const parserPlain = {
   meta: {
@@ -107,6 +110,42 @@ export function toArray<T>(value: T | Array<T>): Array<T> {
   return Array.isArray(value) ? value : [value];
 }
 
+export async function findUp(
+  name: string,
+  startDir = process.cwd(),
+): Promise<string | undefined> {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const candidate = path.join(currentDir, name);
+
+    try {
+      await fsPromises.access(candidate);
+      return candidate;
+    } catch {}
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) return undefined;
+    currentDir = parentDir;
+  }
+}
+
+export function findUpSync(
+  name: string,
+  startDir = process.cwd(),
+): string | undefined {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const candidate = path.join(currentDir, name);
+    if (fs.existsSync(candidate)) return candidate;
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) return undefined;
+    currentDir = parentDir;
+  }
+}
+
 export async function interopDefault<T>(
   m: Awaitable<T>,
 ): Promise<T extends { default: infer U } ? U : T> {
@@ -122,9 +161,11 @@ export function isPackageInScope(name: string): boolean {
 }
 
 export function isInGitHooksOrLintStaged(): boolean {
-  return Boolean(process.env.GIT_PARAMS ||
+  return Boolean(
+    process.env.GIT_PARAMS ||
     process.env.VSCODE_GIT_COMMAND ||
-    process.env.npm_lifecycle_script?.startsWith("lint-staged"));
+    process.env.npm_lifecycle_script?.startsWith("lint-staged"),
+  );
 }
 
 export async function ensurePackages(packages: Array<string | undefined>) {

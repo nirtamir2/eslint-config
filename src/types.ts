@@ -1,7 +1,7 @@
 import type { StylisticCustomizeOptions } from "@stylistic/eslint-plugin";
 import type { ParserOptions } from "@typescript-eslint/parser";
 import type { FlatGitignoreOptions } from "eslint-config-flat-gitignore";
-import type { ConfigWithExtends } from 'eslint-flat-config-utils';
+import type { ConfigWithExtends } from "eslint-flat-config-utils";
 import type { Options as VueBlocksOptions } from "eslint-processor-vue-blocks";
 import type { RuleOptions } from "./typegen";
 import type { VendoredPrettierOptions } from "./vender/prettier-types";
@@ -10,20 +10,23 @@ export type Awaitable<T> = T | Promise<T>;
 
 export interface Rules extends RuleOptions {}
 
-export type TypedFlatConfigItem = Omit<ConfigWithExtends, 'plugins' | 'rules'> & { 
+export type TypedFlatConfigItem = Omit<
+  ConfigWithExtends,
+  "plugins" | "rules"
+> & {
   /**
    * An object containing a name-value mapping of plugin names to plugin objects.
    * When `files` is specified, these plugins are only available to the matching files.
    *
    * @see [Using plugins in your configuration](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#using-plugins-in-your-configuration)
    */
-  plugins?: Record<string, any>
+  plugins?: Record<string, any>;
 
   /**
    * An object containing the configured rules. When `files` or `ignores` are
    * specified, these rule configurations are only available to the matching files.
    */
-  rules?: Rules
+  rules?: Rules;
 };
 
 export interface OptionsFiles {
@@ -69,8 +72,12 @@ export interface OptionsTypeScriptErasableOnly {
 }
 
 export type OptionsTypescript =
-  | (OptionsTypeScriptWithTypes & OptionsOverrides & OptionsTypeScriptErasableOnly)
-  | (OptionsTypeScriptParserOptions & OptionsOverrides & OptionsTypeScriptErasableOnly);
+  | (OptionsTypeScriptWithTypes &
+      OptionsOverrides &
+      OptionsTypeScriptErasableOnly)
+  | (OptionsTypeScriptParserOptions &
+      OptionsOverrides &
+      OptionsTypeScriptErasableOnly);
 
 export interface OptionsFormatters {
   /**
@@ -160,6 +167,26 @@ export interface OptionsComponentExts {
   componentExts?: Array<string>;
 }
 
+export interface OptionsE18e extends OptionsOverrides {
+  /**
+   * Include modernization rules.
+   * @default true
+   */
+  modernization?: boolean;
+
+  /**
+   * Include module replacement rules.
+   * @default type === "lib" && isInEditor
+   */
+  moduleReplacements?: boolean;
+
+  /**
+   * Include performance improvement rules.
+   * @default true
+   */
+  performanceImprovements?: boolean;
+}
+
 export interface OptionsUnicorn {
   /**
    * Include all rules recommended by `eslint-plugin-unicorn`, instead of only ones picked by Anthony.
@@ -236,6 +263,33 @@ export interface OptionsRegExp {
 
 export interface OptionsIsInEditor {
   isInEditor?: boolean;
+}
+
+export interface OptionsPnpm extends OptionsIsInEditor {
+  /**
+   * Require pnpm catalogs in package.json files.
+   *
+   * Auto-detects usage from `pnpm-workspace.yaml` when omitted.
+   */
+  catalogs?: boolean;
+
+  /**
+   * Enable package.json pnpm rules.
+   * @default true
+   */
+  json?: boolean;
+
+  /**
+   * Enable pnpm-workspace.yaml rules.
+   * @default true
+   */
+  yaml?: boolean;
+
+  /**
+   * Sort `pnpm-workspace.yaml` keys.
+   * @default true
+   */
+  sort?: boolean;
 }
 
 export interface TailwindCSSOptions {
@@ -322,6 +376,13 @@ export interface OptionsConfig
    * @default true
    */
   jsx?: boolean;
+
+  /**
+   * Enable e18e rules.
+   *
+   * @default true
+   */
+  e18e?: boolean | OptionsE18e;
 
   /**
    * Options for eslint-plugin-unicorn.
@@ -432,6 +493,28 @@ export interface OptionsConfig
    * @default false
    */
   react?: boolean | OptionsOverrides;
+
+  /**
+   * Enable Next.js rules.
+   *
+   * Requires installing:
+   * - `@next/eslint-plugin-next`
+   *
+   * @default false
+   */
+  nextjs?: boolean | OptionsOverrides;
+
+  /**
+   * Enable Angular rules.
+   *
+   * Requires installing:
+   * - `@angular-eslint/eslint-plugin`
+   * - `@angular-eslint/eslint-plugin-template`
+   * - `@angular-eslint/template-parser`
+   *
+   * @default false
+   */
+  angular?: boolean | OptionsOverrides;
   /**
    * Enable solid rules.
    *
@@ -461,6 +544,13 @@ export interface OptionsConfig
    * @default false
    */
   unocss?: boolean | OptionsUnoCSS;
+
+  /**
+   * Enable pnpm workspace and catalog rules.
+   *
+   * @default auto-detect based on `pnpm-workspace.yaml`
+   */
+  pnpm?: boolean | OptionsPnpm;
 
   /**
    * Use external formatters to format files.
@@ -503,6 +593,8 @@ export interface OptionsConfig
     yaml?: TypedFlatConfigItem["rules"];
     toml?: TypedFlatConfigItem["rules"];
     react?: TypedFlatConfigItem["rules"];
+    nextjs?: TypedFlatConfigItem["rules"];
+    angular?: TypedFlatConfigItem["rules"];
     svelte?: TypedFlatConfigItem["rules"];
   };
 }

@@ -11,6 +11,7 @@ catalogs:
   prod:
     "@antfu/install-pkg": ^1.1.0
     "@clack/prompts": ^1.1.0
+    "@e18e/eslint-plugin": ^0.2.0
     "@eslint-community/eslint-plugin-eslint-comments": ^4.7.1
     "@eslint/compat": ^2.0.3
     "@eslint/eslintrc": ^3.3.5
@@ -43,6 +44,7 @@ catalogs:
     eslint-plugin-no-use-extend-native: 0.7.2
     eslint-plugin-optimize-regex: ^1.2.1
     eslint-plugin-perfectionist: ^5.6.0
+    eslint-plugin-pnpm: ^1.6.0
     eslint-plugin-regexp: ^3.1.0
     eslint-plugin-sonarjs: ^4.0.2
     eslint-plugin-sort-destructure-keys-typescript: ^0.3.0
@@ -96,6 +98,9 @@ catalogs:
     vitest: ^4.1.0
 
   peer:
+    "@angular-eslint/eslint-plugin": ^21.3.0
+    "@angular-eslint/eslint-plugin-template": ^21.3.0
+    "@angular-eslint/template-parser": ^21.3.0
     "@eslint-community/eslint-utils": ^4.9.1
     "@eslint-react/eslint-plugin": ^2.13.0
     "@next/eslint-plugin-next": 16.1.1
