@@ -1,9 +1,9 @@
-import jsdocPlugin from "eslint-plugin-jsdoc";
 import type {
   OptionsOverrides,
   OptionsStylistic,
   TypedFlatConfigItem,
 } from "../types";
+import { GLOB_SRC } from "../globs";
 import { interopDefault } from "../utils";
 
 export async function jsdoc(
@@ -13,10 +13,14 @@ export async function jsdoc(
 
   return [
     {
-      name: "antfu/jsdoc/rules",
+      name: "antfu/jsdoc/setup",
       plugins: {
         jsdoc: await interopDefault(import("eslint-plugin-jsdoc")),
       },
+    },
+    {
+      files: [GLOB_SRC],
+      name: "antfu/jsdoc/rules",
       rules: {
         "jsdoc/check-access": "warn",
         "jsdoc/check-param-names": "warn",
@@ -40,12 +44,7 @@ export async function jsdoc(
               "jsdoc/multiline-blocks": "warn",
             }
           : {}),
-      },
-    },
-    jsdocPlugin.configs["flat/recommended-typescript-flavor"],
-    {
-      name: "nirtamir2/jsdoc/overrides",
-      rules: {
+
         "jsdoc/require-jsdoc": "off",
         ...overrides,
       },

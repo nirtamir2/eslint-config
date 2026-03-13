@@ -1,5 +1,3 @@
-import { mergeProcessors } from "eslint-merge-processors";
-import { GLOB_VUE } from "../globs";
 import type {
   OptionsFiles,
   OptionsHasTypeScript,
@@ -8,6 +6,8 @@ import type {
   OptionsVue,
   TypedFlatConfigItem,
 } from "../types";
+import { mergeProcessors } from "eslint-merge-processors";
+import { GLOB_VUE } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function vue(
@@ -125,7 +125,7 @@ export async function vue(
 
         "antfu/no-top-level-await": "off",
         "n/prefer-global/process": "off",
-        "ts/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
 
         "vue/block-order": [
           "error",

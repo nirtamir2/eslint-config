@@ -1,22 +1,22 @@
-import { fixupConfigRules } from "@eslint/compat";
-import github from "eslint-plugin-github";
-import sonarjs from "eslint-plugin-sonarjs";
-import globals from "globals";
-import { compat } from "../compat";
-import { GLOB_SRC, GLOB_SRC_EXT } from "../globs";
-import {
-  arrayFunc,
-  confusingBrowserGlobals,
-  eslintPluginNoUseExtendNative,
-  js,
-  pluginAntfu,
-  pluginUnusedImports,
-} from "../plugins";
 import type {
   OptionsIsInEditor,
   OptionsOverrides,
   TypedFlatConfigItem,
 } from "../types";
+import { fixupConfigRules } from "@eslint/compat";
+import github from "eslint-plugin-github";
+import sonarjs from "eslint-plugin-sonarjs";
+// @ts-expect-error no types
+import workspacesPlugin from "eslint-plugin-workspaces";
+import globals from "globals";
+import { compat } from "../compat";
+import { GLOB_SRC, GLOB_SRC_EXT } from "../globs";
+import {
+  arrayFunc,
+  eslintPluginNoUseExtendNative,
+  pluginAntfu,
+  pluginUnusedImports,
+} from "../plugins";
 
 export async function javascript(
   options: OptionsIsInEditor & OptionsOverrides = {},
@@ -24,118 +24,6 @@ export async function javascript(
   const { isInEditor = false, overrides = {} } = options;
 
   return [
-    js.configs.recommended,
-    {
-      name: "nirtamir2/javascript/overrides",
-      rules: {
-        // #region eslint
-
-        "no-constant-binary-expression": "error",
-        "max-params": "error",
-
-        // ignore eslint prettier that remove this rule, because I want to remove useless template literal
-        // quotes: [2, "double", { allowTemplateLiterals: false }],
-        "no-implicit-coercion": ["error"],
-        "prefer-destructuring": ["error", { object: true, array: false }], // a[0] should not destruct
-        "func-style": ["error", "declaration", { allowArrowFunctions: true }],
-
-        // Based on https://github.com/antfu/eslint-config/blob/master/packages/basic/index.js
-        // Common
-        "no-param-reassign": "off",
-        camelcase: "off",
-        "no-constant-condition": "warn",
-        "no-debugger": "error",
-        "no-console": ["error", { allow: ["warn", "error"] }],
-        "no-cond-assign": ["error", "always"],
-        "no-restricted-globals": ["error", ...confusingBrowserGlobals],
-        "no-restricted-syntax": [
-          "error",
-          "DebuggerStatement",
-          "ForInStatement",
-          "LabeledStatement",
-          "WithStatement",
-        ],
-
-        // es6
-        "no-var": "error",
-        "prefer-const": [
-          "error",
-          {
-            destructuring: "any",
-            ignoreReadBeforeAssign: true,
-          },
-        ],
-        "prefer-arrow-callback": [
-          "error",
-          {
-            allowNamedFunctions: false,
-            allowUnboundThis: true,
-          },
-        ],
-        "object-shorthand": [
-          "error",
-          "always",
-          {
-            ignoreConstructors: false,
-            avoidQuotes: true,
-          },
-        ],
-        "prefer-rest-params": "error",
-        "prefer-spread": "error",
-        "prefer-template": "error",
-
-        // best-practice
-        "array-callback-return": "error",
-        "block-scoped-var": "error",
-        "consistent-return": "off",
-        complexity: ["off", 11],
-        eqeqeq: ["error", "always", { null: "never" }],
-        "no-alert": "warn",
-        "no-case-declarations": "error",
-        "no-multi-str": "error",
-        "no-with": "error",
-        "no-useless-escape": "off",
-        "vars-on-top": "error",
-        "require-await": "off",
-        "no-return-assign": "off",
-      },
-    },
-    arrayFunc.configs.recommended,
-    {
-      name: "nirtamir2/javascript/arrayFunc/overrides",
-      rules: {
-        "array-func/prefer-array-from": 0, // conflicts with unicorn/prefer-spread
-      },
-    },
-    {
-      name: "nirtamir2/javascript/github",
-      rules: {
-        "github/array-foreach": 2,
-        "github/async-currenttarget": 2,
-        "github/async-preventdefault": 2,
-        "github/authenticity-token": 2,
-        "github/get-attribute": 2,
-        "github/js-class-name": 2,
-        "github/no-blur": 2,
-        "github/no-d-none": 2,
-        "github/no-dataset": 2,
-        "github/no-implicit-buggy-globals": 2,
-        "github/no-inner-html": 2,
-        "github/no-innerText": 2,
-        "github/no-dynamic-script-tag": 2,
-        "github/no-then": 2,
-        "github/no-useless-passive": 2,
-        "github/prefer-observers": 2,
-        "github/require-passive-events": 2,
-        "github/unescaped-html-literal": 2,
-      },
-    },
-    {
-      files: [".prettierrc.mjs"],
-      rules: {
-        "github/unescaped-html-literal": 0,
-      },
-    },
     {
       languageOptions: {
         ecmaVersion: "latest",
@@ -181,6 +69,8 @@ export async function javascript(
         "default-case-last": "error",
         "dot-notation": ["error", { allowKeywords: true }],
         eqeqeq: ["error", "always", { null: "never" }],
+        "func-style": ["error", "declaration", { allowArrowFunctions: true }],
+        "max-params": "error",
         "new-cap": [
           "error",
           { capIsNew: false, newIsCap: true, properties: true },
@@ -195,6 +85,7 @@ export async function javascript(
         "no-cond-assign": ["error", "always"],
         "no-console": ["error", { allow: ["warn", "error"] }],
         "no-const-assign": "error",
+        "no-constant-binary-expression": "error",
         "no-control-regex": "error",
         "no-debugger": "error",
         "no-delete-var": "error",
@@ -213,6 +104,7 @@ export async function javascript(
         "no-fallthrough": "error",
         "no-func-assign": "error",
         "no-global-assign": "error",
+        "no-implicit-coercion": "error",
         "no-implied-eval": "error",
         "no-import-assign": "error",
         "no-invalid-regexp": "error",
@@ -230,6 +122,7 @@ export async function javascript(
         "no-obj-calls": "error",
         "no-octal": "error",
         "no-octal-escape": "error",
+        "no-param-reassign": "off",
         "no-proto": "error",
         "no-prototype-builtins": "error",
         "no-redeclare": ["error", { builtinGlobals: false }],
@@ -335,12 +228,13 @@ export async function javascript(
           },
         ],
         "prefer-const": [
-          "error",
+          isInEditor ? "warn" : "error",
           {
-            destructuring: "all",
+            destructuring: "any",
             ignoreReadBeforeAssign: true,
           },
         ],
+        "prefer-destructuring": ["error", { object: true, array: false }],
         "prefer-exponentiation-operator": "error",
         "prefer-promise-reject-errors": "error",
         "prefer-regex-literals": ["error", { disallowRedundantWrapping: true }],
@@ -357,7 +251,6 @@ export async function javascript(
             memberSyntaxSortOrder: ["none", "all", "multiple", "single"],
           },
         ],
-
         "symbol-description": "error",
         "unicode-bom": ["error", "never"],
         "unused-imports/no-unused-imports": isInEditor ? "warn" : "error",
@@ -379,6 +272,26 @@ export async function javascript(
         "vars-on-top": "error",
         yoda: ["error", "never"],
 
+        // GitHub plugin rules
+        "github/array-foreach": 2,
+        "github/async-currenttarget": 2,
+        "github/async-preventdefault": 2,
+        "github/authenticity-token": 2,
+        "github/get-attribute": 2,
+        "github/js-class-name": 2,
+        "github/no-blur": 2,
+        "github/no-d-none": 2,
+        "github/no-dataset": 2,
+        "github/no-implicit-buggy-globals": 2,
+        "github/no-inner-html": 2,
+        "github/no-innerText": 2,
+        "github/no-dynamic-script-tag": 2,
+        "github/no-then": 2,
+        "github/no-useless-passive": 2,
+        "github/prefer-observers": 2,
+        "github/require-passive-events": 2,
+        "github/unescaped-html-literal": 2,
+
         ...overrides,
       },
     },
@@ -390,9 +303,23 @@ export async function javascript(
       },
     },
     {
-      name: "nirtamir2/javascript/overrides",
+      files: [".prettierrc.mjs"],
+      name: "nirtamir2/javascript/prettier-overrides",
       rules: {
-        "dot-notation": "off", // Collide with TypeScript TS4111: Property comes from an index signature, so it must be accessed with [].
+        "github/unescaped-html-literal": 0,
+      },
+    },
+    {
+      name: "nirtamir2/javascript/typescript-compat",
+      rules: {
+        "dot-notation": "off", // Collide with TypeScript TS4111
+      },
+    },
+    arrayFunc.configs.recommended,
+    {
+      name: "nirtamir2/javascript/arrayFunc/overrides",
+      rules: {
+        "array-func/prefer-array-from": 0, // conflicts with unicorn/prefer-spread
       },
     },
     ...fixupConfigRules(
@@ -400,27 +327,29 @@ export async function javascript(
         extends: ["plugin:optimize-regex/recommended"],
       }),
     ),
-    ...fixupConfigRules(
-      compat.config({
-        extends: ["plugin:workspaces/recommended"],
-      }),
-    ),
-    ...compat.config({
-      extends: ["plugin:eslint-comments/recommended"],
-    }),
-    eslintPluginNoUseExtendNative.configs.recommended,
-    sonarjs.configs.recommended,
     {
-      name: "nirtami2/javascript/sonar/disables",
+      name: "nirtamir2/javascript/workspaces",
+      plugins: {
+        workspaces: workspacesPlugin,
+      },
+      rules: {
+        "workspaces/no-relative-imports": "error",
+        "workspaces/no-absolute-imports": "error",
+        "workspaces/require-dependency": "error",
+      },
+    },
+    eslintPluginNoUseExtendNative.configs.recommended,
+     
+    sonarjs.configs!.recommended,
+    {
+      name: "nirtamir2/javascript/sonar/disables",
       rules: {
         "sonarjs/prefer-read-only-props": "off",
-        "sonarjs/deprecation": "off", // I have it in @typescript-eslint/no-deprecated
-        "sonarjs/new-cap": "off", // sometimes I want api.GET()
-        "sonarjs/todo-tag": "off", // somtimes I want TODO: stuff
-
-        // Bugs in SonarJs
-        "sonarjs/no-fallthrough": "off", // error when using ESLint 9
-        "sonarjs/void-use": "off", // false positive on promises
+        "sonarjs/deprecation": "off",
+        "sonarjs/new-cap": "off",
+        "sonarjs/todo-tag": "off",
+        "sonarjs/no-fallthrough": "off",
+        "sonarjs/void-use": "off",
       },
     },
     ...compat.extends("plugin:clsx/recommended"),

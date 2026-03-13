@@ -1,7 +1,12 @@
 import type { Linter } from "eslint";
+import type {
+  Awaitable,
+  ConfigNames,
+  OptionsConfig,
+  TypedFlatConfigItem,
+} from "./types";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
-import fs from "node:fs";
 import {
   astro,
   command,
@@ -41,12 +46,6 @@ import { regexp } from "./configs/regexp";
 import { security } from "./configs/security";
 import { storybook } from "./configs/storybook";
 import { tailwindcss } from "./configs/tailwindcss";
-import type {
-  Awaitable,
-  ConfigNames,
-  OptionsConfig,
-  TypedFlatConfigItem,
-} from "./types";
 import { interopDefault, isInEditorEnv } from "./utils";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
@@ -105,6 +104,7 @@ export function nirtamir2(
     // autoRenamePlugins = true,
     componentExts = [],
     gitignore: enableGitignore = true,
+    ignores: userIgnores = [],
     isInEditor = isInEditorEnv(),
     jsx: enableJsx = true,
     react: enableReact = false,
@@ -138,16 +138,21 @@ export function nirtamir2(
 
   if (enableGitignore) {
     if (typeof enableGitignore === "boolean") {
-      if (fs.existsSync(".gitignore"))
-        configs.push(
-          interopDefault(import("eslint-config-flat-gitignore")).then((r) => [
-            r(),
-          ]),
-        );
+      configs.push(
+        interopDefault(import("eslint-config-flat-gitignore")).then((r) => [
+          r({
+            name: "antfu/gitignore",
+            strict: false,
+          }),
+        ]),
+      );
     } else {
       configs.push(
         interopDefault(import("eslint-config-flat-gitignore")).then((r) => [
-          r(enableGitignore),
+          r({
+            name: "antfu/gitignore",
+            ...enableGitignore,
+          }),
         ]),
       );
     }
@@ -161,7 +166,7 @@ export function nirtamir2(
 
   // Base configs
   configs.push(
-    ignores(),
+    ignores(userIgnores),
     javascript({
       isInEditor,
       overrides: getOverrides(options, "javascript"),

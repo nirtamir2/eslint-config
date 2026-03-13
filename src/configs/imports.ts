@@ -1,6 +1,6 @@
+import type { OptionsStylistic, TypedFlatConfigItem } from "../types";
 import { GLOB_SRC_EXT } from "../globs";
 import { pluginAntfu, pluginImport } from "../plugins";
-import type { OptionsStylistic, TypedFlatConfigItem } from "../types";
 
 export async function imports(
   options: OptionsStylistic = {},

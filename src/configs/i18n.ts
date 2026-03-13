@@ -1,7 +1,7 @@
-import { fixupConfigRules } from "@eslint/compat";
-import path from "node:path";
-import { compat } from "../compat";
 import type { TypedFlatConfigItem } from "../types";
+import path from "node:path";
+import { fixupConfigRules } from "@eslint/compat";
+import { compat } from "../compat";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function i18n(): Promise<Array<TypedFlatConfigItem>> {

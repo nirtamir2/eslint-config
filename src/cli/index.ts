@@ -1,3 +1,4 @@
+import process from "node:process";
 import * as p from "@clack/prompts";
 import c from "picocolors";
 import yargs from "yargs";

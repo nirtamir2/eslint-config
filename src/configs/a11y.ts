@@ -1,5 +1,5 @@
-import { compat } from "../compat";
 import type { TypedFlatConfigItem } from "../types";
+import { compat } from "../compat";
 
 export function a11y(): Array<TypedFlatConfigItem> {
   return compat.config({

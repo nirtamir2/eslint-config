@@ -58,9 +58,19 @@ export interface OptionsVue extends OptionsOverrides {
   a11y?: boolean;
 }
 
+export interface OptionsTypeScriptErasableOnly {
+  /**
+   * Enable erasable syntax only rules.
+   *
+   * @see https://github.com/JoshuaKGoldberg/eslint-plugin-erasable-syntax-only
+   * @default true
+   */
+  erasableOnly?: boolean;
+}
+
 export type OptionsTypescript =
-  | (OptionsTypeScriptWithTypes & OptionsOverrides)
-  | (OptionsTypeScriptParserOptions & OptionsOverrides);
+  | (OptionsTypeScriptWithTypes & OptionsOverrides & OptionsTypeScriptErasableOnly)
+  | (OptionsTypeScriptParserOptions & OptionsOverrides & OptionsTypeScriptErasableOnly);
 
 export interface OptionsFormatters {
   /**
@@ -201,7 +211,7 @@ export interface OptionsStylistic {
 
 export interface StylisticConfig extends Pick<
   StylisticCustomizeOptions,
-  "indent" | "quotes" | "jsx" | "semi"
+  "indent" | "quotes" | "jsx" | "semi" | "experimental"
 > {}
 
 export interface OptionsOverrides {
@@ -249,6 +259,10 @@ export interface OptionsUnoCSS extends OptionsOverrides {
   strict?: boolean;
 }
 
+export interface OptionsReact extends OptionsOverrides {
+  reactCompiler?: boolean;
+}
+
 export interface OptionsConfig
   extends OptionsComponentExts, OptionsProjectType {
   /**
@@ -260,6 +274,13 @@ export interface OptionsConfig
    * @default true
    */
   gitignore?: boolean | FlatGitignoreOptions;
+
+  /**
+   * Extend the global ignores.
+   *
+   * @default []
+   */
+  ignores?: Array<string> | ((originals: Array<string>) => Array<string>);
 
   /**
    * Disable some opinionated rules to Anthony's preference.

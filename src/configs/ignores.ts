@@ -1,11 +1,16 @@
-import { GLOB_EXCLUDE } from "../globs";
 import type { TypedFlatConfigItem } from "../types";
+import { GLOB_EXCLUDE } from "../globs";
 
-export async function ignores(): Promise<Array<TypedFlatConfigItem>> {
+export async function ignores(
+  userIgnores: Array<string> | ((originals: Array<string>) => Array<string>) = [],
+): Promise<Array<TypedFlatConfigItem>> {
+  let ignoreList = [...GLOB_EXCLUDE];
+
+  ignoreList = typeof userIgnores === "function" ? userIgnores(ignoreList) : [...ignoreList, ...userIgnores];
+
   return [
     {
-      ignores: GLOB_EXCLUDE,
-      // Awaits https://github.com/humanwhocodes/config-array/pull/131
+      ignores: ignoreList,
       name: "antfu/ignores",
     },
   ];

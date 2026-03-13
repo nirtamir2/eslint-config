@@ -1,17 +1,19 @@
-import erasableSyntaxOnlyPlugin from "eslint-plugin-erasable-syntax-only";
-import expectType from "eslint-plugin-expect-type/configs/recommended";
-import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
-import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
-import { pluginAntfu } from "../plugins";
 import type {
   OptionsComponentExts,
   OptionsFiles,
   OptionsOverrides,
   OptionsProjectType,
+  OptionsTypeScriptErasableOnly,
   OptionsTypeScriptParserOptions,
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
+import process from "node:process";
+import erasableSyntaxOnlyPlugin from "eslint-plugin-erasable-syntax-only";
+import expectType from "eslint-plugin-expect-type/configs/recommended";
+import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
+import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
+import { pluginAntfu } from "../plugins";
 import { interopDefault } from "../utils";
 
 export async function typescript(
@@ -20,7 +22,8 @@ export async function typescript(
     OptionsOverrides &
     OptionsTypeScriptWithTypes &
     OptionsTypeScriptParserOptions &
-    OptionsProjectType = {},
+    OptionsProjectType &
+    OptionsTypeScriptErasableOnly = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
     componentExts = [],
@@ -28,6 +31,7 @@ export async function typescript(
     overridesTypeAware = {},
     parserOptions = {},
     type = "app",
+    erasableOnly = true,
   } = options;
 
   const files = options.files ?? [
@@ -230,18 +234,22 @@ export async function typescript(
         "unused-imports/no-unused-vars": "off",
       },
     },
-    {
-      name: "antfu/typescript/erasable-syntax-only",
-      plugins: {
-        "erasable-syntax-only": erasableSyntaxOnlyPlugin,
-      },
-      rules: {
-        "erasable-syntax-only/enums": "error",
-        "erasable-syntax-only/import-aliases": "error",
-        "erasable-syntax-only/namespaces": "error",
-        "erasable-syntax-only/parameter-properties": "error",
-      },
-    },
+    ...(erasableOnly
+      ? [
+          {
+            name: "antfu/typescript/erasable-syntax-only",
+            plugins: {
+              "erasable-syntax-only": erasableSyntaxOnlyPlugin,
+            },
+            rules: {
+              "erasable-syntax-only/enums": "error",
+              "erasable-syntax-only/import-aliases": "error",
+              "erasable-syntax-only/namespaces": "error",
+              "erasable-syntax-only/parameter-properties": "error",
+            },
+          },
+        ]
+      : []),
     {
       files: ["**/*.{test,spec}.ts?(x)"],
       name: "antfu/typescript/disables/test",

@@ -1,5 +1,5 @@
-import { GLOB_JS, GLOB_JSX, GLOB_TS, GLOB_TSX } from "../globs";
 import type { TypedFlatConfigItem } from "../types";
+import { GLOB_JS, GLOB_JSX, GLOB_TS, GLOB_TSX } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function zod(): Promise<Array<TypedFlatConfigItem>> {
