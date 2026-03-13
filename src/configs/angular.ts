@@ -1,5 +1,5 @@
-import { GLOB_HTML, GLOB_TS } from "../globs";
 import type { OptionsOverrides, Rules, TypedFlatConfigItem } from "../types";
+import { GLOB_HTML, GLOB_TS } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function angular(

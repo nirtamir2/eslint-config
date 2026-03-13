@@ -1,5 +1,5 @@
-import fs from "node:fs/promises";
 import type { OptionsPnpm, TypedFlatConfigItem } from "../types";
+import fs from "node:fs/promises";
 import { findUp, interopDefault } from "../utils";
 
 async function detectCatalogUsage(): Promise<boolean> {
@@ -22,10 +22,10 @@ export async function pnpm(
 
   const {
     catalogs = await detectCatalogUsage(),
-    isInEditor = false,
     json = true,
-    sort = true,
     yaml = true,
+    sort = true,
+    isInEditor = false,
   } = options;
 
   const configs: Array<TypedFlatConfigItem> = [];
@@ -101,7 +101,7 @@ export async function pnpm(
             "error",
             {
               order: [
-                ...[
+                
                   "cacheDir",
                   "catalogMode",
                   "cleanupUnusedCatalogs",
@@ -142,14 +142,14 @@ export async function pnpm(
                   "tag",
                   "trustPolicy",
                   "trustPolicyExclude",
-                  "updateNotifier",
-                ],
+                  "updateNotifier"
+                ,
                 "packages",
                 "overrides",
                 "patchedDependencies",
                 "catalog",
                 "catalogs",
-                ...[
+                
                   "allowedDeprecatedVersions",
                   "allowNonAppliedPatches",
                   "configDependencies",
@@ -159,8 +159,8 @@ export async function pnpm(
                   "onlyBuiltDependencies",
                   "onlyBuiltDependenciesFile",
                   "packageExtensions",
-                  "peerDependencyRules",
-                ],
+                  "peerDependencyRules"
+                ,
               ],
               pathPattern: "^$",
             },

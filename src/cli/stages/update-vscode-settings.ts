@@ -21,10 +21,10 @@ export async function updateVscodeSettings(
     await fsp.mkdir(dotVscodePath, { recursive: true });
 
   if (fs.existsSync(settingsPath)) {
-    let settingsContent = await fsp.readFile(settingsPath, "utf8");
+    let settingsContent = (await fsp.readFile(settingsPath, "utf8")).trim();
+    if (settingsContent.endsWith("}"))
+      settingsContent = settingsContent.slice(0, -1).trimEnd();
 
-    // eslint-disable-next-line sonarjs/slow-regex
-    settingsContent = settingsContent.trim().replace(/\s*}$/, "");
     settingsContent +=
       settingsContent.endsWith(",") || settingsContent.endsWith("{") ? "" : ",";
     settingsContent += `${vscodeSettingsString}}\n`;

@@ -17,7 +17,7 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
   ] as const);
 
   return [
-    i18next.configs["flat/recommended"],
+    i18next.configs["flat/recommended"] as TypedFlatConfigItem,
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:i18next/recommended"],
@@ -66,7 +66,7 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
           },
         ],
       }),
-    ),
+    ).map((config) => config as TypedFlatConfigItem),
     {
       name: "nirtamir2/i18n/storybook",
       files: ["**.stories.tsx"],

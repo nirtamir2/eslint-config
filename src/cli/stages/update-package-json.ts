@@ -6,6 +6,8 @@ import * as p from "@clack/prompts";
 import c from "picocolors";
 import { dependenciesMap, pkgJson } from "../constants";
 
+const ESLINT_TS_PATCH_SUFFIX_PATTERN = /-\d+$/;
+
 export async function updatePackageJson(result: PromptResult) {
   const cwd = process.cwd();
 
@@ -20,7 +22,7 @@ export async function updatePackageJson(result: PromptResult) {
   pkg.devDependencies["@nirtamir2/eslint-config"] = `^${pkgJson.version}`;
   pkg.devDependencies.eslint ??= pkgJson.devDependencies.eslint
     .replace("npm:eslint-ts-patch@", "")
-    .replace(/-\d+$/, "");
+    .replace(ESLINT_TS_PATCH_SUFFIX_PATTERN, "");
 
   const addedPackages: Array<string> = [];
 

@@ -3,12 +3,11 @@ import type { ParserOptions } from "@typescript-eslint/parser";
 import type { FlatGitignoreOptions } from "eslint-config-flat-gitignore";
 import type { ConfigWithExtends } from "eslint-flat-config-utils";
 import type { Options as VueBlocksOptions } from "eslint-processor-vue-blocks";
-import type { RuleOptions } from "./typegen";
 import type { VendoredPrettierOptions } from "./vender/prettier-types";
 
 export type Awaitable<T> = T | Promise<T>;
 
-export interface Rules extends RuleOptions {}
+export type Rules = Record<string, any>;
 
 export type TypedFlatConfigItem = Omit<
   ConfigWithExtends,

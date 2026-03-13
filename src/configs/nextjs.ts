@@ -1,9 +1,9 @@
-import { GLOB_SRC } from "../globs";
 import type {
   OptionsFiles,
   OptionsOverrides,
   TypedFlatConfigItem,
 } from "../types";
+import { GLOB_SRC } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 function normalizeRules(
@@ -20,7 +20,7 @@ function normalizeRules(
 export async function nextjs(
   options: OptionsOverrides & OptionsFiles = {},
 ): Promise<Array<TypedFlatConfigItem>> {
-  const { files = [GLOB_SRC], overrides = {} } = options;
+  const { overrides = {}, files = [GLOB_SRC] } = options;
 
   await ensurePackages(["@next/eslint-plugin-next"]);
 

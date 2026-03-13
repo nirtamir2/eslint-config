@@ -44,13 +44,15 @@ import {
 } from "../src";
 
 const configs = await combine(
-  {
-    plugins: {
-      "": {
-        rules: Object.fromEntries(builtinRules.entries()),
+  [
+    {
+      plugins: {
+        "": {
+          rules: Object.fromEntries(builtinRules.entries()),
+        },
       },
     },
-  },
+  ],
   a11y(),
   angular(),
   astro(),
@@ -95,7 +97,7 @@ const configNames = configs
   .map((i) => i?.name)
   .filter(Boolean) as Array<string>;
 
-let dts = await flatConfigsToRulesDTS(configs, {
+let dts = await flatConfigsToRulesDTS(configs as any, {
   includeAugmentation: false,
 });
 

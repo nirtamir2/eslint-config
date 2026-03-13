@@ -9,6 +9,8 @@ import parse from "parse-gitignore";
 import c from "picocolors";
 import { getEslintConfigContent } from "../utils";
 
+const LEGACY_CONFIG_FILE_PATTERN = /eslint|prettier/;
+
 export async function updateEslintFiles(result: PromptResult) {
   const cwd = process.cwd();
   const pathESLintIgnore = path.join(cwd, ".eslintignore");
@@ -63,7 +65,10 @@ export async function updateEslintFiles(result: PromptResult) {
   const files = fs.readdirSync(cwd);
   const legacyConfig: Array<string> = [];
   for (const file of files) {
-    if (/eslint|prettier/.test(file) && !file.includes("eslint.config."))
+    if (
+      LEGACY_CONFIG_FILE_PATTERN.test(file) &&
+      !file.includes("eslint.config.")
+    )
       legacyConfig.push(file);
   }
 

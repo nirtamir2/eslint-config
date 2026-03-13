@@ -1,4 +1,10 @@
 import type { Linter } from "eslint";
+import type {
+  Awaitable,
+  ConfigNames,
+  OptionsConfig,
+  TypedFlatConfigItem,
+} from "./types";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import {
@@ -44,12 +50,6 @@ import { regexp } from "./configs/regexp";
 import { security } from "./configs/security";
 import { storybook } from "./configs/storybook";
 import { tailwindcss } from "./configs/tailwindcss";
-import type {
-  Awaitable,
-  ConfigNames,
-  OptionsConfig,
-  TypedFlatConfigItem,
-} from "./types";
 import { findUpSync, interopDefault, isInEditorEnv } from "./utils";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [

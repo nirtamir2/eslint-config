@@ -1,10 +1,10 @@
-import { isPackageExists } from "local-pkg";
+import type { Awaitable, TypedFlatConfigItem } from "./types";
 import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import type { Awaitable, TypedFlatConfigItem } from "./types";
+import { isPackageExists } from "local-pkg";
 
 export const parserPlain = {
   meta: {

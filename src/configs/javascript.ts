@@ -6,7 +6,6 @@ import type {
 import { fixupConfigRules } from "@eslint/compat";
 import github from "eslint-plugin-github";
 import sonarjs from "eslint-plugin-sonarjs";
-// @ts-expect-error no types
 import workspacesPlugin from "eslint-plugin-workspaces";
 import globals from "globals";
 import { compat } from "../compat";
@@ -339,7 +338,7 @@ export async function javascript(
       },
     },
     eslintPluginNoUseExtendNative.configs.recommended,
-     
+
     sonarjs.configs!.recommended,
     {
       name: "nirtamir2/javascript/sonar/disables",

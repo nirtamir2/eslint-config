@@ -18,21 +18,25 @@ import {
   GLOB_SVG,
   GLOB_XML,
 } from "../globs";
-import { ensurePackages, interopDefault, isPackageInScope, parserPlain } from "../utils";
+import {
+  ensurePackages,
+  interopDefault,
+  isPackageInScope,
+  parserPlain,
+} from "../utils";
 import { StylisticConfigDefaults } from "./stylistic";
 
-function mergePrettierOptions(
-  options: VendoredPrettierOptions,
-  overrides: Record<string, any>,
-): Record<string, any> {
+function mergePrettierOptions<
+  T extends Record<string, any> & { parser: string },
+>(options: VendoredPrettierOptions, overrides: T): VendoredPrettierOptions & T {
   return {
     ...options,
     ...overrides,
     plugins: [
-      ...((overrides.plugins as Array<string>) || []),
+      ...(overrides.plugins || []),
       ...((options.plugins as Array<string>) || []),
     ],
-  };
+  } as VendoredPrettierOptions & T;
 }
 
 export async function formatters(
@@ -78,34 +82,30 @@ export async function formatters(
     ...stylistic,
   };
 
-  const prettierOptions: VendoredPrettierOptions = Object.assign(
-    {
-      endOfLine: "auto",
-      printWidth: 120,
-      semi,
-      singleQuote: quotes === "single",
-      tabWidth: typeof indent === "number" ? indent : 2,
-      trailingComma: "all",
-      useTabs: indent === "tab",
-    } satisfies VendoredPrettierOptions,
-    options.prettierOptions || {},
-  );
+  const prettierOptions: VendoredPrettierOptions = {
+    printWidth: 120,
+    tabWidth: typeof indent === "number" ? indent : 2,
+    useTabs: indent === "tab",
+    semi,
+    singleQuote: quotes === "single",
+    trailingComma: "all",
+    endOfLine: "auto",
+    ...options.prettierOptions,
+  };
 
-  const prettierXmlOptions = {
+  const prettierXmlOptions: Partial<VendoredPrettierOptions> = {
     xmlQuoteAttributes: "double",
     xmlSelfClosingSpace: true,
     xmlSortAttributesByKey: false,
     xmlWhitespaceSensitivity: "ignore",
   };
 
-  const dprintOptions = Object.assign(
-    {
-      indentWidth: typeof indent === "number" ? indent : 2,
-      quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
-      useTabs: indent === "tab",
-    },
-    options.dprintOptions || {},
-  );
+  const dprintOptions = {
+    indentWidth: typeof indent === "number" ? indent : 2,
+    quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
+    useTabs: indent === "tab",
+    ...(typeof options.dprintOptions === "object" ? options.dprintOptions : {}),
+  };
 
   const pluginFormat = await interopDefault(import("eslint-plugin-format"));
 

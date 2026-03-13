@@ -1,22 +1,23 @@
 import type { Linter } from "eslint";
-import { pluginE18e } from "../plugins";
 import type {
   OptionsE18e,
   OptionsIsInEditor,
   OptionsProjectType,
   TypedFlatConfigItem,
 } from "../types";
+import { pluginE18e } from "../plugins";
 
 export async function e18e(
   options: OptionsE18e & OptionsProjectType & OptionsIsInEditor = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    isInEditor = false,
     modernization = true,
-    moduleReplacements = options.type === "lib" && isInEditor,
-    overrides = {},
     performanceImprovements = true,
+    overrides = {},
+    isInEditor = false,
   } = options;
+  const moduleReplacements =
+    options.moduleReplacements ?? (options.type === "lib" && isInEditor);
 
   const configs = pluginE18e.configs as Record<string, Linter.Config>;
 
