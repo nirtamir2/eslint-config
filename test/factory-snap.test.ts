@@ -49,10 +49,12 @@ const ignoreConfigs = new Set([
   "antfu/javascript/setup",
 ]);
 
-function serializeConfigs(configs: Array<TypedFlatConfigItem>) {
+function serializeConfigs(
+  configs: Array<TypedFlatConfigItem>,
+): Array<Record<string, any>> {
   return configs.map((config) => {
     if (config.name && ignoreConfigs.has(config.name)) {
-      return "<ignored>";
+      return { name: "[ignored]" };
     }
 
     const clone = { ...config } as Record<string, any>;
@@ -62,12 +64,15 @@ function serializeConfigs(configs: Array<TypedFlatConfigItem>) {
     }
 
     if (config.languageOptions) {
-      if (config.languageOptions.parser && typeof config.languageOptions.parser !== "string") {
-          clone.languageOptions.parser =
-            (config.languageOptions.parser as any).meta?.name ||
-            (config.languageOptions.parser as any).name ||
-            "unknown";
-        }
+      if (
+        config.languageOptions.parser &&
+        typeof config.languageOptions.parser !== "string"
+      ) {
+        clone.languageOptions.parser =
+          (config.languageOptions.parser as any).meta?.name ||
+          (config.languageOptions.parser as any).name ||
+          "unknown";
+      }
 
       delete clone.languageOptions.globals;
 
