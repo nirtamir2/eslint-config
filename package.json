@@ -290,7 +290,7 @@
     "*": "eslint --fix"
   },
   "inlinedDependencies": {
-    "@next/eslint-plugin-next": "16.1.1",
+    "@next/eslint-plugin-next": "16.1.6",
     "fast-glob": "3.3.1",
     "is-extglob": "2.1.1",
     "is-glob": "4.0.3",
