@@ -3,15 +3,15 @@
 import { ref } from "vue";
 
 const greeting = ref(`Hello, Vue 3!${  1}`);
-let counter = ref(0);
-let doubled = computed(() => counter.value * 2);
+const counter = ref(0);
+const doubled = computed(() => counter.value * 2);
 
 // Define a function
 const incrementCounter = () => {
   counter.value++;
 };
 
-let _zero = doubled.value + counter.value;
+const _zero = doubled.value + counter.value;
 </script>
 
 <template>

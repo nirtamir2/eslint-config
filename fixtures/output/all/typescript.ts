@@ -12,7 +12,7 @@ const people: Array<Person> = [
 ];
 
  
-let {log} = console;
+const {log} = console;
 
 // Use a for...of loop to iterate over the array
 for (const person of people) {
@@ -73,7 +73,7 @@ class Dog extends Animal {
 const dog = new Dog("Buddy");
 dog.bark();
 
-let fn = (): string => {
+const fn = (): string => {
   return `hello${  1}`;
 };
 
