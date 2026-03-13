@@ -1,11 +1,12 @@
 import { join } from "node:path";
 import process from "node:process";
+import { fileURLToPath } from "node:url";
 import { execa } from "execa";
 import fs from "fs-extra";
 import { afterAll, beforeEach, expect, it } from "vitest";
 
-const CLI_PATH = join(__dirname, "../bin/index.js");
-const genPath = join(__dirname, "..", ".temp", randomStr());
+const CLI_PATH = fileURLToPath(new URL("../src/cli/index.ts", import.meta.url));
+const genPath = fileURLToPath(new URL(`../.temp/${randomStr()}`, import.meta.url));
 
 function randomStr() {
   // eslint-disable-next-line sonarjs/pseudo-random
@@ -19,7 +20,7 @@ async function run(
     NO_COLOR: "1",
   },
 ) {
-  return await execa("node", [CLI_PATH, ...params], {
+  return await execa("pnpm", ["exec", "tsx", CLI_PATH, ...params], {
     cwd: genPath,
     env: {
       ...process.env,
@@ -62,7 +63,7 @@ it("package.json updated", async () => {
 });
 
 it("esm eslint.config.js", async () => {
-  const pkgContent = await fs.readFile("package.json", "utf8");
+  const pkgContent = await fs.readFile(join(genPath, "package.json"), "utf8");
   await fs.writeFile(
     join(genPath, "package.json"),
     JSON.stringify({ ...JSON.parse(pkgContent), type: "module" }, null, 2),

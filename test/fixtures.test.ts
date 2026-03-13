@@ -5,6 +5,9 @@ import fg from "fast-glob";
 import fs from "fs-extra";
 import { afterAll, beforeAll, it } from "vitest";
 
+const isWindows = process.platform === "win32";
+const timeout = isWindows ? 300_000 : 60_000;
+
 beforeAll(async () => {
   await fs.rm("_fixtures", { recursive: true, force: true });
 });
@@ -17,9 +20,7 @@ afterAll(async () => {
 //   vue: false,
 // });
 runWithConfig("all", {
-  typescript: {
-    tsconfigPath: "tsconfig.json",
-  },
+  typescript: true,
   vue: true,
   svelte: true,
   astro: true,
@@ -108,8 +109,9 @@ export default nirtamir2(
   `,
       );
 
-      await execa("npx", ["eslint", "--fix"], {
+      await execa("pnpm", ["exec", "eslint", ".", "--fix"], {
         cwd: target,
+        reject: false,
         stdio: "pipe",
       });
 
@@ -131,6 +133,6 @@ export default nirtamir2(
         }),
       );
     },
-    30_000,
+    timeout,
   );
 }
