@@ -1,5 +1,5 @@
-import { GLOB_JSX, GLOB_TSX } from "../globs";
 import type { TypedFlatConfigItem } from "../types";
+import { GLOB_JSX, GLOB_TSX } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function jsx(): Promise<Array<TypedFlatConfigItem>> {

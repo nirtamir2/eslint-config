@@ -1,12 +1,15 @@
-import * as p from "@clack/prompts";
+import type { PromptResult } from "../types";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
+import process from "node:process";
+import * as p from "@clack/prompts";
 // @ts-expect-error missing types
 import parse from "parse-gitignore";
 import c from "picocolors";
-import type { PromptResult } from "../types";
 import { getEslintConfigContent } from "../utils";
+
+const LEGACY_CONFIG_FILE_PATTERN = /eslint|prettier/;
 
 export async function updateEslintFiles(result: PromptResult) {
   const cwd = process.cwd();
@@ -62,7 +65,10 @@ export async function updateEslintFiles(result: PromptResult) {
   const files = fs.readdirSync(cwd);
   const legacyConfig: Array<string> = [];
   for (const file of files) {
-    if (/eslint|prettier/.test(file) && !file.includes("eslint.config."))
+    if (
+      LEGACY_CONFIG_FILE_PATTERN.test(file) &&
+      !file.includes("eslint.config.")
+    )
       legacyConfig.push(file);
   }
 

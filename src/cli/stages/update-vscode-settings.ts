@@ -1,10 +1,11 @@
-import * as p from "@clack/prompts";
+import type { PromptResult } from "../types";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
+import process from "node:process";
+import * as p from "@clack/prompts";
 import c from "picocolors";
 import { vscodeSettingsString } from "../constants";
-import type { PromptResult } from "../types";
 
 export async function updateVscodeSettings(
   result: PromptResult,
@@ -20,10 +21,10 @@ export async function updateVscodeSettings(
     await fsp.mkdir(dotVscodePath, { recursive: true });
 
   if (fs.existsSync(settingsPath)) {
-    let settingsContent = await fsp.readFile(settingsPath, "utf8");
+    let settingsContent = (await fsp.readFile(settingsPath, "utf8")).trim();
+    if (settingsContent.endsWith("}"))
+      settingsContent = settingsContent.slice(0, -1).trimEnd();
 
-    // eslint-disable-next-line sonarjs/slow-regex
-    settingsContent = settingsContent.trim().replace(/\s*}$/, "");
     settingsContent +=
       settingsContent.endsWith(",") || settingsContent.endsWith("{") ? "" : ",";
     settingsContent += `${vscodeSettingsString}}\n`;

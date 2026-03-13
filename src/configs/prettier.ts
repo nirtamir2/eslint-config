@@ -1,5 +1,5 @@
-import { eslintConfigPrettier } from "../plugins";
 import type { TypedFlatConfigItem } from "../types";
+import { eslintConfigPrettier } from "../plugins";
 
 /**
  * Optional perfectionist plugin for props and items sorting.

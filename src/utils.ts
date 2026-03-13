@@ -1,5 +1,10 @@
-import { isPackageExists } from "local-pkg";
 import type { Awaitable, TypedFlatConfigItem } from "./types";
+import fs from "node:fs";
+import fsPromises from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
+import { fileURLToPath } from "node:url";
+import { isPackageExists } from "local-pkg";
 
 export const parserPlain = {
   meta: {
@@ -27,9 +32,9 @@ export const parserPlain = {
  * @param {...any} configs
  */
 export async function combine(
-  ...configs: Array<Awaitable<TypedFlatConfigItem | Array<TypedFlatConfigItem>>>
+  ...configs: Array<Awaitable<Array<TypedFlatConfigItem>>>
 ): Promise<Array<TypedFlatConfigItem>> {
-  const resolved = await Promise.all(configs);
+  const resolved = await Promise.all(configs.map((c) => Promise.resolve(c)));
   return resolved.flat();
 }
 
@@ -105,6 +110,42 @@ export function toArray<T>(value: T | Array<T>): Array<T> {
   return Array.isArray(value) ? value : [value];
 }
 
+export async function findUp(
+  name: string,
+  startDir = process.cwd(),
+): Promise<string | undefined> {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const candidate = path.join(currentDir, name);
+
+    try {
+      await fsPromises.access(candidate);
+      return candidate;
+    } catch {}
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) return undefined;
+    currentDir = parentDir;
+  }
+}
+
+export function findUpSync(
+  name: string,
+  startDir = process.cwd(),
+): string | undefined {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const candidate = path.join(currentDir, name);
+    if (fs.existsSync(candidate)) return candidate;
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) return undefined;
+    currentDir = parentDir;
+  }
+}
+
 export async function interopDefault<T>(
   m: Awaitable<T>,
 ): Promise<T extends { default: infer U } ? U : T> {
@@ -112,11 +153,26 @@ export async function interopDefault<T>(
   return (resolved as any).default || resolved;
 }
 
+const scopeUrl = fileURLToPath(new URL(".", import.meta.url));
+const isCwdInScope = isPackageExists("@nirtamir2/eslint-config");
+
+export function isPackageInScope(name: string): boolean {
+  return isPackageExists(name, { paths: [scopeUrl] });
+}
+
+export function isInGitHooksOrLintStaged(): boolean {
+  return Boolean(
+    process.env.GIT_PARAMS ||
+    process.env.VSCODE_GIT_COMMAND ||
+    process.env.npm_lifecycle_script?.startsWith("lint-staged"),
+  );
+}
+
 export async function ensurePackages(packages: Array<string | undefined>) {
-  if (process.env.CI || !process.stdout.isTTY) return;
+  if (process.env.CI || !process.stdout.isTTY || !isCwdInScope) return;
 
   const nonExistingPackages = packages.filter(
-    (i) => i && !isPackageExists(i),
+    (i) => i && !isPackageInScope(i),
   ) as Array<string>;
   if (nonExistingPackages.length === 0) return;
 
@@ -135,12 +191,14 @@ export async function ensurePackages(packages: Array<string | undefined>) {
 }
 
 export function isInEditorEnv(): boolean {
+  if (process.env.CI) return false;
+  if (isInGitHooksOrLintStaged()) return false;
   return Boolean(
-    (process.env.VSCODE_PID ||
-      process.env.VSCODE_CWD ||
-      process.env.JETBRAINS_IDE ||
-      process.env.VIM ||
-      process.env.NVIM) &&
-    !process.env.CI,
+    process.env.VSCODE_PID ||
+    process.env.VSCODE_CWD ||
+    process.env.JETBRAINS_IDE ||
+    process.env.VIM ||
+    process.env.NVIM ||
+    (process.env.ZED_ENVIRONMENT && !process.env.ZED_TERM),
   );
 }

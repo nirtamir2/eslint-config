@@ -9,5 +9,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "exclude": ["./fixtures/**/*.*", "./_fixtures/**/*.*"]
+  "exclude": [
+    "./dist/**/*.*",
+    "./fixtures/**/*.*",
+    "./_fixtures/**/*.*",
+    "./stuff/**/*.*"
+  ]
 }

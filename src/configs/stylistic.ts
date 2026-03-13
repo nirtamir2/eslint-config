@@ -1,9 +1,9 @@
-import { pluginAntfu } from "../plugins";
 import type {
   OptionsOverrides,
   StylisticConfig,
   TypedFlatConfigItem,
 } from "../types";
+import { pluginAntfu } from "../plugins";
 import { interopDefault } from "../utils";
 
 export const StylisticConfigDefaults: StylisticConfig = {
@@ -11,6 +11,7 @@ export const StylisticConfigDefaults: StylisticConfig = {
   quotes: "double",
   jsx: true,
   semi: true,
+  experimental: false,
 };
 
 export interface StylisticOptions extends StylisticConfig, OptionsOverrides {
@@ -26,6 +27,7 @@ export async function stylistic(
     quotes,
     jsx,
     semi,
+    experimental,
     overrides = {},
   } = {
     ...StylisticConfigDefaults,
@@ -37,6 +39,7 @@ export async function stylistic(
   );
 
   const config = pluginStylistic.configs.customize({
+    experimental,
     indent,
     jsx,
     pluginName: "style",
@@ -54,7 +57,9 @@ export async function stylistic(
       rules: {
         ...config.rules,
 
-        "antfu/consistent-list-newline": "error",
+        ...(experimental ? {} : { "antfu/consistent-list-newline": "error" }),
+
+        "antfu/consistent-chaining": "error",
 
         ...(lessOpinionated
           ? {
@@ -65,6 +70,9 @@ export async function stylistic(
               "antfu/if-newline": "error",
               "antfu/top-level-function": "error",
             }),
+
+        "style/generator-star-spacing": ["error", { after: true, before: false }],
+        "style/yield-star-spacing": ["error", { after: true, before: false }],
 
         ...overrides,
       },

@@ -5,14 +5,14 @@ interface Person {
 }
 
 // Create an array of objects with the defined interface
-const people: Person[] = [
+const people: Array<Person> = [
   { name: "Alice", age: 30 },
   { name: "Bob", age: 25 },
   { name: "Charlie", age: 35 },
 ];
 
-// eslint-disable-next-line no-console
-const log = console.log;
+ 
+const {log} = console;
 
 // Use a for...of loop to iterate over the array
 for (const person of people) {
@@ -55,7 +55,6 @@ class Animal {
   constructor(name: string) {
     this.name = name;
   }
-
   protected makeSound(sound: string) {
     log(`${this.name} says ${sound}`);
   }
@@ -66,7 +65,6 @@ class Dog extends Animal {
   constructor(private alias: string) {
     super(alias);
   }
-
   bark() {
     this.makeSound("Woof!");
   }
@@ -75,8 +73,8 @@ class Dog extends Animal {
 const dog = new Dog("Buddy");
 dog.bark();
 
-function fn(): string {
-  return `hello${1}`;
-}
+const fn = (): string => {
+  return `hello${  1}`;
+};
 
 log(car1, car2, favoriteFruit, numericValue, fn());

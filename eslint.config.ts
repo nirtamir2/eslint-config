@@ -60,7 +60,12 @@ export default nirtamir2(
       },
     },
     {
-      ignores: ["fixtures/input", "_fixtures"],
+      ignores: [
+        "fixtures/input",
+        "fixtures/jsx-a11y-errors",
+        "fixtures/jsx-a11y-valid",
+        "_fixtures",
+      ],
     },
   ],
 );

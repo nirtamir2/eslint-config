@@ -1,5 +1,5 @@
-import c from "picocolors";
 import type { ExtraLibrariesOption, FrameworkOption, PromItem } from "./types";
+import c from "picocolors";
 
 export const vscodeSettingsString = `
   // Enable the ESlint flat config support

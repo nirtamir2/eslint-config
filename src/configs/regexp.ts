@@ -1,9 +1,9 @@
-import { configs } from "eslint-plugin-regexp";
 import type {
   OptionsOverrides,
   OptionsRegExp,
   TypedFlatConfigItem,
 } from "../types";
+import { configs } from "eslint-plugin-regexp";
 
 const nirOverridesConfig: TypedFlatConfigItem["rules"] = {
   // Nir's override

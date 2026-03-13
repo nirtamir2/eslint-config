@@ -1,3 +1,9 @@
+import type {
+  OptionsFormatters,
+  StylisticConfig,
+  TypedFlatConfigItem,
+} from "../types";
+import type { VendoredPrettierOptions } from "../vender/prettier-types";
 import { isPackageExists } from "local-pkg";
 import {
   GLOB_ASTRO,
@@ -9,31 +15,46 @@ import {
   GLOB_MARKDOWN,
   GLOB_POSTCSS,
   GLOB_SCSS,
+  GLOB_SVG,
   GLOB_XML,
 } from "../globs";
-import type {
-  OptionsFormatters,
-  StylisticConfig,
-  TypedFlatConfigItem,
-} from "../types";
-import { ensurePackages, interopDefault, parserPlain } from "../utils";
-import type { VendoredPrettierOptions } from "../vender/prettier-types";
+import {
+  ensurePackages,
+  interopDefault,
+  isPackageInScope,
+  parserPlain,
+} from "../utils";
 import { StylisticConfigDefaults } from "./stylistic";
+
+function mergePrettierOptions<
+  T extends Record<string, any> & { parser: string },
+>(options: VendoredPrettierOptions, overrides: T): VendoredPrettierOptions & T {
+  return {
+    ...options,
+    ...overrides,
+    plugins: [
+      ...(overrides.plugins || []),
+      ...((options.plugins as Array<string>) || []),
+    ],
+  } as VendoredPrettierOptions & T;
+}
 
 export async function formatters(
   options: OptionsFormatters | true = {},
   stylistic: StylisticConfig = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   if (options === true) {
+    const isPrettierPluginXmlInScope = isPackageInScope("@prettier/plugin-xml");
     options = {
-      astro: isPackageExists("prettier-plugin-astro"),
+      astro: isPackageInScope("prettier-plugin-astro"),
       css: true,
       graphql: true,
       html: true,
       markdown: true,
       slidev: isPackageExists("@slidev/cli"),
+      svg: isPrettierPluginXmlInScope,
       tailwindcss: isPackageExists("tailwindcss"),
-      xml: isPackageExists("@prettier/plugin-xml"),
+      xml: isPrettierPluginXmlInScope,
     };
   }
 
@@ -56,38 +77,35 @@ export async function formatters(
       "`slidev` option only works when `markdown` is enabled with `prettier`",
     );
 
-  const { indent, quotes, semi } = {
+  const { semi, indent, quotes } = {
     ...StylisticConfigDefaults,
     ...stylistic,
   };
 
-  const prettierOptions: VendoredPrettierOptions = Object.assign(
-    {
-      endOfLine: "auto",
-      semi,
-      singleQuote: quotes === "single",
-      tabWidth: typeof indent === "number" ? indent : 2,
-      trailingComma: "all",
-      useTabs: indent === "tab",
-    } satisfies VendoredPrettierOptions,
-    options.prettierOptions || {},
-  );
+  const prettierOptions: VendoredPrettierOptions = {
+    printWidth: 120,
+    tabWidth: typeof indent === "number" ? indent : 2,
+    useTabs: indent === "tab",
+    semi,
+    singleQuote: quotes === "single",
+    trailingComma: "all",
+    endOfLine: "auto",
+    ...options.prettierOptions,
+  };
 
-  const prettierXmlOptions = {
+  const prettierXmlOptions: Partial<VendoredPrettierOptions> = {
     xmlQuoteAttributes: "double",
     xmlSelfClosingSpace: true,
     xmlSortAttributesByKey: false,
     xmlWhitespaceSensitivity: "ignore",
   };
 
-  const dprintOptions = Object.assign(
-    {
-      indentWidth: typeof indent === "number" ? indent : 2,
-      quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
-      useTabs: indent === "tab",
-    },
-    options.dprintOptions || {},
-  );
+  const dprintOptions = {
+    indentWidth: typeof indent === "number" ? indent : 2,
+    quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
+    useTabs: indent === "tab",
+    ...(typeof options.dprintOptions === "object" ? options.dprintOptions : {}),
+  };
 
   const pluginFormat = await interopDefault(import("eslint-plugin-format"));
 
@@ -111,10 +129,9 @@ export async function formatters(
         rules: {
           "format/prettier": [
             "error",
-            {
-              ...prettierOptions,
+            mergePrettierOptions(prettierOptions, {
               parser: "css",
-            },
+            }),
           ],
         },
       },
@@ -127,10 +144,9 @@ export async function formatters(
         rules: {
           "format/prettier": [
             "error",
-            {
-              ...prettierOptions,
+            mergePrettierOptions(prettierOptions, {
               parser: "scss",
-            },
+            }),
           ],
         },
       },
@@ -143,10 +159,9 @@ export async function formatters(
         rules: {
           "format/prettier": [
             "error",
-            {
-              ...prettierOptions,
+            mergePrettierOptions(prettierOptions, {
               parser: "less",
-            },
+            }),
           ],
         },
       },
@@ -163,10 +178,9 @@ export async function formatters(
       rules: {
         "format/prettier": [
           "error",
-          {
-            ...prettierOptions,
+          mergePrettierOptions(prettierOptions, {
             parser: "html",
-          },
+          }),
         ],
       },
     });
@@ -182,12 +196,35 @@ export async function formatters(
       rules: {
         "format/prettier": [
           "error",
-          {
-            ...prettierXmlOptions,
-            ...prettierOptions,
-            parser: "xml",
-            plugins: ["@prettier/plugin-xml"],
-          },
+          mergePrettierOptions(
+            { ...prettierXmlOptions, ...prettierOptions },
+            {
+              parser: "xml",
+              plugins: ["@prettier/plugin-xml"],
+            },
+          ),
+        ],
+      },
+    });
+  }
+
+  if (options.svg) {
+    configs.push({
+      files: [GLOB_SVG],
+      languageOptions: {
+        parser: parserPlain,
+      },
+      name: "antfu/formatter/svg",
+      rules: {
+        "format/prettier": [
+          "error",
+          mergePrettierOptions(
+            { ...prettierXmlOptions, ...prettierOptions },
+            {
+              parser: "xml",
+              plugins: ["@prettier/plugin-xml"],
+            },
+          ),
         ],
       },
     });
@@ -213,12 +250,10 @@ export async function formatters(
         [`format/${formater}`]: [
           "error",
           formater === "prettier"
-            ? {
-                printWidth: 120,
-                ...prettierOptions,
+            ? mergePrettierOptions(prettierOptions, {
                 embeddedLanguageFormatting: "off",
                 parser: "markdown",
-              }
+              })
             : {
                 ...dprintOptions,
                 language: "markdown",
@@ -237,13 +272,11 @@ export async function formatters(
         rules: {
           "format/prettier": [
             "error",
-            {
-              printWidth: 120,
-              ...prettierOptions,
+            mergePrettierOptions(prettierOptions, {
               embeddedLanguageFormatting: "off",
               parser: "slidev",
               plugins: ["prettier-plugin-slidev"],
-            },
+            }),
           ],
         },
       });
@@ -261,11 +294,10 @@ export async function formatters(
         rules: {
           "format/prettier": [
             "error",
-            {
-              ...prettierOptions,
+            mergePrettierOptions(prettierOptions, {
               parser: "astro",
               plugins: ["prettier-plugin-astro"],
-            },
+            }),
           ],
         },
       },
@@ -295,10 +327,9 @@ export async function formatters(
       rules: {
         "format/prettier": [
           "error",
-          {
-            ...prettierOptions,
+          mergePrettierOptions(prettierOptions, {
             parser: "graphql",
-          },
+          }),
         ],
       },
     });

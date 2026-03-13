@@ -1,5 +1,5 @@
-import { pluginNode } from "../plugins";
 import type { TypedFlatConfigItem } from "../types";
+import { pluginNode } from "../plugins";
 
 export async function node(): Promise<Array<TypedFlatConfigItem>> {
   return [
@@ -14,8 +14,8 @@ export async function node(): Promise<Array<TypedFlatConfigItem>> {
         "n/no-exports-assign": "error",
         "n/no-new-require": "error",
         "n/no-path-concat": "error",
-        "n/prefer-global/buffer": "error",
-        "n/prefer-global/process": "error",
+        "n/prefer-global/buffer": ["error", "never"],
+        "n/prefer-global/process": ["error", "never"],
         "n/process-exit-as-throw": "error",
       },
     },

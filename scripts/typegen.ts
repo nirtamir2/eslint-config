@@ -1,13 +1,15 @@
+import fs from "node:fs/promises";
 import { flatConfigsToRulesDTS } from "eslint-typegen/core";
 import { builtinRules } from "eslint/use-at-your-own-risk";
-import fs from "node:fs/promises";
 import {
   a11y,
+  angular,
   astro,
   combine,
   command,
   comments,
   defaultImportName,
+  e18e,
   formatters,
   i18n,
   ignores,
@@ -16,8 +18,10 @@ import {
   jsdoc,
   jsonc,
   markdown,
+  nextjs,
   node,
   perfectionist,
+  pnpm,
   prettier,
   query,
   react,
@@ -40,17 +44,21 @@ import {
 } from "../src";
 
 const configs = await combine(
-  {
-    plugins: {
-      "": {
-        rules: Object.fromEntries(builtinRules.entries()),
+  [
+    {
+      plugins: {
+        "": {
+          rules: Object.fromEntries(builtinRules.entries()),
+        },
       },
     },
-  },
+  ],
   a11y(),
+  angular(),
   astro(),
   command(),
   comments(),
+  e18e(),
   formatters(),
   i18n(),
   ignores(),
@@ -61,8 +69,10 @@ const configs = await combine(
   tsdoc(),
   defaultImportName(),
   markdown(),
+  nextjs(),
   node(),
   perfectionist(),
+  pnpm(),
   prettier(),
   react(),
   regexp(),
@@ -87,7 +97,7 @@ const configNames = configs
   .map((i) => i?.name)
   .filter(Boolean) as Array<string>;
 
-let dts = await flatConfigsToRulesDTS(configs, {
+let dts = await flatConfigsToRulesDTS(configs as any, {
   includeAugmentation: false,
 });
 

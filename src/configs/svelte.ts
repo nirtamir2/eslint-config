@@ -1,4 +1,3 @@
-import { GLOB_SVELTE } from "../globs";
 import type {
   OptionsFiles,
   OptionsHasTypeScript,
@@ -6,6 +5,7 @@ import type {
   OptionsStylistic,
   TypedFlatConfigItem,
 } from "../types";
+import { GLOB_SVELTE } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function svelte(

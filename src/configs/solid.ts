@@ -1,4 +1,3 @@
-import { GLOB_JSX, GLOB_TSX } from "../globs";
 import type {
   OptionsFiles,
   OptionsHasTypeScript,
@@ -6,6 +5,7 @@ import type {
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
+import { GLOB_JSX, GLOB_TSX } from "../globs";
 import { ensurePackages, interopDefault, toArray } from "../utils";
 import { a11y } from "./a11y";
 import { react } from "./react";

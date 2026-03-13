@@ -1,10 +1,10 @@
-import { GLOB_TESTS } from "../globs";
 import type {
   OptionsFiles,
   OptionsIsInEditor,
   OptionsOverrides,
   TypedFlatConfigItem,
 } from "../types";
+import { GLOB_TESTS } from "../globs";
 import { interopDefault } from "../utils";
 
 // Hold the reference so we don't redeclare the plugin on each call
@@ -52,6 +52,11 @@ export async function test(
         "vitest/no-only-tests": isInEditor ? "warn" : "error",
         "vitest/prefer-hooks-in-order": "error",
         "vitest/prefer-lowercase-title": "error",
+
+        // Disables
+        "antfu/no-top-level-await": "off",
+        "no-unused-expressions": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
 
         ...overrides,
       },
