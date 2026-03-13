@@ -1,7 +1,13 @@
 [
-  "<ignored>",
-  "<ignored>",
-  "<ignored>",
+  {
+    "name": "[ignored]",
+  },
+  {
+    "name": "[ignored]",
+  },
+  {
+    "name": "[ignored]",
+  },
   {
     "name": "antfu/javascript/rules",
     "plugins": [
