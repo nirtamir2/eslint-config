@@ -1,5 +1,5 @@
-import type { ExtraLibrariesOption, FrameworkOption, PromItem } from "./types";
 import c from "picocolors";
+import type { ExtraLibrariesOption, FrameworkOption, PromItem } from "./types";
 
 export const vscodeSettingsString = `
   // Enable the ESlint flat config support
@@ -92,6 +92,11 @@ export const extraOptions: Array<PromItem<ExtraLibrariesOption>> = [
     label: c.red("Formatter"),
     value: "formatter",
     hint: "Use external formatters (Prettier and/or dprint) to format files that ESLint cannot handle yet (.css, .html, etc)",
+  },
+  {
+    label: c.green("Perfectionist"),
+    value: "perfectionist",
+    hint: "Sort imports and exports with eslint-plugin-perfectionist",
   },
   {
     label: c.cyan("UnoCSS"),

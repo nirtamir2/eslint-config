@@ -15,6 +15,12 @@ const suites: Array<Suite> = [
     configs: {},
   },
   {
+    name: "perfectionist",
+    configs: {
+      perfectionist: true,
+    },
+  },
+  {
     name: "in-editor",
     configs: {
       isInEditor: true,

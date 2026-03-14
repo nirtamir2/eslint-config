@@ -1,10 +1,10 @@
-import type { ExtraLibrariesOption, PromptResult } from "../types";
+import * as p from "@clack/prompts";
 import fsp from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import * as p from "@clack/prompts";
 import c from "picocolors";
 import { dependenciesMap, pkgJson } from "../constants";
+import type { ExtraLibrariesOption, PromptResult } from "../types";
 
 const ESLINT_TS_PATCH_SUFFIX_PATTERN = /-\d+$/;
 
@@ -37,6 +37,13 @@ export async function updatePackageJson(result: PromptResult) {
               : null,
           ] as const) {
             if (!f) continue;
+            pkg.devDependencies[f] = pkgJson.devDependencies[f];
+            addedPackages.push(f);
+          }
+          break;
+        }
+        case "perfectionist": {
+          for (const f of ["eslint-plugin-perfectionist"] as const) {
             pkg.devDependencies[f] = pkgJson.devDependencies[f];
             addedPackages.push(f);
           }

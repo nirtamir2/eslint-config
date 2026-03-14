@@ -1,12 +1,12 @@
-import type { PromptResult } from "../types";
+import * as p from "@clack/prompts";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
-import * as p from "@clack/prompts";
 // @ts-expect-error missing types
 import parse from "parse-gitignore";
 import c from "picocolors";
+import type { PromptResult } from "../types";
 import { getEslintConfigContent } from "../utils";
 
 const LEGACY_CONFIG_FILE_PATTERN = /eslint|prettier/;
@@ -45,6 +45,9 @@ export async function updateEslintFiles(result: PromptResult) {
     configLines.push(`ignores: ${JSON.stringify(eslintIgnores)},`);
 
   if (result.extra.includes("formatter")) configLines.push(`formatters: true,`);
+
+  if (result.extra.includes("perfectionist"))
+    configLines.push(`perfectionist: true,`);
 
   if (result.extra.includes("unocss")) configLines.push(`unocss: true,`);
 

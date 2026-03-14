@@ -757,18 +757,6 @@
     ],
   },
   {
-    "name": "antfu/perfectionist/setup",
-    "plugins": [
-      "perfectionist",
-    ],
-    "rules": [
-      "perfectionist/sort-exports",
-      "perfectionist/sort-imports",
-      "perfectionist/sort-named-exports",
-      "perfectionist/sort-named-imports",
-    ],
-  },
-  {
     "files": [
       "**/*.?([cm])jsx",
       "**/*.?([cm])tsx",

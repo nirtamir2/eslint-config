@@ -350,6 +350,12 @@ export interface OptionsConfig
   storybook?: boolean;
   i18n?: boolean;
   security?: boolean;
+  /**
+   * Enable import/export sorting with eslint-plugin-perfectionist.
+   *
+   * @default false
+   */
+  perfectionist?: boolean;
 
   /**
    * Core rules. Can't be disabled.

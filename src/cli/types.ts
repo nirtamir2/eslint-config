@@ -12,7 +12,7 @@ export type FrameworkOption =
   | "solid"
   | "slidev";
 
-export type ExtraLibrariesOption = "formatter" | "unocss";
+export type ExtraLibrariesOption = "formatter" | "perfectionist" | "unocss";
 
 export interface PromptResult {
   uncommittedConfirmed: boolean;

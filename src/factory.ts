@@ -1,10 +1,4 @@
 import type { Linter } from "eslint";
-import type {
-  Awaitable,
-  ConfigNames,
-  OptionsConfig,
-  TypedFlatConfigItem,
-} from "./types";
 import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import {
@@ -50,6 +44,12 @@ import { regexp } from "./configs/regexp";
 import { security } from "./configs/security";
 import { storybook } from "./configs/storybook";
 import { tailwindcss } from "./configs/tailwindcss";
+import type {
+  Awaitable,
+  ConfigNames,
+  OptionsConfig,
+  TypedFlatConfigItem,
+} from "./types";
 import { findUpSync, interopDefault, isInEditorEnv } from "./utils";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
@@ -115,6 +115,7 @@ export function nirtamir2(
     jsx: enableJsx = true,
     nextjs: enableNextjs = isPackageExists("next"),
     pnpm: enablePnpm = Boolean(findUpSync("pnpm-workspace.yaml")),
+    perfectionist: enablePerfectionist = false,
     react: enableReact = false,
     regexp: enableRegexp = true,
     solid: enableSolid = false,
@@ -187,10 +188,11 @@ export function nirtamir2(
     }),
     unicorn(),
     command(),
-
-    // Optional plugins (installed but not enabled by default)
-    perfectionist(),
   );
+
+  if (enablePerfectionist) {
+    configs.push(perfectionist());
+  }
 
   if (enableVue) {
     componentExts.push("vue");
