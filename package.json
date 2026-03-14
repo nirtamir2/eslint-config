@@ -1,7 +1,7 @@
 {
   "name": "@nirtamir2/eslint-config",
   "type": "module",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "packageManager": "pnpm@10.32.1",
   "description": "Nir Tamir's ESLint config",
   "author": "Nir Tamir <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
