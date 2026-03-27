@@ -312,9 +312,7 @@ export interface OptionsUnoCSS extends OptionsOverrides {
   strict?: boolean;
 }
 
-export interface OptionsReact extends OptionsOverrides {
-  reactCompiler?: boolean;
-}
+export interface OptionsReact extends OptionsOverrides {}
 
 export interface OptionsConfig
   extends OptionsComponentExts, OptionsProjectType {
@@ -492,7 +490,6 @@ export interface OptionsConfig
    *
    * Requires installing:
    * - `@eslint-react/eslint-plugin`
-   * - `eslint-plugin-react-hooks`
    * - `eslint-plugin-react-refresh`
    *
    * @default false
