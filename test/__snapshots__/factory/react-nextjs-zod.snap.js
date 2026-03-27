@@ -1202,6 +1202,8 @@
       "@eslint-react/naming-convention/context-name",
       "@eslint-react/naming-convention/id-name",
       "@eslint-react/naming-convention/ref-name",
+      "- @eslint-react/dom/no-string-style-prop",
+      "- @eslint-react/dom/no-unknown-property",
       "@eslint-react/prefer-namespace-import",
     ],
   },
