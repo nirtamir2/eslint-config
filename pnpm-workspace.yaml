@@ -92,7 +92,7 @@ catalogs:
     eslint-plugin-array-func: ^5.1.1
     eslint-plugin-clsx: ^0.0.12
     eslint-plugin-command: ^3.5.2
-    eslint-plugin-default-import-name: ^0.6.2
+    eslint-plugin-default-import-name: ^0.6.3
     eslint-plugin-erasable-syntax-only: ^0.4.0
     eslint-plugin-eslint-comments: ^3.2.0
     eslint-plugin-expect-type: ^0.6.2
