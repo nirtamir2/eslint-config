@@ -119,9 +119,6 @@
     "eslint-plugin-perfectionist": {
       "optional": true
     },
-    "eslint-plugin-react": {
-      "optional": true
-    },
     "eslint-plugin-react-refresh": {
       "optional": true
     },
@@ -248,7 +245,6 @@
     "eslint-plugin-import-zod": "catalog:peer",
     "eslint-plugin-jsx-a11y": "catalog:peer",
     "eslint-plugin-perfectionist": "catalog:prod",
-    "eslint-plugin-react": "catalog:peer",
     "eslint-plugin-react-refresh": "catalog:peer",
     "eslint-plugin-react-you-might-not-need-an-effect": "catalog:peer",
     "eslint-plugin-security": "catalog:inline",
