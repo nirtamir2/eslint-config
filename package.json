@@ -186,7 +186,6 @@
     "eslint-plugin-import-x": "catalog:prod",
     "eslint-plugin-jsdoc": "catalog:prod",
     "eslint-plugin-jsonc": "catalog:prod",
-    "eslint-plugin-markdown": "catalog:prod",
     "eslint-plugin-n": "catalog:prod",
     "eslint-plugin-no-only-tests": "catalog:prod",
     "eslint-plugin-no-use-extend-native": "catalog:prod",
