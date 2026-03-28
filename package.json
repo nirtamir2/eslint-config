@@ -1,8 +1,8 @@
 {
   "name": "@nirtamir2/eslint-config",
   "type": "module",
-  "version": "0.2.1",
-  "packageManager": "pnpm@10.32.1",
+  "version": "0.2.4",
+  "packageManager": "pnpm@10.33.0",
   "description": "Nir Tamir's ESLint config",
   "author": "Nir Tamir <nirtamir2@gmail.com> (https://github.com/nirtamir2/)",
   "license": "MIT",
@@ -42,7 +42,7 @@
     "@angular-eslint/eslint-plugin": "^21.1.0",
     "@angular-eslint/eslint-plugin-template": "^21.1.0",
     "@angular-eslint/template-parser": "^21.1.0",
-    "@eslint-react/eslint-plugin": "^2.12.4",
+    "@eslint-react/eslint-plugin": "^3.0.0",
     "@prettier/plugin-xml": "^3.4.1",
     "@tanstack/eslint-plugin-query": "^5.66.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -55,7 +55,6 @@
     "eslint-plugin-import-zod": "^1.2.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-perfectionist": "^5.6.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
     "eslint-plugin-react-you-might-not-need-an-effect": "^0.4.1",
     "eslint-plugin-solid": "^0.14.3",
@@ -123,9 +122,6 @@
     "eslint-plugin-react": {
       "optional": true
     },
-    "eslint-plugin-react-hooks": {
-      "optional": true
-    },
     "eslint-plugin-react-refresh": {
       "optional": true
     },
@@ -190,7 +186,6 @@
     "eslint-plugin-import-x": "catalog:prod",
     "eslint-plugin-jsdoc": "catalog:prod",
     "eslint-plugin-jsonc": "catalog:prod",
-    "eslint-plugin-markdown": "catalog:prod",
     "eslint-plugin-n": "catalog:prod",
     "eslint-plugin-no-only-tests": "catalog:prod",
     "eslint-plugin-no-use-extend-native": "catalog:prod",
@@ -254,7 +249,6 @@
     "eslint-plugin-jsx-a11y": "catalog:peer",
     "eslint-plugin-perfectionist": "catalog:prod",
     "eslint-plugin-react": "catalog:peer",
-    "eslint-plugin-react-hooks": "catalog:peer",
     "eslint-plugin-react-refresh": "catalog:peer",
     "eslint-plugin-react-you-might-not-need-an-effect": "catalog:peer",
     "eslint-plugin-security": "catalog:inline",
@@ -294,7 +288,7 @@
     "*": "eslint --fix"
   },
   "inlinedDependencies": {
-    "@next/eslint-plugin-next": "16.1.6",
+    "@next/eslint-plugin-next": "16.1.1",
     "fast-glob": "3.3.1",
     "is-extglob": "2.1.1",
     "is-glob": "4.0.3",

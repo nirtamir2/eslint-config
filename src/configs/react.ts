@@ -28,7 +28,6 @@ export async function react(
   await ensurePackages([
     "@eslint-react/eslint-plugin",
     "eslint-plugin-react-you-might-not-need-an-effect",
-    "eslint-plugin-react-hooks",
     "eslint-plugin-react-refresh",
     "eslint-plugin-react",
   ]);
@@ -40,13 +39,11 @@ export async function react(
 
   const [
     pluginReact,
-    pluginReactHooks,
     pluginReactRefresh,
     parserTs,
     pluginReactYouMightNotNeedAnEffect,
   ] = await Promise.all([
     interopDefault(import("@eslint-react/eslint-plugin")),
-    interopDefault(import("eslint-plugin-react-hooks")),
     interopDefault(import("eslint-plugin-react-refresh")),
     interopDefault(import("@typescript-eslint/parser")),
     interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
@@ -66,13 +63,11 @@ export async function react(
       plugins: {
         "@eslint-react": plugins["@eslint-react"],
         "@eslint-react/dom": plugins["@eslint-react/dom"],
-        "@eslint-react/hooks-extra": plugins["@eslint-react/hooks-extra"],
         "@eslint-react/naming-convention":
           plugins["@eslint-react/naming-convention"],
         "@eslint-react/web-api": plugins["@eslint-react/web-api"],
         "@eslint-react/rsc": plugins["@eslint-react/rsc"],
 
-        "react-hooks": pluginReactHooks,
         "react-refresh": pluginReactRefresh,
         "react-you-might-not-need-an-effect":
           pluginReactYouMightNotNeedAnEffect,
@@ -96,62 +91,7 @@ export async function react(
         ...(isTypeAware
           ? pluginReact.configs["recommended-type-checked"].rules
           : pluginReact.configs["recommended-typescript"].rules),
-        // // recommended ru
-        // les from @eslint-react/dom
-        //         "@eslint-react/dom/no-children-in-void-dom-elements": "warn",
-        //         "@eslint-react/dom/no-dangerously-set-innerhtml": "warn",
-        //         "@eslint-react/dom/no-dangerously-set-innerhtml-with-children": "error",
-        //         "@eslint-react/dom/no-find-dom-node": "error",
-        //         "@eslint-react/dom/no-missing-button-type": "warn",
-        //         "@eslint-react/dom/no-missing-iframe-sandbox": "warn",
-        //         "@eslint-react/dom/no-namespace": "error",
-        //         "@eslint-react/dom/no-render-return-value": "error",
-        //         "@eslint-react/dom/no-script-url": "warn",
-        //         "@eslint-react/dom/no-unsafe-iframe-sandbox": "warn",
-        //         "@eslint-react/dom/no-unsafe-target-blank": "warn",
-
-        //         "@eslint-react/jsx-no-comment-textnodes": "warn",      // // recommended rules from @eslint-react
-        //         "@eslint-react/ensure-forward-ref-using-ref": "warn",
-        //         "@eslint-react/no-access-state-in-setstate": "error",
-        //         "@eslint-react/no-array-index-key": "warn",
-        //         "@eslint-react/no-children-count": "warn",
-        //         "@eslint-react/no-children-for-each": "warn",
-        //         "@eslint-react/no-children-map": "warn",
-        //         "@eslint-react/no-children-only": "warn",
-        //         "@eslint-react/no-children-prop": "warn",
-        //         "@eslint-react/no-children-to-array": "warn",
-        //         "@eslint-react/no-clone-element": "warn",
-        //         "@eslint-react/no-component-will-mount": "error",
-        //         "@eslint-react/no-component-will-receive-props": "error",
-        //         "@eslint-react/no-component-will-update": "error",
-        //         "@eslint-react/no-create-ref": "error",
-        //         "@eslint-react/no-direct-mutation-state": "error",
-        //         "@eslint-react/no-duplicate-key": "error",
-        //         "@eslint-react/no-implicit-key": "error",
-        //         "@eslint-react/no-missing-key": "error",
-        //         "@eslint-react/no-nested-components": "warn",
-        //         "@eslint-react/no-redundant-should-component-update": "error",
-        //         "@eslint-react/no-set-state-in-component-did-mount": "warn",
-        //         "@eslint-react/no-set-state-in-component-did-update": "warn",
-        //         "@eslint-react/no-set-state-in-component-will-update": "warn",
-        //         "@eslint-react/no-string-refs": "error",
-        //         "@eslint-react/no-unsafe-component-will-mount": "warn",
-        //         "@eslint-react/no-unsafe-component-will-receive-props": "warn",
-        //         "@eslint-react/no-unsafe-component-will-update": "warn",
-        //         "@eslint-react/no-unstable-context-value": "error",
-        //         "@eslint-react/no-unstable-default-props": "error",
-        //         "@eslint-react/no-unused-class-component-members": "warn",
-        //         "@eslint-react/no-unused-state": "warn",
-        //         "@eslint-react/no-useless-fragment": "warn",
-        //         "@eslint-react/prefer-destructuring-assignment": "warn",
-        //         "@eslint-react/prefer-shorthand-boolean": "warn",
-        //         "@eslint-react/prefer-shorthand-fragment": "warn",
-
-        //         ...(isTypeAware
-        //           ? {
-        //             "@eslint-react/no-leaked-conditional-rendering": "warn",
-        //           }
-        //           : {}),
+        "@eslint-react/prefer-namespace-import": "error",
       },
     },
     {
@@ -185,8 +125,28 @@ export async function react(
         ...overrides,
       },
     },
-    pluginReactHooks.configs.flat.recommended,
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
+    ...(isTypeAware
+      ? [
+          {
+            files,
+            languageOptions: {
+              parser: parserTs,
+              parserOptions: {
+                ecmaFeatures: {
+                  jsx: true,
+                },
+                projectService: true,
+              },
+              sourceType: "module",
+            },
+            name: "nirtamir2/react/type-aware-rules",
+            rules: {
+              "@eslint-react/no-leaked-conditional-rendering": "error",
+            },
+          },
+        ]
+      : []),
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:ssr-friendly/recommended"],
