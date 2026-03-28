@@ -21,8 +21,7 @@ export async function markdown(
     overrides = {},
   } = options;
 
-  // @ts-expect-error missing types
-  const markdown = await interopDefault(import("eslint-plugin-markdown"));
+  const markdown = await interopDefault(import("@eslint/markdown"));
 
   return [
     {
@@ -35,7 +34,7 @@ export async function markdown(
       files,
       ignores: [GLOB_MARKDOWN_IN_MARKDOWN],
       name: "antfu/markdown/processor",
-      // `eslint-plugin-markdown` only creates virtual files for code blocks,
+      // `@eslint/markdown` only creates virtual files for code blocks,
       // but not the markdown file itself. We use `eslint-merge-processors` to
       // add a pass-through processor for the markdown file itself.
       processor: mergeProcessors([
