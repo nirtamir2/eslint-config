@@ -166,17 +166,17 @@ export async function react(
           ],
 
           // https://github.com/yannickcr/eslint-plugin-react/blob/master/docs/rules/jsx-sort-props.md
-          "react/jsx-sort-props": [
-            "error",
-            {
-              callbacksLast: true,
-              shorthandFirst: true,
-              // "shorthandLast": <boolean>,
-              // "ignoreCase": <boolean>,
-              noSortAlphabetically: true,
-              reservedFirst: true,
-            },
-          ],
+          // "react/jsx-sort-props": [
+          //   "error",
+          //   {
+          //     callbacksLast: true,
+          //     shorthandFirst: true,
+          //     // "shorthandLast": <boolean>,
+          //     // "ignoreCase": <boolean>,
+          //     noSortAlphabetically: true,
+          //     reservedFirst: true,
+          //   },
+          // ],
           "react/jsx-key": [
             1,
             { checkFragmentShorthand: true, checkKeyMustBeforeSpread: true },
