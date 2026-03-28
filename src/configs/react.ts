@@ -95,12 +95,8 @@ export async function react(
           : pluginReact.configs["recommended-typescript"].rules),
         "@eslint-react/dom/no-unknown-property": "error",
         "@eslint-react/dom/no-unsafe-target-blank": "error",
-        "@eslint-react/jsx-no-comment-textnodes": "error",
         "@eslint-react/no-children-prop": "error",
         "@eslint-react/no-unstable-context-value": "error",
-        "@eslint-react/no-unsafe-component-will-mount": "error",
-        "@eslint-react/no-unsafe-component-will-receive-props": "error",
-        "@eslint-react/no-unsafe-component-will-update": "error",
         "@eslint-react/no-useless-fragment": "error",
         "@eslint-react/prefer-namespace-import": "error",
         "style/jsx-curly-brace-presence": [
@@ -148,27 +144,6 @@ export async function react(
       },
     },
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
-    ...(isTypeAware
-      ? [
-          {
-            files,
-            languageOptions: {
-              parser: parserTs,
-              parserOptions: {
-                ecmaFeatures: {
-                  jsx: true,
-                },
-                projectService: true,
-              },
-              sourceType: "module",
-            },
-            name: "nirtamir2/react/type-aware-rules",
-            rules: {
-              "@eslint-react/no-leaked-conditional-rendering": "error",
-            },
-          },
-        ]
-      : []),
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:ssr-friendly/recommended"],
