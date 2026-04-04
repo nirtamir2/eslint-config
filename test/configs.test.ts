@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultImportName } from "../src/configs/default-import-name";
 import { nextjs } from "../src/configs/nextjs";
+import { react } from "../src/configs/react";
 import { zod } from "../src/configs/zod";
 
 describe("custom config blocks", () => {
@@ -39,6 +40,35 @@ describe("custom config blocks", () => {
     ]);
     expect(config.rules).toMatchObject({
       "import-zod/prefer-zod-namespace": "error",
+    });
+  });
+
+  it("adds classname-components only for type-aware React TSX rules", async () => {
+    const withoutTypes = await react();
+    const withoutTypesConfig = withoutTypes.find(
+      (config) => config.name === "nirtamir2/react/classname-components",
+    );
+
+    expect(withoutTypesConfig).toBeUndefined();
+
+    const withTypes = await react({ tsconfigPath: "tsconfig.json" });
+    const withTypesConfig = withTypes.find(
+      (config) => config.name === "nirtamir2/react/classname-components",
+    );
+
+    expect(withTypesConfig).toBeDefined();
+    expect(withTypesConfig?.plugins).toHaveProperty(
+      "eslint-plugin-classname-components",
+    );
+    expect(withTypesConfig?.rules).toMatchObject({
+      "eslint-plugin-classname-components/no-classname-prop-in-styled-components":
+        "error",
+      "eslint-plugin-classname-components/no-classname-prop-merge-in-styled-components":
+        "error",
+      "eslint-plugin-classname-components/prefer-plain-props-parameter":
+        "error",
+      "eslint-plugin-classname-components/prefer-static-classname-in-styled-components":
+        "error",
     });
   });
 });
