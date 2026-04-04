@@ -1,7 +1,16 @@
-import type { TypedFlatConfigItem } from "../types";
 import { pluginComments } from "../plugins";
+import type { TypedFlatConfigItem } from "../types";
 
 export async function comments(): Promise<Array<TypedFlatConfigItem>> {
+  const recommendedRules = Object.fromEntries(
+    Object.entries(pluginComments.configs.recommended.rules).map(
+      ([rule, value]) => [
+        rule.replace("@eslint-community/eslint-comments/", "eslint-comments/"),
+        value,
+      ],
+    ),
+  );
+
   return [
     {
       name: "antfu/eslint-comments/rules",
@@ -9,10 +18,8 @@ export async function comments(): Promise<Array<TypedFlatConfigItem>> {
         "eslint-comments": pluginComments,
       },
       rules: {
-        "eslint-comments/no-aggregating-enable": "error",
-        "eslint-comments/no-duplicate-disable": "error",
-        "eslint-comments/no-unlimited-disable": "error",
-        "eslint-comments/no-unused-enable": "error",
+        ...recommendedRules,
+        "eslint-comments/disable-enable-pair": "off",
       },
     },
   ];

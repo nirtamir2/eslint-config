@@ -30,8 +30,7 @@ export async function tailwindcss(
     {
       name: "tailwindcss/overrides",
       rules: {
-        ...pluginTailwindCSS.configs["stylistic-warn"].rules,
-        ...pluginTailwindCSS.configs["correctness-warn"].rules,
+        ...pluginTailwindCSS.configs["recommended-warn"].rules,
         "better-tailwindcss/enforce-consistent-line-wrapping": "off",
       },
     },
