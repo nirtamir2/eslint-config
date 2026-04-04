@@ -1,10 +1,10 @@
+import { GLOB_ASTRO } from "../globs";
 import type {
   OptionsFiles,
   OptionsOverrides,
   OptionsStylistic,
   TypedFlatConfigItem,
 } from "../types";
-import { GLOB_ASTRO } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function astro(
@@ -19,6 +19,17 @@ export async function astro(
     interopDefault(import("astro-eslint-parser")),
     interopDefault(import("@typescript-eslint/parser")),
   ] as const);
+
+  const recommendedRules = pluginAstro.configs["flat/recommended"].reduce(
+    (
+      rules: NonNullable<TypedFlatConfigItem["rules"]>,
+      config: TypedFlatConfigItem,
+    ) => ({
+      ...rules,
+      ...(config.rules ?? {}),
+    }),
+    {},
+  );
 
   return [
     {
@@ -41,19 +52,10 @@ export async function astro(
       name: "antfu/astro/rules",
       processor: "astro/client-side-ts",
       rules: {
+        ...recommendedRules,
         "antfu/no-top-level-await": "off",
-
-        // use recommended rules
-        "astro/missing-client-only-directive-value": "error",
-        "astro/no-conflict-set-directives": "error",
-        "astro/no-deprecated-astro-canonicalurl": "error",
-        "astro/no-deprecated-astro-fetchcontent": "error",
-        "astro/no-deprecated-astro-resolve": "error",
-        "astro/no-deprecated-getentrybyslug": "error",
         "astro/no-set-html-directive": "off",
-        "astro/no-unused-define-vars-in-style": "error",
         "astro/semi": "off",
-        "astro/valid-compile": "error",
 
         ...(stylistic
           ? {

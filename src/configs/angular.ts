@@ -1,5 +1,5 @@
-import type { OptionsOverrides, Rules, TypedFlatConfigItem } from "../types";
 import { GLOB_HTML, GLOB_TS } from "../globs";
+import type { OptionsOverrides, Rules, TypedFlatConfigItem } from "../types";
 import { ensurePackages, interopDefault } from "../utils";
 
 export async function angular(
@@ -48,18 +48,10 @@ export async function angular(
         "extract-inline-html"
       ] as TypedFlatConfigItem["processor"],
       rules: {
-        "@angular-eslint/contextual-lifecycle": "error",
-        "@angular-eslint/no-empty-lifecycle-method": "error",
-        "@angular-eslint/no-input-rename": "error",
-        "@angular-eslint/no-inputs-metadata-property": "error",
-        "@angular-eslint/no-output-native": "error",
-        "@angular-eslint/no-output-on-prefix": "error",
-        "@angular-eslint/no-output-rename": "error",
-        "@angular-eslint/no-outputs-metadata-property": "error",
+        ...(pluginAngular.configs.recommended.rules as Rules),
         "@angular-eslint/prefer-inject": "error",
         "@angular-eslint/prefer-standalone": "error",
         "@angular-eslint/use-lifecycle-interface": "error",
-        "@angular-eslint/use-pipe-transform-interface": "error",
         ...angularTsRules,
       },
     },
@@ -70,10 +62,7 @@ export async function angular(
       },
       name: "antfu/angular/rules/template",
       rules: {
-        "@angular-eslint/template/banana-in-box": "error",
-        "@angular-eslint/template/eqeqeq": "error",
-        "@angular-eslint/template/no-negated-async": "error",
-        "@angular-eslint/template/prefer-control-flow": "error",
+        ...(pluginAngularTemplate.configs.recommended.rules as Rules),
         "@stylistic/indent": "off",
         "@stylistic/no-multiple-empty-lines": ["error", { max: 1 }],
         "@stylistic/no-trailing-spaces": "off",

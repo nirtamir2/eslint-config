@@ -1,3 +1,9 @@
+import erasableSyntaxOnlyPlugin from "eslint-plugin-erasable-syntax-only";
+import expectType from "eslint-plugin-expect-type/configs/recommended";
+import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
+import process from "node:process";
+import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
+import { pluginAntfu } from "../plugins";
 import type {
   OptionsComponentExts,
   OptionsFiles,
@@ -8,12 +14,6 @@ import type {
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
-import process from "node:process";
-import erasableSyntaxOnlyPlugin from "eslint-plugin-erasable-syntax-only";
-import expectType from "eslint-plugin-expect-type/configs/recommended";
-import sortDestructureKeysTypescriptConfig from "eslint-plugin-sort-destructure-keys-typescript/config";
-import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
-import { pluginAntfu } from "../plugins";
 import { interopDefault } from "../utils";
 
 export async function typescript(
@@ -51,19 +51,7 @@ export async function typescript(
 
   const typeAwareRules: TypedFlatConfigItem["rules"] = {
     "dot-notation": "off",
-    "no-implied-eval": "off",
-    "@typescript-eslint/await-thenable": "error",
     "@typescript-eslint/dot-notation": ["error", { allowKeywords: true }],
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-for-in-array": "error",
-    "@typescript-eslint/no-implied-eval": "error",
-    "@typescript-eslint/no-misused-promises": "error",
-    "@typescript-eslint/no-unnecessary-type-assertion": "error",
-    "@typescript-eslint/no-unsafe-argument": "error",
-    "@typescript-eslint/no-unsafe-assignment": "error",
-    "@typescript-eslint/no-unsafe-call": "error",
-    "@typescript-eslint/no-unsafe-member-access": "error",
-    "@typescript-eslint/no-unsafe-return": "error",
     "@typescript-eslint/promise-function-async": "error",
     "@typescript-eslint/restrict-plus-operands": "error",
     "@typescript-eslint/restrict-template-expressions": "error",
@@ -73,7 +61,59 @@ export async function typescript(
       { allowString: false, allowNumber: false, allowNullableObject: false },
     ],
     "@typescript-eslint/switch-exhaustiveness-check": "error",
+  };
+  const typeAwareOverrideRules: TypedFlatConfigItem["rules"] = {
+    "@typescript-eslint/no-empty-object-type": [
+      "error",
+      { allowInterfaces: "always" },
+    ],
+  };
+  const nonTypeAwareFallbackRules: TypedFlatConfigItem["rules"] = {
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-base-to-string": "error",
+    "@typescript-eslint/no-confusing-void-expression": "error",
+    "@typescript-eslint/no-dynamic-delete": "error",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-extraneous-class": "error",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-for-in-array": "error",
+    "@typescript-eslint/no-implied-eval": "error",
+    "@typescript-eslint/no-invalid-void-type": "error",
+    "@typescript-eslint/no-meaningless-void-operator": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
+    "@typescript-eslint/no-unnecessary-condition": "error",
+    "@typescript-eslint/no-unnecessary-type-arguments": "error",
+    "@typescript-eslint/no-unnecessary-type-assertion": "error",
+    "@typescript-eslint/no-unsafe-argument": "error",
+    "@typescript-eslint/no-unsafe-assignment": "error",
+    "@typescript-eslint/no-unsafe-call": "error",
+    "@typescript-eslint/no-unsafe-member-access": "error",
+    "@typescript-eslint/no-unsafe-return": "error",
+    "@typescript-eslint/no-useless-constructor": "error",
+    "@typescript-eslint/prefer-reduce-type-parameter": "error",
+    "@typescript-eslint/prefer-return-this-type": "error",
+    "@typescript-eslint/promise-function-async": "error",
+    "@typescript-eslint/require-await": "error",
+    "@typescript-eslint/restrict-plus-operands": "error",
+    "@typescript-eslint/restrict-template-expressions": "error",
+    "@typescript-eslint/strict-boolean-expressions": [
+      "error",
+      {
+        allowString: false,
+        allowNumber: false,
+        allowNullableObject: false,
+      },
+    ],
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
+    "@typescript-eslint/triple-slash-reference": "error",
     "@typescript-eslint/unbound-method": "error",
+    "@typescript-eslint/unified-signatures": "error",
+    "dot-notation": "off",
+    "no-implied-eval": "off",
+    "no-throw-literal": "off",
+    "require-await": "off",
   };
 
   const [pluginTs, parserTs] = await Promise.all([
@@ -134,7 +174,6 @@ export async function typescript(
         "no-dupe-class-members": "off",
         "no-redeclare": "off",
         "no-use-before-define": "off",
-        "no-useless-constructor": "off",
         "@typescript-eslint/ban-ts-comment": [
           "error",
           { "ts-expect-error": "allow-with-description" },
@@ -161,11 +200,9 @@ export async function typescript(
         ],
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-extraneous-class": "off",
-        "@typescript-eslint/no-import-type-side-effects": "error",
         "@typescript-eslint/no-invalid-void-type": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-redeclare": ["error", { builtinGlobals: false }],
-        "@typescript-eslint/no-require-imports": "error",
         "@typescript-eslint/no-unused-expressions": [
           "error",
           {
@@ -180,7 +217,6 @@ export async function typescript(
           { classes: false, functions: false, variables: true },
         ],
         "@typescript-eslint/no-useless-constructor": "off",
-        "@typescript-eslint/no-wrapper-object-types": "error",
         "@typescript-eslint/triple-slash-reference": "off",
         "@typescript-eslint/unified-signatures": "off",
 
@@ -228,7 +264,7 @@ export async function typescript(
       files: ["**/*.d.?([cm])ts"],
       name: "antfu/typescript/disables/dts",
       rules: {
-        "eslint-comments/no-unlimited-disable": "off",
+        "@eslint-community/eslint-comments/no-unlimited-disable": "off",
         "import-x/no-duplicates": "off",
         "no-restricted-syntax": "off",
         "unused-imports/no-unused-vars": "off",
@@ -355,7 +391,6 @@ export async function typescript(
         // #endregion no need
 
         // #region @typescript-eslint - warn
-        "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": [
           "warn",
           { argsIgnorePattern: "^_" },
@@ -365,11 +400,9 @@ export async function typescript(
         // #region @typescript-eslint all https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/src/configs/all.ts
 
         "@typescript-eslint/consistent-generic-constructors": "error",
-        "@typescript-eslint/no-unsafe-declaration-merging": "error",
         // "@typescript-eslint/no-unsafe-enum-comparison": "error", new rule
         "@typescript-eslint/no-import-type-side-effects": "error",
 
-        "@typescript-eslint/no-duplicate-enum-values": "error",
         "@typescript-eslint/no-useless-empty-export": "error",
         "@typescript-eslint/ban-ts-comment": [
           "error",
@@ -383,7 +416,6 @@ export async function typescript(
         ],
         "@typescript-eslint/adjacent-overload-signatures": "error",
         "@typescript-eslint/array-type": ["error", { default: "generic" }],
-        "@typescript-eslint/await-thenable": "error",
         "@typescript-eslint/no-restricted-types": [
           "error",
           {
@@ -431,129 +463,66 @@ export async function typescript(
         "@typescript-eslint/consistent-type-exports": "error",
         "default-param-last": "off",
         "@typescript-eslint/default-param-last": "error",
-        "dot-notation": "off",
         "@typescript-eslint/dot-notation": "error",
         "@typescript-eslint/explicit-member-accessibility": "off",
         "init-declarations": "off",
         "@typescript-eslint/init-declarations": "error",
         "@typescript-eslint/member-ordering": "error",
         "@typescript-eslint/method-signature-style": "error",
-        "no-array-constructor": "off",
-        "@typescript-eslint/no-array-constructor": "error",
-        "@typescript-eslint/no-base-to-string": "error",
         "@typescript-eslint/no-confusing-non-null-assertion": "error",
-        "@typescript-eslint/no-confusing-void-expression": "error",
-        "no-dupe-class-members": "off",
-        "@typescript-eslint/no-dupe-class-members": "error",
         "no-duplicate-imports": "off",
-        "@typescript-eslint/no-dynamic-delete": "error",
-        "@typescript-eslint/no-empty-object-type": [
-          "error",
-          { allowInterfaces: "always" },
-        ],
         "no-empty-function": "off",
         "@typescript-eslint/no-empty-function": "error",
-        "@typescript-eslint/no-explicit-any": "error",
-        "@typescript-eslint/no-extra-non-null-assertion": "error",
 
         // Less important rules:
-        "@typescript-eslint/no-extraneous-class": "error",
-        "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-for-in-array": "error",
-        "no-implied-eval": "off",
-        "@typescript-eslint/no-implied-eval": "error",
         "@typescript-eslint/no-inferrable-types": "error",
         "no-invalid-this": "off",
         "@typescript-eslint/no-invalid-this": "error",
-        "@typescript-eslint/no-invalid-void-type": "error",
         "no-loop-func": "off",
         "@typescript-eslint/no-loop-func": "error",
         "no-loss-of-precision": "off",
-        "@typescript-eslint/no-meaningless-void-operator": "error",
-        "@typescript-eslint/no-misused-new": "error",
-        "@typescript-eslint/no-misused-promises": "error",
-        "@typescript-eslint/no-namespace": "error",
-        "@typescript-eslint/no-non-null-asserted-nullish-coalescing": "error",
-        "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-        "@typescript-eslint/no-non-null-assertion": "error",
         "@typescript-eslint/parameter-properties": "error",
-        "no-redeclare": "off",
         "@typescript-eslint/no-redeclare": "error",
-        "@typescript-eslint/no-require-imports": "error",
         "no-restricted-imports": "off",
         "@typescript-eslint/no-restricted-imports": "error",
-        "@typescript-eslint/no-this-alias": "error",
-        "no-throw-literal": "off",
-        "@typescript-eslint/only-throw-error": ["error", {
-          allow: [
-            {
-              from: "package",
-              package: "@tanstack/router-core",
-              name: "Redirect",
-            },
-            {
-              from: "package",
-              package: "@tanstack/react-router",
-              name: "Redirect",
-            }],
-        }],
+        "@typescript-eslint/only-throw-error": [
+          "error",
+          {
+            allow: [
+              {
+                from: "package",
+                package: "@tanstack/router-core",
+                name: "Redirect",
+              },
+              {
+                from: "package",
+                package: "@tanstack/react-router",
+                name: "Redirect",
+              },
+            ],
+          },
+        ],
         // "@typescript-eslint/no-type-alias": "off", // A & B, type AppRouter = typeof appRouter, Merge<A,B>
-        "@typescript-eslint/no-unnecessary-boolean-literal-compare": "error",
-        "@typescript-eslint/no-unnecessary-condition": "error",
         "@typescript-eslint/no-unnecessary-qualifier": "error",
-        "@typescript-eslint/no-unnecessary-type-arguments": "error",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error",
-        "@typescript-eslint/no-unnecessary-type-constraint": "error",
-        "@typescript-eslint/no-unsafe-argument": "error",
-        "@typescript-eslint/no-unsafe-assignment": "error",
-        "@typescript-eslint/no-unsafe-call": "error",
-        "@typescript-eslint/no-unsafe-member-access": "error",
-        "@typescript-eslint/no-unsafe-return": "error",
-        "no-unused-expressions": "off",
-        "@typescript-eslint/no-unused-expressions": "error",
-        "no-use-before-define": "off",
         "@typescript-eslint/no-use-before-define": "error",
-        "no-useless-constructor": "off",
-        "@typescript-eslint/no-useless-constructor": "error",
         "@typescript-eslint/non-nullable-type-assertion-style": "error",
-        "@typescript-eslint/prefer-as-const": "error",
         "@typescript-eslint/prefer-enum-initializers": "error",
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/prefer-includes": "error",
-        "@typescript-eslint/prefer-literal-enum-member": "error",
-        "@typescript-eslint/prefer-namespace-keyword": "error",
         "@typescript-eslint/prefer-nullish-coalescing": [
           "error",
           { ignoreIfStatements: true },
         ],
         "@typescript-eslint/prefer-optional-chain": "error",
-        "@typescript-eslint/prefer-reduce-type-parameter": "error",
         "@typescript-eslint/prefer-regexp-exec": "error",
-        "@typescript-eslint/prefer-return-this-type": "error",
         "@typescript-eslint/prefer-string-starts-ends-with": "error",
-        "@typescript-eslint/promise-function-async": "error",
         "@typescript-eslint/require-array-sort-compare": "error",
-        "require-await": "off",
-        "@typescript-eslint/require-await": "error",
-        "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/restrict-template-expressions": "error",
         "@typescript-eslint/return-await": ["error", "always"],
-        "@typescript-eslint/strict-boolean-expressions": [
-          "error",
-          {
-            allowString: false,
-            allowNumber: false,
-            allowNullableObject: false,
-          },
-        ],
-        "@typescript-eslint/switch-exhaustiveness-check": "error",
-        "@typescript-eslint/triple-slash-reference": "error",
-        "@typescript-eslint/unbound-method": "error",
-        "@typescript-eslint/unified-signatures": "error",
         // #endregion
 
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
+        ...(isTypeAware ? typeAwareOverrideRules : nonTypeAwareFallbackRules),
         ...(isTypeAware ? {} : pluginTs.configs["disable-type-checked"].rules),
       },
     },
