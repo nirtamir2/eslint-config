@@ -264,7 +264,7 @@ export async function typescript(
       files: ["**/*.d.?([cm])ts"],
       name: "antfu/typescript/disables/dts",
       rules: {
-        "eslint-comments/no-unlimited-disable": "off",
+        "@eslint-community/eslint-comments/no-unlimited-disable": "off",
         "import-x/no-duplicates": "off",
         "no-restricted-syntax": "off",
         "unused-imports/no-unused-vars": "off",

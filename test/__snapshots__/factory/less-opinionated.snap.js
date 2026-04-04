@@ -525,14 +525,14 @@
   {
     "name": "antfu/eslint-comments/rules",
     "plugins": [
-      "eslint-comments",
+      "@eslint-community/eslint-comments",
     ],
     "rules": [
-      "- eslint-comments/disable-enable-pair",
-      "eslint-comments/no-aggregating-enable",
-      "eslint-comments/no-duplicate-disable",
-      "eslint-comments/no-unlimited-disable",
-      "eslint-comments/no-unused-enable",
+      "- @eslint-community/eslint-comments/disable-enable-pair",
+      "@eslint-community/eslint-comments/no-aggregating-enable",
+      "@eslint-community/eslint-comments/no-duplicate-disable",
+      "@eslint-community/eslint-comments/no-unlimited-disable",
+      "@eslint-community/eslint-comments/no-unused-enable",
     ],
   },
   {
@@ -893,7 +893,7 @@
     ],
     "name": "antfu/typescript/disables/dts",
     "rules": [
-      "- eslint-comments/no-unlimited-disable",
+      "- @eslint-community/eslint-comments/no-unlimited-disable",
       "- import-x/no-duplicates",
       "- no-restricted-syntax",
       "- unused-imports/no-unused-vars",
@@ -2039,7 +2039,7 @@
     ],
     "name": "antfu/disables/dts",
     "rules": [
-      "- eslint-comments/no-unlimited-disable",
+      "- @eslint-community/eslint-comments/no-unlimited-disable",
       "- no-restricted-syntax",
       "- unused-imports/no-unused-vars",
     ],
