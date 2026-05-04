@@ -7,7 +7,7 @@
 - Designed to work with TypeScript, JSX, Vue, JSON, YAML, Toml, Markdown, etc. Out-of-box.
 - Opinionated, but [very customizable](#customization)
 - [ESLint Flat config](https://eslint.org/docs/latest/use/configure/configuration-files-new), compose easily!
-- Optional [React](#react), [Svelte](#svelte), [UnoCSS](#unocss), [Astro](#astro), [Solid](#solid) support
+- Optional [React](#react), [TanStack Router](#tanstack-router), [Svelte](#svelte), [UnoCSS](#unocss), [Astro](#astro), [Solid](#solid) support
 - Optional [formatters](#formatters) support for formatting CSS, HTML, XML, etc.
 - **Style principle**: Minimal for reading, stable for diff, consistent
   - Sorted imports, dangling commas
@@ -480,6 +480,19 @@ Running `npx eslint` should prompt you to install the required dependencies, oth
 
 ```bash
 npm i -D @eslint-react/eslint-plugin eslint-plugin-react-hooks eslint-plugin-react-refresh
+```
+
+#### TanStack Router
+
+TanStack Router support is enabled automatically when `@tanstack/react-router` or `@tanstack/solid-router` is installed. You can also explicitly enable or disable it:
+
+```js
+// eslint.config.js
+import antfu from '@antfu/eslint-config'
+
+export default antfu({
+  tanstackRouter: true,
+})
 ```
 
 #### Svelte

@@ -23,6 +23,7 @@ import {
   sortTsconfig,
   stylistic,
   svelte,
+  tanstackRouter,
   test,
   toml,
   typescript,
@@ -52,6 +53,11 @@ const VuePackages = [
   'nuxt',
   'vitepress',
   '@slidev/cli',
+]
+
+const TanStackRouterPackages = [
+  '@tanstack/react-router',
+  '@tanstack/solid-router',
 ]
 
 export const defaultPluginRenaming = {
@@ -93,6 +99,7 @@ export function antfu(
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
+    tanstackRouter: enableTanStackRouter = TanStackRouterPackages.some(i => isPackageExists(i)),
     typescript: enableTypeScript = isPackageExists('typescript'),
     unocss: enableUnoCSS = false,
     vue: enableVue = VuePackages.some(i => isPackageExists(i)),
@@ -200,6 +207,12 @@ export function antfu(
       overrides: getOverrides(options, 'solid'),
       tsconfigPath,
       typescript: !!enableTypeScript,
+    }))
+  }
+
+  if (enableTanStackRouter) {
+    configs.push(tanstackRouter({
+      overrides: getOverrides(options, 'tanstackRouter'),
     }))
   }
 

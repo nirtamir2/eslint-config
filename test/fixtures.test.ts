@@ -21,6 +21,7 @@ runWithConfig('all', {
   vue: true,
   svelte: true,
   astro: true,
+  tanstackRouter: true,
 })
 runWithConfig('no-style', {
   typescript: true,

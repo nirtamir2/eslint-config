@@ -322,6 +322,15 @@ export interface OptionsConfig extends OptionsComponentExts {
    * @default false
    */
   react?: boolean | OptionsOverrides
+
+  /**
+   * Enable TanStack Router rules.
+   *
+   * @see https://tanstack.com/router/v1/docs/eslint/eslint-plugin-router
+   * @default auto-detect based on the dependencies
+   */
+  tanstackRouter?: boolean | OptionsOverrides
+
   /**
    * Enable solid rules.
    *
@@ -393,6 +402,7 @@ export interface OptionsConfig extends OptionsComponentExts {
     yaml?: TypedFlatConfigItem['rules']
     toml?: TypedFlatConfigItem['rules']
     react?: TypedFlatConfigItem['rules']
+    tanstackRouter?: TypedFlatConfigItem['rules']
     svelte?: TypedFlatConfigItem['rules']
   }
 }
