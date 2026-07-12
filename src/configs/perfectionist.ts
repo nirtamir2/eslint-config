@@ -1,11 +1,15 @@
-import type { TypedFlatConfigItem } from "../types";
+import type { OptionsOverrides, TypedFlatConfigItem } from "../types";
 import { ensurePackages, interopDefault } from "../utils";
 
 /**
  * Optional perfectionist plugin for props and items sorting.
  * @see https://github.com/azat-io/eslint-plugin-perfectionist
  */
-export async function perfectionist(): Promise<Array<TypedFlatConfigItem>> {
+export async function perfectionist(
+  options: OptionsOverrides = {},
+): Promise<Array<TypedFlatConfigItem>> {
+  const { overrides = {} } = options;
+
   await ensurePackages(["eslint-plugin-perfectionist"]);
 
   const pluginPerfectionist = await interopDefault(
@@ -51,6 +55,7 @@ export async function perfectionist(): Promise<Array<TypedFlatConfigItem>> {
           "error",
           { order: "asc", type: "natural" },
         ],
+        ...overrides,
       },
     },
   ];

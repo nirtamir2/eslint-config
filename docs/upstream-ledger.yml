@@ -60,39 +60,42 @@ backfill:
 
     - upstream_commits:
         - ae1d6ff9d1f21e9a7c4eba37e81194d22586ee15
-      disposition: defer
+      disposition: adapt
       priority: medium
       summary: Allow Perfectionist rule overrides through the factory option
       rationale: >-
-        The capability fits, but the fork intentionally keeps Perfectionist disabled
-        by default and has a custom lazily loaded ruleset.
+        Added object-form overrides while preserving the fork's opt-in false default
+        and lazily loaded custom ruleset. Focused tests cover both the default and an
+        override winning over the bundled rule.
       reviewed_at: 2026-07-12
-      draft_pr: null
-      follow_up: Adapt the option shape and preserve the fork's false default.
+      draft_pr: https://github.com/nirtamir2/eslint-config/pull/14
+      follow_up: null
 
     - upstream_commits:
         - bd7848daae58beb2c7850549a5094f50916f1075
-      disposition: defer
+      disposition: port
       priority: medium
       summary: Expose brace style through Stylistic and Vue configuration
       rationale: >-
-        The fork already forwards a selected subset of Stylistic customize options,
-        so this is a compatible extension if the current Stroustrup default remains.
+        Added braceStyle to the public Stylistic options and passed it through both
+        Stylistic and Vue. The existing Stroustrup default remains unchanged and an
+        Allman override is covered in both configs.
       reviewed_at: 2026-07-12
-      draft_pr: null
-      follow_up: Adapt the type, Stylistic call, and Vue rule with focused snapshots.
+      draft_pr: https://github.com/nirtamir2/eslint-config/pull/14
+      follow_up: null
 
     - upstream_commits:
         - 527b625c826da31020d72a052dd20ddf202ae753
-      disposition: defer
+      disposition: adapt
       priority: medium
       summary: Ignore common AI-agent working directories
       rationale: >-
-        Adding .context, .claude, .agents, and nested skill directories is useful,
-        but the upstream patch also drops the fork-specific routeTree.gen.ts ignore.
+        Added the four AI working-directory patterns while deliberately retaining the
+        fork-specific routeTree.gen.ts ignore. Tests cover both the additions and the
+        preserved fork behavior.
       reviewed_at: 2026-07-12
-      draft_pr: null
-      follow_up: Adapt only the additive ignores and preserve routeTree.gen.ts.
+      draft_pr: https://github.com/nirtamir2/eslint-config/pull/14
+      follow_up: null
 
     - upstream_commits:
         - 5ada54fd1f6527b012203c9694212eb8fa11bc82
@@ -125,12 +128,14 @@ backfill:
       priority: low
       summary: Replace the curated Svelte rules with the full recommended preset
       rationale: >-
-        The current plugin exposes the recommended config array, but adopting it adds
-        many consumer-facing rules and upstream drops the fork's extra
-        require-store-callbacks-use-set-param rule.
+        The installed Svelte v3 exposes the recommended config array, but the fork's
+        declared v2 peer exposes an object, so the exact upstream .map implementation
+        would crash supported consumers. It also adds 21 consumer-facing rules.
       reviewed_at: 2026-07-12
       draft_pr: null
-      follow_up: Adapt the preset only after human approval, preserving the extra fork rule.
+      follow_up: >-
+        Use a dedicated Svelte v3 peer migration, preserve the extra fork rule, and
+        review the full consumer rule delta.
 
 continuous:
   reviewed_through: 5ada54fd1f6527b012203c9694212eb8fa11bc82

@@ -191,7 +191,11 @@ export function nirtamir2(
   );
 
   if (enablePerfectionist) {
-    configs.push(perfectionist());
+    configs.push(
+      perfectionist({
+        overrides: getOverrides(options, "perfectionist"),
+      }),
+    );
   }
 
   if (enableVue) {

@@ -237,7 +237,7 @@ export interface OptionsStylistic {
 
 export interface StylisticConfig extends Pick<
   StylisticCustomizeOptions,
-  "indent" | "quotes" | "jsx" | "semi" | "experimental"
+  "indent" | "quotes" | "jsx" | "semi" | "braceStyle" | "experimental"
 > {}
 
 export interface OptionsOverrides {
@@ -353,7 +353,7 @@ export interface OptionsConfig
    *
    * @default false
    */
-  perfectionist?: boolean;
+  perfectionist?: boolean | OptionsOverrides;
 
   /**
    * Core rules. Can't be disabled.
