@@ -33,7 +33,7 @@ Never:
 
 - merge or rebase upstream wholesale;
 - blindly cherry-pick an upstream commit;
-- push directly to `master`;
+- push directly to `main`;
 - mark a PR ready, approve it, or merge it;
 - publish packages, create releases or tags, or change package versions;
 - weaken fork-specific behavior merely to match upstream.
@@ -61,7 +61,7 @@ commit SHAs.
 
 ## Procedure
 
-1. Start from a clean branch based on the latest `origin/master`. Stop if the
+1. Start from a clean branch based on the latest `origin/main`. Stop if the
    worktree is dirty. Name the branch `codex/upstream-<date>-<topic>`; the
    reserved prefix prevents maintenance PRs from publishing preview packages.
 2. Check for an existing upstream-maintenance PR, then fetch `upstream/main`.
