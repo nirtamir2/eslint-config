@@ -28,6 +28,7 @@
     "dev": "npx @eslint/config-inspector --config eslint.config.ts",
     "format": "prettier \"**/*\" --write --ignore-unknown",
     "lint": "eslint . --fix",
+    "lint:check": "eslint .",
     "prepack": "nr build",
     "prepare": "simple-git-hooks",
     "release": "bumpp",

@@ -26,7 +26,7 @@ export async function astro(
       config: TypedFlatConfigItem,
     ) => ({
       ...rules,
-      ...(config.rules ?? {}),
+      ...config.rules,
     }),
     {},
   );

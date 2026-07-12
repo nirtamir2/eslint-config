@@ -77,7 +77,7 @@ export async function formatters(
       "`slidev` option only works when `markdown` is enabled with `prettier`",
     );
 
-  const { semi, indent, quotes } = {
+  const { indent, quotes, semi } = {
     ...StylisticConfigDefaults,
     ...stylistic,
   };

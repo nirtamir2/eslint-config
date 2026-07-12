@@ -51,7 +51,7 @@ export async function react(
     interopDefault(import("@stylistic/eslint-plugin")),
     isTypeAware
       ? interopDefault(import("eslint-plugin-classname-components/config"))
-      : Promise.resolve(undefined),
+      : Promise.resolve(),
   ] as const);
 
   const isUsingNext = isPackageExists("next");
@@ -78,7 +78,7 @@ export async function react(
           pluginReactYouMightNotNeedAnEffect,
       },
       settings: {
-        ...(eslintReactConfig.settings ?? {}),
+        ...eslintReactConfig.settings,
         react: { version: "detect" },
       },
     },

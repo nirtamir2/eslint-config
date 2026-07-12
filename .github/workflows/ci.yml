@@ -3,11 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - master
 
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   lint:
@@ -33,7 +33,7 @@ jobs:
         run: nr build
 
       - name: Lint
-        run: nr lint
+        run: nr lint:check
 
       - name: Typecheck
         run: nr typecheck
