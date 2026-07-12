@@ -62,7 +62,8 @@ commit SHAs.
 ## Procedure
 
 1. Start from a clean branch based on the latest `origin/master`. Stop if the
-   worktree is dirty.
+   worktree is dirty. Name the branch `codex/upstream-<date>-<topic>`; the
+   reserved prefix prevents maintenance PRs from publishing preview packages.
 2. Check for an existing upstream-maintenance PR, then fetch `upstream/main`.
    Do not change remote configuration.
 3. Read `docs/upstream-ledger.yml`.

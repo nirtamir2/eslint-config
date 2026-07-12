@@ -3,6 +3,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    if: ${{ !startsWith(github.head_ref, 'codex/upstream-') && !startsWith(github.ref_name, 'codex/upstream-') }}
     runs-on: ubuntu-latest
 
     steps:
