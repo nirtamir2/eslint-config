@@ -1,0 +1,139 @@
+schema_version: 1
+
+upstream:
+  repository: antfu/eslint-config
+  remote: upstream
+  branch: main
+  fork_point: 5a46487fdf9f3defe06b8a4a6b08966281de180d
+  initial_snapshot:
+    sha: 5ada54fd1f6527b012203c9694212eb8fa11bc82
+    captured_at: 2026-07-12
+
+backfill:
+  status: in_progress # pending | in_progress | complete
+  range:
+    after_exclusive: 5a46487fdf9f3defe06b8a4a6b08966281de180d
+    through_inclusive: 5ada54fd1f6527b012203c9694212eb8fa11bc82
+  decisions:
+    - upstream_commits:
+        - 8d25a37e3e0c5776796ff042265889fc1657bcd5
+      disposition: superseded
+      priority: low
+      summary: Keep global user rule overrides away from Markdown source files
+      rationale: >-
+        The upstream crash is specific to its native markdown/gfm SourceCode. This
+        fork parses Markdown source through parserPlain, retaining a JS-compatible
+        AST; dry probes with the affected global rules completed without fatal errors.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: >-
+        Revisit only if the fork adopts the native Markdown language. The upstream
+        fix also requires a newer eslint-flat-config-utils setDefaultIgnores API.
+
+    - upstream_commits:
+        - 7edec03bf2b34096c34b776084784d934734ed07
+        - 299c2cd434505840569f02e5374430978be3edc8
+        - 52069a3aa5758f46cac70cf03c2ae9b6e341414e
+      disposition: defer
+      priority: high
+      summary: Disable risky e18e rewrites and overly strict static-regex checks
+      rationale: >-
+        The fork enables the same e18e presets by default but is missing the complete
+        safety set from these three commits. All affected rules exist in the locked
+        @e18e/eslint-plugin 0.3.0, and project type already reaches this config.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Port all three commits together with app and library rule-output tests.
+
+    - upstream_commits:
+        - 82078763e3125e37eb673973eff2af3d4baa6c14
+      disposition: defer
+      priority: high
+      summary: Scope Unicorn rules to JavaScript and TypeScript source files
+      rationale: >-
+        The fork applies the full recommended Unicorn preset globally, so rules can
+        leak into non-source language configs. Only the small config-scoping intent
+        fits; the bundled dependency and lockfile churn does not.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Adapt only src/configs/unicorn.ts and add a non-source regression test.
+
+    - upstream_commits:
+        - ae1d6ff9d1f21e9a7c4eba37e81194d22586ee15
+      disposition: defer
+      priority: medium
+      summary: Allow Perfectionist rule overrides through the factory option
+      rationale: >-
+        The capability fits, but the fork intentionally keeps Perfectionist disabled
+        by default and has a custom lazily loaded ruleset.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Adapt the option shape and preserve the fork's false default.
+
+    - upstream_commits:
+        - bd7848daae58beb2c7850549a5094f50916f1075
+      disposition: defer
+      priority: medium
+      summary: Expose brace style through Stylistic and Vue configuration
+      rationale: >-
+        The fork already forwards a selected subset of Stylistic customize options,
+        so this is a compatible extension if the current Stroustrup default remains.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Adapt the type, Stylistic call, and Vue rule with focused snapshots.
+
+    - upstream_commits:
+        - 527b625c826da31020d72a052dd20ddf202ae753
+      disposition: defer
+      priority: medium
+      summary: Ignore common AI-agent working directories
+      rationale: >-
+        Adding .context, .claude, .agents, and nested skill directories is useful,
+        but the upstream patch also drops the fork-specific routeTree.gen.ts ignore.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Adapt only the additive ignores and preserve routeTree.gen.ts.
+
+    - upstream_commits:
+        - 5ada54fd1f6527b012203c9694212eb8fa11bc82
+      disposition: defer
+      priority: medium
+      summary: Accept eslint-plugin-astro version 2 as a peer
+      rationale: >-
+        The fork currently declares ^1.3.0 and uses @typescript-eslint/parser 8.57.2,
+        while eslint-plugin-astro 2 requires parser >=8.61.0 and newer Node versions.
+        The peer contract should not change without a coordinated compatibility pass.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Test against v1 and v2, then prefer an explicit major range over >=1.2.0.
+
+    - upstream_commits:
+        - 06a1a8a5beac2076a2b2f1fb121fe779a67260d3
+      disposition: defer
+      priority: low
+      summary: Upgrade @eslint-react to version 5
+      rationale: >-
+        This is a breaking migration, while the fork has substantial custom and
+        type-aware @eslint-react v4 rules. Automatic adoption would be unsafe.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Require explicit human approval and a dedicated migration PR.
+
+    - upstream_commits:
+        - 6c8395e07c68a59efd217607dfed692ab6a53008
+      disposition: defer
+      priority: low
+      summary: Replace the curated Svelte rules with the full recommended preset
+      rationale: >-
+        The current plugin exposes the recommended config array, but adopting it adds
+        many consumer-facing rules and upstream drops the fork's extra
+        require-store-callbacks-use-set-param rule.
+      reviewed_at: 2026-07-12
+      draft_pr: null
+      follow_up: Adapt the preset only after human approval, preserving the extra fork rule.
+
+continuous:
+  reviewed_through: 5ada54fd1f6527b012203c9694212eb8fa11bc82
+  decisions: []
+  # Use the same decision shape as backfill. The cursor may advance only when
+  # every preceding upstream commit after the previous cursor is recorded.
