@@ -1,4 +1,5 @@
 import type { TypedFlatConfigItem } from "../types";
+import { GLOB_SRC } from "../globs";
 import { pluginUnicorn } from "../plugins";
 
 export interface OptionsUnicornExtended {
@@ -13,10 +14,14 @@ export async function unicorn(options: OptionsUnicornExtended = {}): Promise<Arr
   } = options;
   return [
     {
-      name: "nirtamir2/unicorn/rules",
+      name: "nirtamir2/unicorn/setup",
       plugins: {
         unicorn: pluginUnicorn,
       },
+    },
+    {
+      files: [GLOB_SRC],
+      name: "nirtamir2/unicorn/rules",
       rules: {
         ...(allRecommended
           ? pluginUnicorn.configs["flat/recommended"].rules

@@ -34,29 +34,29 @@ backfill:
         - 7edec03bf2b34096c34b776084784d934734ed07
         - 299c2cd434505840569f02e5374430978be3edc8
         - 52069a3aa5758f46cac70cf03c2ae9b6e341414e
-      disposition: defer
+      disposition: port
       priority: high
       summary: Disable risky e18e rewrites and overly strict static-regex checks
       rationale: >-
-        The fork enables the same e18e presets by default but is missing the complete
-        safety set from these three commits. All affected rules exist in the locked
-        @e18e/eslint-plugin 0.3.0, and project type already reaches this config.
+        Ported the complete default-off safety set against the locked
+        @e18e/eslint-plugin 0.3.0. User overrides remain last so consumers can opt in,
+        and app versus library handling is covered by focused tests.
       reviewed_at: 2026-07-12
-      draft_pr: null
-      follow_up: Port all three commits together with app and library rule-output tests.
+      draft_pr: https://github.com/nirtamir2/eslint-config/pull/14
+      follow_up: null
 
     - upstream_commits:
         - 82078763e3125e37eb673973eff2af3d4baa6c14
-      disposition: defer
+      disposition: adapt
       priority: high
       summary: Scope Unicorn rules to JavaScript and TypeScript source files
       rationale: >-
-        The fork applies the full recommended Unicorn preset globally, so rules can
-        leak into non-source language configs. Only the small config-scoping intent
-        fits; the bundled dependency and lockfile churn does not.
+        Adapted only the config-scoping hunk: plugin registration remains global and
+        rules now apply to GLOB_SRC. The unrelated dependency, lockfile, CLI, and
+        generated snapshot churn was intentionally omitted.
       reviewed_at: 2026-07-12
-      draft_pr: null
-      follow_up: Adapt only src/configs/unicorn.ts and add a non-source regression test.
+      draft_pr: https://github.com/nirtamir2/eslint-config/pull/14
+      follow_up: null
 
     - upstream_commits:
         - ae1d6ff9d1f21e9a7c4eba37e81194d22586ee15
