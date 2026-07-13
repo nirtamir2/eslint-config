@@ -53,6 +53,25 @@ function cloneOverride(override: OxlintOverride): OxlintOverride {
   return cloneValue(override);
 }
 
+function replayRootRulePrecedence(
+  overrides: OxlintConfig["overrides"],
+  incomingRules: NonNullable<OxlintConfig["rules"]>,
+): void {
+  const incomingRuleEntries = incomingRules as Record<string, unknown>;
+
+  for (const override of overrides ?? []) {
+    if (!override.rules) continue;
+
+    const scopedRuleEntries = override.rules as Record<string, unknown>;
+    for (const ruleName of Object.keys(scopedRuleEntries)) {
+      if (Object.hasOwn(incomingRuleEntries, ruleName))
+        scopedRuleEntries[ruleName] = cloneValue(
+          incomingRuleEntries[ruleName],
+        );
+    }
+  }
+}
+
 function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
   if (config.categories)
     result.categories = {
@@ -73,6 +92,11 @@ function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
     result.jsPlugins = mergeJsPlugins(result.jsPlugins, config.jsPlugins);
   if (config.options)
     result.options = { ...result.options, ...cloneValue(config.options) };
+  if (config.rules) {
+    const incomingRules = cloneValue(config.rules);
+    replayRootRulePrecedence(result.overrides, incomingRules);
+    result.rules = { ...result.rules, ...incomingRules };
+  }
   if (config.overrides)
     result.overrides = [
       ...(result.overrides ?? []),
@@ -80,8 +104,6 @@ function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
     ];
   if (config.plugins)
     result.plugins = mergeUnique(result.plugins, config.plugins);
-  if (config.rules)
-    result.rules = { ...result.rules, ...cloneValue(config.rules) };
   if (config.settings)
     result.settings = { ...result.settings, ...cloneValue(config.settings) };
 }

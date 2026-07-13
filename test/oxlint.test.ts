@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import oxlint, { recommended } from "../src/oxlint";
 import { composeOxlintConfigs } from "../src/oxlint/compose";
 import { createOxlintConfig } from "../src/oxlint/factory";
+import type { OxlintOptions } from "../src/oxlint/types";
 import { generatedOxlintFragments } from "../src/generated/oxlint";
 
 const noPackages = {
@@ -111,6 +112,55 @@ describe("oxlint config factory", () => {
       rules: { [customRule]: "error" },
     });
   });
+
+  it.each([
+    {
+      name: "root rules",
+      options: {
+        rules: { "typescript/no-explicit-any": "off" },
+        typescript: true,
+      },
+      userConfigs: [],
+    },
+    {
+      name: "a trailing config",
+      options: { typescript: true },
+      userConfigs: [
+        { rules: { "typescript/no-explicit-any": "off" } },
+      ],
+    },
+  ] satisfies Array<{
+    name: string;
+    options: OxlintOptions;
+    userConfigs: Array<OxlintConfig>;
+  }>)(
+    "lets $name override earlier integration-scoped rules",
+    ({ options, userConfigs }) => {
+      const customRule = "typescript/no-explicit-any";
+      const config = createOxlintConfig(
+        {
+          jsdoc: false,
+          jsx: false,
+          nextjs: false,
+          react: false,
+          test: false,
+          unicorn: false,
+          vue: false,
+          ...options,
+        },
+        userConfigs,
+        noPackages,
+      );
+      const scopedRules = config.overrides
+        ?.filter((override) =>
+          Object.hasOwn(override.rules ?? {}, customRule),
+        )
+        .map((override) => override.rules?.[customRule]);
+
+      expect(scopedRules?.length).toBeGreaterThan(0);
+      expect(scopedRules).toEqual(scopedRules?.map(() => "off"));
+    },
+  );
 
   it("auto-detects the shared TypeScript, Vue, and Next.js features", () => {
     const detected = createOxlintConfig({}, [], {

@@ -79,6 +79,38 @@ describe("composeOxlintConfigs", () => {
     });
   });
 
+  it("replays root rules into extended scopes but not its own overrides", () => {
+    const earlier = {
+      overrides: [
+        {
+          files: ["**/*.ts"],
+          rules: { "typescript/no-explicit-any": "error" },
+        },
+      ],
+    } satisfies OxlintConfig;
+    const later = {
+      extends: [earlier],
+      rules: { "typescript/no-explicit-any": "off" },
+      overrides: [
+        {
+          files: ["**/*.generated.ts"],
+          rules: { "typescript/no-explicit-any": "warn" },
+        },
+      ],
+    } satisfies OxlintConfig;
+
+    expect(composeOxlintConfigs(later).overrides).toEqual([
+      {
+        files: ["**/*.ts"],
+        rules: { "typescript/no-explicit-any": "off" },
+      },
+      {
+        files: ["**/*.generated.ts"],
+        rules: { "typescript/no-explicit-any": "warn" },
+      },
+    ]);
+  });
+
   it("lets an explicit null clear JavaScript plugins", () => {
     expect(
       composeOxlintConfigs(
