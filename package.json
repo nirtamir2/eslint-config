@@ -63,6 +63,8 @@
     "eslint-plugin-storybook": "^0.11.3",
     "eslint-plugin-svelte": "^2.46.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
+    "oxlint": "^1.73.0",
+    "oxlint-tsgolint": "^0.24.0",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-packagejson": "^2.5.3",
     "prettier-plugin-slidev": "^1.0.5",
@@ -143,6 +145,12 @@
       "optional": true
     },
     "eslint-plugin-vuejs-accessibility": {
+      "optional": true
+    },
+    "oxlint": {
+      "optional": true
+    },
+    "oxlint-tsgolint": {
       "optional": true
     },
     "prettier-plugin-astro": {
@@ -228,6 +236,7 @@
     "@naturacosmeticos/eslint-plugin-i18n-checker": "catalog:dev",
     "@next/eslint-plugin-next": "catalog:peer",
     "@nirtamir2/eslint-config": "workspace:*",
+    "@oxlint/migrate": "catalog:dev",
     "@prettier/plugin-xml": "catalog:peer",
     "@tanstack/eslint-plugin-query": "catalog:peer",
     "@trivago/prettier-plugin-sort-imports": "catalog:peer",
@@ -265,6 +274,8 @@
     "fs-extra": "catalog:dev",
     "jiti": "catalog:dev",
     "lint-staged": "catalog:dev",
+    "oxlint": "catalog:dev",
+    "oxlint-tsgolint": "catalog:dev",
     "prettier-plugin-astro": "catalog:peer",
     "prettier-plugin-slidev": "catalog:peer",
     "rimraf": "catalog:dev",
