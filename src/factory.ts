@@ -50,6 +50,7 @@ import type {
   OptionsConfig,
   TypedFlatConfigItem,
 } from "./types";
+import { resolveSharedFeaturePlan } from "./feature-plan";
 import { findUpSync, interopDefault, isInEditorEnv } from "./utils";
 
 const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
@@ -63,8 +64,6 @@ const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "rules",
   "settings",
 ];
-
-const VuePackages = ["vue", "nuxt", "vitepress", "@slidev/cli"];
 
 const TanstackQueryPackages = [
   "@tanstack/react-query",
@@ -103,6 +102,11 @@ export function nirtamir2(
     >
   >
 ): FlatConfigComposer<TypedFlatConfigItem, ConfigNames> {
+  const sharedPlan = resolveSharedFeaturePlan(options, {
+    hasPackage: isPackageExists,
+    isInEditor: options.isInEditor ?? isInEditorEnv(),
+  });
+
   const {
     angular: enableAngular = false,
     astro: enableAstro = false,
@@ -111,21 +115,14 @@ export function nirtamir2(
     e18e: enableE18e = true,
     gitignore: enableGitignore = true,
     ignores: userIgnores = [],
-    isInEditor = isInEditorEnv(),
-    jsx: enableJsx = true,
-    nextjs: enableNextjs = isPackageExists("next"),
     pnpm: enablePnpm = Boolean(findUpSync("pnpm-workspace.yaml")),
     perfectionist: enablePerfectionist = false,
-    react: enableReact = false,
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
-    type: appType = "app",
     zod: enableZod = isPackageExists("zod") && isPackageExists("next"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
-    typescript: enableTypeScript = isPackageExists("typescript"),
     unocss: enableUnoCSS = false,
-    vue: enableVue = VuePackages.some((i) => isPackageExists(i)),
     storybook: enableStorybook = StorybookPackages.some((i) =>
       isPackageExists(i),
     ),
@@ -133,6 +130,16 @@ export function nirtamir2(
     i18n: enableI18n = false,
     security: enableSecurity = false,
   } = options;
+  const {
+    jsdoc: enableJsdoc,
+    jsx: enableJsx,
+    nextjs: enableNextjs,
+    react: enableReact,
+    test: enableTest,
+    typescript: enableTypeScript,
+    vue: enableVue,
+  } = sharedPlan.enabled;
+  const { isInEditor, type: appType } = sharedPlan;
 
   const stylisticOptions =
     options.stylistic === false || options.stylistic == null
@@ -241,7 +248,7 @@ export function nirtamir2(
     configs.push(regexp(typeof enableRegexp === "boolean" ? {} : enableRegexp));
   }
 
-  if (options.test ?? true) {
+  if (enableTest) {
     configs.push(
       test({
         isInEditor,
@@ -256,7 +263,7 @@ export function nirtamir2(
         ...resolveSubOptions(options, "vue"),
         overrides: getOverrides(options, "vue"),
         stylistic: stylisticOptions,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -287,7 +294,7 @@ export function nirtamir2(
       solid({
         overrides: getOverrides(options, "solid"),
         tsconfigPath,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -297,7 +304,7 @@ export function nirtamir2(
       svelte({
         overrides: getOverrides(options, "svelte"),
         stylistic: stylisticOptions,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -372,7 +379,7 @@ export function nirtamir2(
 
   configs.push(defaultImportName());
 
-  if (options.jsdoc ?? false) {
+  if (enableJsdoc) {
     configs.push(
       jsdoc({
         stylistic: stylisticOptions,
