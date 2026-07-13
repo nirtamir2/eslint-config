@@ -14,6 +14,7 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./cli": "./dist/cli.mjs",
+    "./oxlint": "./dist/oxlint.mjs",
     "./package.json": "./package.json"
   },
   "types": "./dist/index.d.mts",
@@ -23,10 +24,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "nr typegen && tsdown --clean --dts",
+    "build": "nr typegen && nr check:oxlint-generated && tsdown --clean --dts",
     "build:inspector": "pnpm build && npx @eslint/config-inspector build",
+    "check:oxlint-generated": "tsx scripts/generate-oxlint.ts --check",
     "dev": "npx @eslint/config-inspector --config eslint.config.ts",
     "format": "prettier \"**/*\" --write --ignore-unknown",
+    "generate:oxlint": "tsx scripts/generate-oxlint.ts",
     "lint": "eslint . --fix",
     "lint:check": "eslint . --max-warnings=0",
     "prepack": "nr build",
@@ -34,6 +37,7 @@
     "release": "bumpp",
     "stub": "tsdown",
     "test": "vitest",
+    "test:oxlint-package": "tsx scripts/test-oxlint-package.ts",
     "type-check": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "typegen": "esno scripts/typegen.ts",

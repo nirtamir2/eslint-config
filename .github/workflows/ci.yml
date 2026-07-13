@@ -29,8 +29,14 @@ jobs:
       - name: Install
         run: nci
 
+      - name: Check generated Oxlint config
+        run: nr check:oxlint-generated
+
       - name: Build
         run: nr build
+
+      - name: Test packed Oxlint entry
+        run: nr test:oxlint-package
 
       - name: Lint
         run: nr lint:check
