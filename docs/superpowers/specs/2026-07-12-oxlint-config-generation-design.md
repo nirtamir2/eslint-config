@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted for implementation planning.
+Implemented and verified.
 
 ## Date
 
@@ -38,8 +38,8 @@ Oxlint provides the official `@oxlint/migrate` converter. It accepts a
 resolved ESLint flat config and asynchronously returns an Oxlint config.
 Running that converter in every consumer process would require top-level
 `await`, load the ESLint plugin graph during every Oxlint invocation, and
-couple users to migration-tool internals. Therefore conversion belongs in the
-package build rather than the user runtime.
+couple users to migration-tool internals. Therefore conversion belongs in an
+explicit maintainer generation workflow rather than the user runtime.
 
 ## Goals
 
@@ -48,8 +48,8 @@ package build rather than the user runtime.
   behavior.
 - Reject ESLint-only or unsupported options instead of silently ignoring them.
 - Keep ESLint rules and presets as the sole manually maintained rule source.
-- Prefer native Oxlint plugins, with JavaScript-plugin fallbacks only after
-  compatibility tests pass.
+- Ship native Oxlint rules only in v1. Defer JavaScript-plugin fallbacks until
+  their runtime compatibility is proven separately.
 - Produce deterministic generated artifacts and a reviewable compatibility
   report.
 - Prevent a release from silently losing previously supported rules or
@@ -72,9 +72,9 @@ package build rather than the user runtime.
 ## Decision
 
 Generate Oxlint config fragments from the existing ESLint config functions at
-build time. Commit the generated artifacts for review, validate them in CI,
-and publish a lightweight synchronous factory that composes only those
-artifacts.
+maintainer request. Commit the generated artifacts for review, verify drift
+without rewriting them during build and release checks, and publish a
+lightweight synchronous factory that composes only those artifacts.
 
 The generator is repository-specific. Its internal units should be isolated
 and unsurprising, but extraction into a generic tool is outside this scope.
@@ -143,7 +143,8 @@ import { recommended } from "@nirtamir2/eslint-config/oxlint";
 export default recommended;
 ```
 
-`recommended` contains the base configuration only. It performs no package
+`recommended` contains the application base plus the default Unicorn fragment.
+It includes no JSX, test, or framework fragment and performs no package
 auto-detection.
 
 ### Option contract
@@ -163,9 +164,10 @@ The initial required option surface covers:
 
 All other current ESLint integrations are compatibility candidates. A
 candidate enters `OxlintOptions` only through an intentional API change after
-its native or JavaScript-plugin fragment passes the compatibility gates in
-this document. The public type never changes merely because a new migrator
-version happens to emit more rules.
+its native fragment passes the compatibility gates in this document. A future
+JavaScript fallback would require a separately reviewed policy change. The
+public type never changes merely because a new migrator version happens to
+emit more rules.
 
 The initial API explicitly excludes options whose defining behavior depends
 on unsupported custom languages, parsers, processors, or formatter execution,
@@ -181,10 +183,10 @@ names. No migration runs at user startup.
 
 ### Auto-detection
 
-When a supported option is omitted, the Oxlint factory retains the
-corresponding existing package auto-detection behavior whenever the ESLint
-factory already auto-detects that integration. Unsupported integrations are
-never auto-enabled.
+The factory conditionally adds the default Unicorn and JSX/test fragments,
+then adds supported TypeScript, Next.js, and Vue fragments using the existing
+package auto-detection behavior when their options are omitted. React and
+JSDoc remain opt-in. Unsupported integrations are never auto-enabled.
 
 To avoid maintaining orchestration twice, extract shared, linter-independent
 feature detection and ordering from the current ESLint factory. Both factories
@@ -210,8 +212,7 @@ A small handwritten Oxlint capability manifest owns semantic decisions that a
 migration tool cannot infer:
 
 - Public option key.
-- Native, JavaScript-plugin, partial, or unsupported classification.
-- Exact JavaScript plugin package specifier and alias.
+- Native, partial, or unsupported classification.
 - Required peer dependency, when applicable.
 - Supported generated variants.
 - Documented limitations.
@@ -219,26 +220,31 @@ migration tool cannot infer:
 The manifest contains no rule lists. It is adapter metadata, not a second
 configuration.
 
-### 3. Build generator
+### 3. Artifact generator
 
-`scripts/generate-oxlint.ts` resolves controlled variants of existing ESLint
-config functions and passes the resulting flat configs to a pinned
-`@oxlint/migrate` version.
+`scripts/generate-oxlint.ts` resolves isolated existing ESLint config
+producers and their declared variants, then passes each resulting flat config
+unit to a pinned `@oxlint/migrate` version. Isolating source units preserves
+feature boundaries and makes compatibility changes attributable.
 
 The generator must:
 
 1. Resolve only declared variants.
-2. Use native Oxlint implementations when available.
-3. Admit a JavaScript plugin only when the capability manifest supplies the
-   exact specifier and compatibility tests pass.
-4. Normalize output deterministically.
-5. Validate the normalized config.
-6. Emit config fragments and compatibility metadata.
-7. Fail on unreviewed compatibility drift.
+2. Use native Oxlint implementations only in v1.
+3. Preserve source `files` and `ignores` scopes in the generated fragment
+   metadata and Oxlint overrides.
+4. Normalize disabled rule arrays such as `["off", options]` to a bare
+   disabled severity so Oxlint does not validate inactive ESLint-only options.
+5. Translate supported ESLint extglobs to Oxlint-compatible brace globs and
+   fail on any unrecognized extglob instead of emitting an inert file scope.
+6. Normalize output deterministically.
+7. Feed the normalized config to pinned CLI compatibility validation.
+8. Emit config fragments and compatibility metadata.
+9. Fail on unreviewed compatibility drift.
 
-The generator must not trust guessed plugin package names from the migrator.
-The capability manifest is authoritative for JavaScript plugin aliases and
-specifiers.
+JavaScript-plugin output from the migrator is discarded in v1. A future
+fallback must use an explicitly reviewed package specifier and alias rather
+than trusting a guessed migrator value.
 
 ### 4. Generated artifacts
 
@@ -297,7 +303,8 @@ the option can be published.
 
 Native Oxlint plugins always take precedence over ESLint JavaScript plugins.
 
-A JavaScript-plugin fallback is allowed only when:
+The initial release does not publish JavaScript-plugin fallbacks. A future
+fallback may be admitted only when:
 
 - No adequate native implementation covers the selected rules.
 - The plugin handles file kinds that Oxlint supports for that integration.
@@ -306,10 +313,9 @@ A JavaScript-plugin fallback is allowed only when:
 - Relevant fixtures produce expected diagnostics.
 - Its known limitations are published.
 
-Supported JavaScript plugins are peer dependencies because package specifiers
-inside imported Oxlint config objects resolve in the consumer environment.
-Explicitly enabling a missing peer produces a targeted factory error.
-Auto-detected integrations remain disabled when their dependency is absent.
+Any future supported JavaScript plugin would be a peer dependency because
+package specifiers inside imported Oxlint config objects resolve in the
+consumer environment. This policy does not add such peers in v1.
 
 ## Failure and compatibility policy
 
@@ -317,7 +323,7 @@ Generation fails closed on:
 
 - Migrator crashes.
 - Invalid Oxlint configuration.
-- Unknown or guessed JavaScript plugin aliases.
+- Unexpected JavaScript-plugin output in a native-only artifact.
 - Schema or load failures.
 - Unexpected skipped-rule drift.
 - A compatibility regression in an already supported integration.
@@ -326,8 +332,8 @@ At runtime:
 
 - Unknown and ESLint-only option keys throw an `Unsupported Oxlint option`
   error.
-- Explicitly enabled integrations with missing peer dependencies throw an
-  installation error naming the package.
+- Features requiring an optional runtime companion, such as type-aware
+  linting, produce a targeted installation error when it is unavailable.
 - User rule configuration is left to Oxlint's own validation.
 - The factory never silently falls back to ESLint.
 
@@ -352,7 +358,7 @@ Compatibility changes follow public API semantics:
 
 ### Compatibility tests
 
-- Every native and JavaScript-plugin integration loads under pinned Oxlint.
+- Every native integration loads under pinned Oxlint.
 - Representative fixtures assert diagnostics, not only successful parsing.
 - Framework combinations cover ordering interactions such as React with
   TypeScript and Vue with TypeScript.
@@ -373,7 +379,6 @@ Compatibility changes follow public API semantics:
 - The published `./oxlint` entry contains no runtime import of ESLint or
   `@oxlint/migrate`.
 - Generated modules and declarations are included in the package.
-- Supported JavaScript plugin peer metadata matches the capability manifest.
 - `oxlint`, `@oxlint/migrate`, and compatibility fixtures use aligned pinned
   versions.
 
@@ -381,12 +386,14 @@ Compatibility changes follow public API semantics:
 
 Add these script entry points:
 
-- `generate:oxlint`: generate and validate artifacts.
-- `check:oxlint-generated`: regenerate and fail on a diff.
+- `generate:oxlint`: the only command that writes generated artifacts; it
+  generates them explicitly for maintainers.
+- `check:oxlint-generated`: generate in memory or a temporary location and
+  fail on drift without mutating the working tree.
 
-Generation runs before the existing build and during `prepack`. CI runs the
-drift check independently so a release cannot rely on an uncommitted local
-generation result.
+The build, `prepack`, and CI run the non-mutating drift check. They never
+rewrite tracked files, so a release cannot hide stale artifacts behind an
+uncommitted local generation result.
 
 The package build adds an Oxlint entry and declaration output. README usage
 documents:
@@ -431,10 +438,10 @@ would be a large refactor and still require linter-specific adapters.
 Create a new reusable package that turns arbitrary ESLint config factories
 into Oxlint factories.
 
-Rejected from the initial scope. A generic tool can migrate resolved configs,
+Deferred from the initial scope. A generic tool can migrate resolved configs,
 but it cannot infer a factory's public options, meaningful variants,
-auto-detection contract, or acceptable degradation policy. This repository
-will first prove the package-specific workflow.
+auto-detection contract, or acceptable degradation policy. Those decisions
+require package-specific declarations even when rule conversion is generic.
 
 ## Consequences
 
@@ -446,6 +453,8 @@ will first prove the package-specific workflow.
 - Compatibility gaps cannot disappear silently.
 - The package can add Oxlint capabilities incrementally without overpromising
   unsupported ESLint behavior.
+- The published runtime does not import ESLint or the migrator, although the
+  same-package v1 retains the package's existing ESLint install footprint.
 
 ### Costs
 
@@ -453,8 +462,8 @@ will first prove the package-specific workflow.
   fixtures.
 - Oxlint and migrator upgrades require deliberate regeneration and review.
 - Some familiar ESLint options remain unavailable in the Oxlint entry.
-- JavaScript-plugin fallbacks require peer dependency and compatibility
-  maintenance.
+- JavaScript-plugin fallbacks remain deferred work requiring peer dependency
+  and compatibility maintenance if later adopted.
 - Shared feature detection requires a targeted refactor of the current ESLint
   factory.
 
