@@ -28,7 +28,10 @@ function cloneValue<T>(value: T): T {
     return value;
 
   return Object.fromEntries(
-    Object.entries(value).map(([key, item]) => [key, cloneValue(item)]),
+    Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+      key,
+      cloneValue(item),
+    ]),
   ) as T;
 }
 
