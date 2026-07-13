@@ -33,6 +33,20 @@ describe("oxlint artifact generation", () => {
     expect(first.get("src/generated/oxlint/fragments.ts")).not.toContain("?(");
   });
 
+  it("records only generator toolchain versions and frozen React detection", async () => {
+    const rendered = await renderOxlintArtifacts();
+    const report = rendered.get(
+      "src/generated/oxlint/compatibility-report.ts",
+    );
+
+    expect(report).toContain(
+      "versions: { migrate: string; oxlint: string }",
+    );
+    expect(report).not.toContain("config: string");
+    expect(report).not.toContain('"config":');
+    expect(report).toContain('"id": "react-refresh-environment-detection"');
+  });
+
   it("translates ESLint extglobs inside composed Oxlint file patterns", () => {
     expect(translateOxlintGlob("**/cli.?([cm])[jt]s?(x)")).toBe(
       "**/cli.{js,jsx,mjs,mjsx,cjs,cjsx,ts,tsx,mts,mtsx,cts,ctsx}",

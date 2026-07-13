@@ -33,7 +33,7 @@ export interface OxlintCompatibilityReport {
   }>;
   schemaVersion: 1;
   variants: Record<string, OxlintVariantCompatibility>;
-  versions: { config: string; migrate: string; oxlint: string };
+  versions: { migrate: string; oxlint: string };
 }
 
 export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
@@ -62,6 +62,11 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "classification": "generated-adaptation",
       "description": "Rule-bearing root items in optional integrations are scoped to that integration's default files.",
       "id": "integration-rule-scoping"
+    },
+    {
+      "classification": "intentional-v1",
+      "description": "React variants are generated with package detection disabled, so their migrated react/only-export-components options are frozen and do not automatically adapt to installed Next.js, Vite, or Remix packages; the separately enabled Next.js fragment still applies its own rule.",
+      "id": "react-refresh-environment-detection"
     },
     {
       "classification": "runtime-requirement",
@@ -1347,7 +1352,6 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     }
   },
   "versions": {
-    "config": "0.2.7",
     "migrate": "1.73.0",
     "oxlint": "1.73.0"
   }

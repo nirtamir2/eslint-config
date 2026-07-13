@@ -179,6 +179,14 @@ this includes `angular`, `formatters`, `jsonc`, `markdown`, `pnpm`,
 `stylistic`, `toml`, and `yaml`. Formatting remains a separate concern, such
 as Oxfmt or Prettier.
 
+React refresh package detection is intentionally frozen in the generated
+native v1 config. The React fragment does not dynamically vary
+`react/only-export-components` for installed Next.js, Vite, or Remix
+packages. Enabling `nextjs` still applies its separately generated Next.js
+fragment; for Vite- or Remix-specific refresh options, set a native
+`react.overrides` rule until environment-specific generated variants are
+available.
+
 For example, add a package script like this:
 
 ```json

@@ -88,7 +88,6 @@ interface CompatibilityReportData {
   schemaVersion: 1;
   variants: Record<string, VariantCompatibility>;
   versions: {
-    config: string;
     migrate: string;
     oxlint: string;
   };
@@ -287,6 +286,12 @@ function compatibilityLimitations(): CompatibilityReportData["limitations"] {
       id: "integration-rule-scoping",
     },
     {
+      classification: "intentional-v1",
+      description:
+        "React variants are generated with package detection disabled, so their migrated react/only-export-components options are frozen and do not automatically adapt to installed Next.js, Vite, or Remix packages; the separately enabled Next.js fragment still applies its own rule.",
+      id: "react-refresh-environment-detection",
+    },
+    {
       classification: "runtime-requirement",
       description:
         "Type-aware variants require oxlint-tsgolint at runtime and set options.typeAware.",
@@ -430,8 +435,7 @@ async function generateData(): Promise<GeneratedData> {
   });
   variants.jsdoc = jsdocFragment.compatibility;
 
-  const [configVersion, migrateVersion, oxlintVersion] = await Promise.all([
-    readPackageVersion(new URL("../../package.json", import.meta.url)),
+  const [migrateVersion, oxlintVersion] = await Promise.all([
     readPackageVersion(
       new URL("../../node_modules/@oxlint/migrate/package.json", import.meta.url),
     ),
@@ -486,7 +490,6 @@ async function generateData(): Promise<GeneratedData> {
       schemaVersion: 1,
       variants,
       versions: {
-        config: configVersion,
         migrate: migrateVersion,
         oxlint: oxlintVersion,
       },
@@ -565,7 +568,7 @@ export interface OxlintCompatibilityReport {
   }>;
   schemaVersion: 1;
   variants: Record<string, OxlintVariantCompatibility>;
-  versions: { config: string; migrate: string; oxlint: string };
+  versions: { migrate: string; oxlint: string };
 }
 
 export const oxlintCompatibilityReport: OxlintCompatibilityReport = ${renderValue(
