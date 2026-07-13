@@ -13,7 +13,7 @@ describe("composeOxlintConfigs", () => {
       options: { maxWarnings: 10 },
       overrides: [{ files: ["**/*.ts"], rules: { "no-console": "off" } }],
       plugins: ["import", "unicorn"],
-      rules: { eqeqeq: "error", "no-console": "warn" },
+      rules: { eqeqeq: ["error", "always"], "no-console": "warn" },
       settings: { react: { version: "18" } },
     } satisfies OxlintConfig;
     const extension = {
@@ -55,6 +55,12 @@ describe("composeOxlintConfigs", () => {
     });
     expect(base.ignorePatterns).toEqual(["dist/**"]);
     expect(base.overrides).toHaveLength(1);
+
+    const result = composeOxlintConfigs(base);
+    (result.rules?.eqeqeq as Array<unknown>)[0] = "off";
+    (result.settings?.react as { version: string }).version = "changed";
+    expect(base.rules.eqeqeq).toEqual(["error", "always"]);
+    expect(base.settings.react.version).toBe("18");
   });
 
   it("resolves imported object extends depth-first", () => {
@@ -71,6 +77,15 @@ describe("composeOxlintConfigs", () => {
     ).toEqual({
       rules: { eqeqeq: "error", "no-console": "off" },
     });
+  });
+
+  it("lets an explicit null clear JavaScript plugins", () => {
+    expect(
+      composeOxlintConfigs(
+        { jsPlugins: ["eslint-plugin-example"] },
+        { jsPlugins: null },
+      ),
+    ).toEqual({ jsPlugins: null });
   });
 
   it("rejects cyclic and path-based extends", () => {

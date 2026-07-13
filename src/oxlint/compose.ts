@@ -15,45 +15,51 @@ function jsPluginKey(plugin: ExternalPluginEntry): string {
   return typeof plugin === "string" ? plugin : plugin.name;
 }
 
+function cloneValue<T>(value: T): T {
+  if (Array.isArray(value))
+    return value.map((item) => cloneValue(item)) as T;
+  if (Object.is(value, null) || typeof value !== "object") return value;
+
+  const prototype = Object.getPrototypeOf(value);
+  if (
+    !Object.is(prototype, Object.prototype) &&
+    !Object.is(prototype, null)
+  )
+    return value;
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [key, cloneValue(item)]),
+  ) as T;
+}
+
 function mergeJsPlugins(
   current: OxlintConfig["jsPlugins"],
   incoming: NonNullable<OxlintConfig["jsPlugins"]>,
 ): NonNullable<OxlintConfig["jsPlugins"]> {
   const plugins = new Map<string, ExternalPluginEntry>();
 
-  for (const plugin of current ?? []) plugins.set(jsPluginKey(plugin), plugin);
-  for (const plugin of incoming) plugins.set(jsPluginKey(plugin), plugin);
+  for (const plugin of current ?? [])
+    plugins.set(jsPluginKey(plugin), cloneValue(plugin));
+  for (const plugin of incoming)
+    plugins.set(jsPluginKey(plugin), cloneValue(plugin));
 
   return [...plugins.values()];
 }
 
 function cloneOverride(override: OxlintOverride): OxlintOverride {
-  return {
-    ...override,
-    ...(override.env ? { env: { ...override.env } } : {}),
-    ...(override.excludeFiles
-      ? { excludeFiles: [...override.excludeFiles] }
-      : {}),
-    files: [...override.files],
-    ...(override.globals ? { globals: { ...override.globals } } : {}),
-    ...(override.jsPlugins
-      ? {
-          jsPlugins: override.jsPlugins.map((plugin) =>
-            typeof plugin === "string" ? plugin : { ...plugin },
-          ),
-        }
-      : {}),
-    ...(override.plugins ? { plugins: [...override.plugins] } : {}),
-    ...(override.rules ? { rules: { ...override.rules } } : {}),
-  };
+  return cloneValue(override);
 }
 
 function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
   if (config.categories)
-    result.categories = { ...result.categories, ...config.categories };
-  if (config.env) result.env = { ...result.env, ...config.env };
+    result.categories = {
+      ...result.categories,
+      ...cloneValue(config.categories),
+    };
+  if (config.env)
+    result.env = { ...result.env, ...cloneValue(config.env) };
   if (config.globals)
-    result.globals = { ...result.globals, ...config.globals };
+    result.globals = { ...result.globals, ...cloneValue(config.globals) };
   if (config.ignorePatterns)
     result.ignorePatterns = mergeUnique(
       result.ignorePatterns,
@@ -63,7 +69,7 @@ function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
   else if (config.jsPlugins)
     result.jsPlugins = mergeJsPlugins(result.jsPlugins, config.jsPlugins);
   if (config.options)
-    result.options = { ...result.options, ...config.options };
+    result.options = { ...result.options, ...cloneValue(config.options) };
   if (config.overrides)
     result.overrides = [
       ...(result.overrides ?? []),
@@ -71,9 +77,10 @@ function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
     ];
   if (config.plugins)
     result.plugins = mergeUnique(result.plugins, config.plugins);
-  if (config.rules) result.rules = { ...result.rules, ...config.rules };
+  if (config.rules)
+    result.rules = { ...result.rules, ...cloneValue(config.rules) };
   if (config.settings)
-    result.settings = { ...result.settings, ...config.settings };
+    result.settings = { ...result.settings, ...cloneValue(config.settings) };
 }
 
 function mergeConfig(
