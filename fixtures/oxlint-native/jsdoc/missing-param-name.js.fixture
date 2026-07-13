@@ -1,0 +1,8 @@
+/**
+ * Echo a value.
+ *
+ * @param {string}
+ */
+export function echo(value) {
+  return value;
+}

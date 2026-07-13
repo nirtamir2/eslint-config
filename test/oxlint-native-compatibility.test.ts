@@ -8,6 +8,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 import { translateOxlintGlobs } from "../scripts/oxlint/normalize";
+import {
+  generatedOxlintFragments,
+  oxlintCompatibilityReport,
+} from "../src/generated/oxlint";
 import { GLOB_TESTS } from "../src/globs";
 import { createOxlintConfig } from "../src/oxlint/factory";
 
@@ -36,6 +40,20 @@ interface ExecuteOptions {
   workingDirectory: string;
 }
 
+interface DiagnosticCase {
+  assertTypeAware?: true;
+  file: string;
+  name: string;
+  options?: Partial<OxlintOptions>;
+  rule: string;
+}
+
+interface VariantLoadCase {
+  config: OxlintConfig;
+  file: string;
+  name: string;
+}
+
 const require = createRequire(import.meta.url);
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 const fixtureRoot = path.join(repositoryRoot, "fixtures", "oxlint-native");
@@ -44,6 +62,8 @@ const oxlintCli = path.join(oxlintPackageRoot, "bin", "oxlint");
 const localBinDirectory = path.join(repositoryRoot, "node_modules", ".bin");
 const temporaryDirectories: Array<string> = [];
 const timeout = process.platform === "win32" ? 120_000 : 60_000;
+const compareNames = (left: string, right: string) =>
+  left.localeCompare(right);
 
 const disabledOptions = {
   ignores: [],
@@ -59,6 +79,158 @@ const disabledOptions = {
   vue: false,
 } satisfies OxlintOptions;
 
+const variantLoadCases = [
+  {
+    config: generatedOxlintFragments.base.default,
+    file: "base/debugger.js",
+    name: "base.default",
+  },
+  {
+    config: generatedOxlintFragments.base.editor,
+    file: "base/debugger.js",
+    name: "base.editor",
+  },
+  {
+    config: generatedOxlintFragments.unicorn.allRecommended.config,
+    file: "unicorn/prefer-includes.js",
+    name: "unicorn.allRecommended",
+  },
+  {
+    config: generatedOxlintFragments.unicorn.selected.config,
+    file: "unicorn/prefer-includes.js",
+    name: "unicorn.selected",
+  },
+  {
+    config: generatedOxlintFragments.jsx.config,
+    file: "jsx/missing-alt.jsx",
+    name: "jsx",
+  },
+  {
+    config: generatedOxlintFragments.typescript.app.standard.config,
+    file: "typescript/explicit-any.ts",
+    name: "typescript.app.standard",
+  },
+  {
+    config: generatedOxlintFragments.typescript.app.typeAware.config,
+    file: "typescript/floating-promise.ts",
+    name: "typescript.app.typeAware",
+  },
+  {
+    config: generatedOxlintFragments.typescript.lib.standard.config,
+    file: "typescript/explicit-any.ts",
+    name: "typescript.lib.standard",
+  },
+  {
+    config: generatedOxlintFragments.typescript.lib.typeAware.config,
+    file: "typescript/floating-promise.ts",
+    name: "typescript.lib.typeAware",
+  },
+  {
+    config: generatedOxlintFragments.test.default.config,
+    file: "test/duplicate-title.test.ts",
+    name: "test.default",
+  },
+  {
+    config: generatedOxlintFragments.test.editor.config,
+    file: "test/duplicate-title.test.ts",
+    name: "test.editor",
+  },
+  {
+    config: generatedOxlintFragments.vue.javascript.config,
+    file: "vue/component.vue",
+    name: "vue.javascript",
+  },
+  {
+    config: generatedOxlintFragments.vue.typescript.config,
+    file: "vue/component.vue",
+    name: "vue.typescript",
+  },
+  {
+    config: generatedOxlintFragments.react.standard.config,
+    file: "framework/react-mixed-exports.tsx",
+    name: "react.standard",
+  },
+  {
+    config: generatedOxlintFragments.react.typeAware.config,
+    file: "framework/react-mixed-exports.tsx",
+    name: "react.typeAware",
+  },
+  {
+    config: generatedOxlintFragments.nextjs.config,
+    file: "framework/next-image.tsx",
+    name: "nextjs",
+  },
+  {
+    config: generatedOxlintFragments.jsdoc.config,
+    file: "jsdoc/missing-param-name.js",
+    name: "jsdoc",
+  },
+] satisfies Array<VariantLoadCase>;
+
+const diagnosticCases = [
+  {
+    file: "base/debugger.js",
+    name: "base",
+    rule: "no-debugger",
+  },
+  {
+    file: "unicorn/prefer-includes.js",
+    name: "Unicorn",
+    options: { unicorn: true },
+    rule: "prefer-includes",
+  },
+  {
+    file: "jsx/missing-alt.jsx",
+    name: "JSX accessibility",
+    options: { jsx: true },
+    rule: "alt-text",
+  },
+  {
+    file: "typescript/explicit-any.ts",
+    name: "TypeScript",
+    options: { typescript: true },
+    rule: "no-explicit-any",
+  },
+  {
+    assertTypeAware: true,
+    file: "typescript/floating-promise.ts",
+    name: "type-aware TypeScript",
+    options: { typescript: { typeAware: true } },
+    rule: "no-floating-promises",
+  },
+  {
+    file: "test/duplicate-title.test.ts",
+    name: "Vitest",
+    options: { test: true },
+    rule: "no-identical-title",
+  },
+  {
+    file: "vue/invalid-watch.vue",
+    name: "Vue",
+    options: { vue: true },
+    rule: "no-arrow-functions-in-watch",
+  },
+  {
+    assertTypeAware: true,
+    file: "framework/react-mixed-exports.tsx",
+    name: "type-aware React",
+    options: { react: true, typescript: { typeAware: true } },
+    rule: "only-export-components",
+  },
+  {
+    file: "framework/next-image.tsx",
+    name: "Next.js",
+    options: { nextjs: true },
+    rule: "no-img-element",
+  },
+  {
+    file: "jsdoc/missing-param-name.js",
+    name: "JSDoc",
+    options: { jsdoc: true },
+    rule: "require-param-name",
+  },
+] satisfies Array<DiagnosticCase>;
+
 afterEach(async () => {
   await Promise.all(
     temporaryDirectories.splice(0).map((directory) =>
@@ -68,78 +240,79 @@ afterEach(async () => {
 });
 
 describe("generated Oxlint config compatibility", () => {
-  it(
-    "reports the base no-debugger rule with the pinned Oxlint CLI",
-    async () => {
-      const result = await runOxlint(createConfig(), ["base/debugger.js"]);
+  it("covers every generated variant in the compatibility report", () => {
+    expect(
+      variantLoadCases.map(({ name }) => name).toSorted(compareNames),
+    ).toEqual(
+      Object.keys(oxlintCompatibilityReport.variants).toSorted(compareNames),
+    );
+  });
 
-      expect(result.exitCode).toBe(1);
-      expect(findDiagnostic(result.output, "no-debugger")).toBeDefined();
-    },
-    timeout,
-  );
-
-  it(
-    "reports a native JSX accessibility diagnostic",
-    async () => {
-      const result = await runOxlint(createConfig({ jsx: true }), [
-        "jsx/missing-alt.jsx",
-      ]);
-
-      expect(findDiagnostic(result.output, "alt-text")).toBeDefined();
-    },
-    timeout,
-  );
-
-  it(
-    "applies the Vitest rules to the shared test globs",
-    async () => {
-      const config = createConfig({ test: true });
-      const vitestOverride = config.overrides?.find((override) =>
-        Object.keys(override.rules ?? {}).includes(
-          "vitest/no-identical-title",
-        ),
-      );
-
-      expect(vitestOverride?.files).toEqual(translateOxlintGlobs(GLOB_TESTS));
-
-      const result = await runOxlint(config, [
-        "test/duplicate-title.test.ts",
-      ]);
-      expect(
-        findDiagnostic(result.output, "no-identical-title"),
-      ).toBeDefined();
-    },
-    timeout,
-  );
-
-  it(
-    "loads type-aware TypeScript rules through oxlint-tsgolint",
-    async () => {
-      const config = createConfig({
-        typescript: { typeAware: true },
-      });
-
-      expect(config.options?.typeAware).toBe(true);
-
-      const result = await runOxlint(config, [
-        "typescript/floating-promise.ts",
-      ]);
-      expect(
-        findDiagnostic(result.output, "no-floating-promises"),
-      ).toBeDefined();
-    },
-    timeout,
-  );
-
-  it(
-    "loads a Vue script block without config or plugin errors",
-    async () => {
-      const result = await runOxlint(createConfig({ vue: true }), [
-        "vue/component.vue",
-      ]);
+  it.each(variantLoadCases)(
+    "loads and schema-validates $name with the pinned Oxlint CLI",
+    async ({ config, file }) => {
+      const result = await runOxlint(config, [file]);
 
       expect(result.output.number_of_files).toBe(1);
+      expect(result.output.number_of_rules).toBeGreaterThan(0);
+    },
+    timeout,
+  );
+
+  it.each(diagnosticCases)(
+    "reports a representative $name diagnostic",
+    async ({ assertTypeAware, file, options, rule }) => {
+      const config = createConfig(options);
+      if (assertTypeAware) expect(config.options?.typeAware).toBe(true);
+
+      const result = await runOxlint(config, [file]);
+
+      expect(
+        findDiagnostic(result.output, rule),
+        JSON.stringify(result.output.diagnostics),
+      ).toBeDefined();
+    },
+    timeout,
+  );
+
+  it("applies the Vitest rules to the shared test globs", () => {
+    const config = createConfig({ test: true });
+    const vitestOverride = config.overrides?.find((override) =>
+      Object.keys(override.rules ?? {}).includes(
+        "vitest/no-identical-title",
+      ),
+    );
+
+    expect(vitestOverride?.files).toEqual(translateOxlintGlobs(GLOB_TESTS));
+  });
+
+  it.each([
+    {
+      name: "root rules",
+      options: {
+        rules: { "typescript/no-explicit-any": "off" },
+        typescript: true,
+      } satisfies Partial<OxlintOptions>,
+      userConfigs: [] as Array<OxlintConfig>,
+    },
+    {
+      name: "a trailing config",
+      options: { typescript: true } satisfies Partial<OxlintOptions>,
+      userConfigs: [
+        { rules: { "typescript/no-explicit-any": "off" } },
+      ] satisfies Array<OxlintConfig>,
+    },
+  ])(
+    "lets $name disable an earlier integration-scoped rule",
+    async ({ options, userConfigs }) => {
+      const result = await runOxlint(
+        createConfig(options, userConfigs),
+        ["typescript/explicit-any.ts"],
+      );
+
+      expect(
+        findDiagnostic(result.output, "no-explicit-any"),
+      ).toBeUndefined();
     },
     timeout,
   );
@@ -175,10 +348,13 @@ describe("generated Oxlint config compatibility", () => {
   );
 });
 
-function createConfig(options: Partial<OxlintOptions> = {}): OxlintConfig {
+function createConfig(
+  options: Partial<OxlintOptions> = {},
+  userConfigs: Array<OxlintConfig> = [],
+): OxlintConfig {
   return createOxlintConfig(
     { ...disabledOptions, ...options },
-    [],
+    userConfigs,
     {
       hasPackage: (name) => name === "oxlint-tsgolint",
       isInEditor: false,

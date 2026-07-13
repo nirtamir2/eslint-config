@@ -1,0 +1,3 @@
+const values = ["first", "second"];
+
+export const hasFirst = values.indexOf("first") !== -1;
