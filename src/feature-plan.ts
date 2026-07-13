@@ -49,22 +49,31 @@ export function resolveSharedFeaturePlan(
   input: SharedFeatureInput,
   environment: FeatureEnvironment,
 ): SharedFeaturePlan {
-  const enabled: Record<SharedFeature, boolean> = {
-    vue: resolveEnabled(
-      input.vue,
-      vuePackages.some((name) => environment.hasPackage(name)),
-    ),
-    unicorn: resolveEnabled(input.unicorn, true),
-    jsx: resolveEnabled(input.jsx, true),
-    typescript: resolveEnabled(
-      input.typescript,
-      environment.hasPackage("typescript"),
-    ),
-    test: resolveEnabled(input.test, true),
-    react: resolveEnabled(input.react, false),
-    nextjs: resolveEnabled(input.nextjs, environment.hasPackage("next")),
-    jsdoc: resolveEnabled(input.jsdoc, false),
-  };
+  const enabled = Object.fromEntries([
+    ["unicorn", resolveEnabled(input.unicorn, true)],
+    ["jsx", resolveEnabled(input.jsx, true)],
+    [
+      "typescript",
+      resolveEnabled(
+        input.typescript,
+        environment.hasPackage("typescript"),
+      ),
+    ],
+    ["test", resolveEnabled(input.test, true)],
+    [
+      "vue",
+      resolveEnabled(
+        input.vue,
+        vuePackages.some((name) => environment.hasPackage(name)),
+      ),
+    ],
+    ["react", resolveEnabled(input.react, false)],
+    ["nextjs", resolveEnabled(input.nextjs, environment.hasPackage("next"))],
+    ["jsdoc", resolveEnabled(input.jsdoc, false)],
+  ] satisfies Array<[SharedFeature, boolean]>) as Record<
+    SharedFeature,
+    boolean
+  >;
 
   return {
     enabled,
