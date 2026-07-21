@@ -34,7 +34,7 @@
     "lint:check": "eslint . --max-warnings=0",
     "prepack": "nr build",
     "prepare": "simple-git-hooks",
-    "release": "bumpp",
+    "release": "bumpp --tag eslint-config-v%s",
     "stub": "tsdown",
     "test": "vitest",
     "test:oxlint-package": "tsx scripts/test-oxlint-package.ts",
