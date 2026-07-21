@@ -79,6 +79,124 @@ For example:
 }
 ```
 
+## Oxlint
+
+This package also publishes a synchronous Oxlint config factory. Its rule
+fragments are generated from the ESLint config during development, so the
+ESLint rules remain the single manually maintained source.
+
+Install Oxlint alongside this package:
+
+```bash
+pnpm i -D eslint oxlint @nirtamir2/eslint-config
+```
+
+The ESLint peer is still part of the package's installation footprint in this
+initial same-package release. The compiled `./oxlint` entry itself does not
+load ESLint, ESLint plugins, or `@oxlint/migrate` when Oxlint starts.
+
+Create an `oxlint.config.ts` and call the factory:
+
+```ts
+// oxlint.config.ts
+import nirtamir2 from "@nirtamir2/eslint-config/oxlint";
+
+export default nirtamir2(
+  {
+    react: true,
+    typescript: true,
+    ignores: ["generated/**"],
+    rules: {
+      "no-console": "warn",
+    },
+  },
+  {
+    // Trailing Oxlint configs are applied last.
+    rules: {
+      "no-debugger": "error",
+    },
+  },
+);
+```
+
+Oxlint receives the returned plain config object; it does not call exported
+functions itself. Root `rules`, integration `overrides`, and trailing configs
+must therefore use Oxlint rule IDs and values. No migration runs in the user
+project.
+
+For a deterministic base config without package auto-detection, import the
+static preset instead:
+
+```ts
+// oxlint.config.ts
+import { recommended } from "@nirtamir2/eslint-config/oxlint";
+
+export default recommended;
+```
+
+`recommended` contains the application base and its default Unicorn rules. It
+does not enable JSX, tests, TypeScript, React, Next.js, Vue, JSDoc, or other
+detected integrations. Use the factory when you want integration selection
+and familiar options.
+
+### Oxlint options
+
+The initial Oxlint API supports:
+
+- `type`, `ignores`, and root `rules`.
+- `typescript`, `jsx`, `react`, `nextjs`, `test`, `vue`, `unicorn`, and
+  `jsdoc`.
+- Integration `overrides` for native Oxlint rules.
+- `typescript.typeAware` for Oxlint's type-aware linting.
+
+Type-aware linting additionally requires `oxlint-tsgolint`:
+
+```bash
+pnpm i -D oxlint-tsgolint
+```
+
+Unknown options and ESLint-only options throw an `Unsupported Oxlint option`
+error instead of being ignored.
+
+### Compatibility scope
+
+The first Oxlint release is native-only: the generator includes rules that
+the pinned Oxlint migrator maps to native Oxlint implementations and records
+the remaining rules in the committed compatibility report. It does not load
+JavaScript ESLint-plugin fallbacks. Consequently, an enabled integration can
+be partial when Oxlint does not yet implement every source rule.
+
+For maintainers, rule changes are made only in the ESLint source and then
+materialized with `pnpm generate:oxlint`. The generated fragments and report
+are committed for review. `pnpm build`, `prepack`, and CI use the non-mutating
+`check:oxlint-generated` command so stale output fails instead of being
+rewritten during packaging.
+
+Vue support covers supported script-block rules and does not promise ESLint
+template-processor parity. ESLint features whose defining behavior needs
+custom parsers, processors, or formatter execution are not exposed here;
+this includes `angular`, `formatters`, `jsonc`, `markdown`, `pnpm`,
+`stylistic`, `toml`, and `yaml`. Formatting remains a separate concern, such
+as Oxfmt or Prettier.
+
+React refresh package detection is intentionally frozen in the generated
+native v1 config. The React fragment does not dynamically vary
+`react/only-export-components` for installed Next.js, Vite, or Remix
+packages. Enabling `nextjs` still applies its separately generated Next.js
+fragment; for Vite- or Remix-specific refresh options, set a native
+`react.overrides` rule until environment-specific generated variants are
+available.
+
+For example, add a package script like this:
+
+```json
+{
+  "scripts": {
+    "lint:oxlint": "oxlint"
+  }
+}
+```
+
 ## Customization
 
 It uses [ESLint Flat config](https://eslint.org/docs/latest/use/configure/configuration-files-new). It provides much better organization and composition.

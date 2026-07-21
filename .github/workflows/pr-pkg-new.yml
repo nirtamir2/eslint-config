@@ -3,6 +3,7 @@ on: [push, pull_request]
 
 jobs:
   build:
+    if: ${{ !startsWith(github.head_ref, 'codex/upstream-') && !startsWith(github.ref_name, 'codex/upstream-') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +21,13 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Check generated Oxlint config
+        run: pnpm check:oxlint-generated
+
       - name: Build
         run: pnpm build
+
+      - name: Test packed Oxlint entry
+        run: pnpm test:oxlint-package
 
       - run: pnpx pkg-pr-new publish --pnpm

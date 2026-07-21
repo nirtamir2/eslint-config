@@ -235,10 +235,14 @@ export interface OptionsStylistic {
   stylistic?: boolean | StylisticConfig;
 }
 
-export interface StylisticConfig extends Pick<
-  StylisticCustomizeOptions,
-  "indent" | "quotes" | "jsx" | "semi" | "experimental"
-> {}
+export interface StylisticConfig {
+  indent?: StylisticCustomizeOptions["indent"];
+  quotes?: StylisticCustomizeOptions["quotes"];
+  jsx?: StylisticCustomizeOptions["jsx"];
+  semi?: StylisticCustomizeOptions["semi"];
+  braceStyle?: StylisticCustomizeOptions["braceStyle"];
+  experimental?: StylisticCustomizeOptions["experimental"];
+}
 
 export interface OptionsOverrides {
   overrides?: TypedFlatConfigItem["rules"];
@@ -353,7 +357,7 @@ export interface OptionsConfig
    *
    * @default false
    */
-  perfectionist?: boolean;
+  perfectionist?: boolean | OptionsOverrides;
 
   /**
    * Core rules. Can't be disabled.

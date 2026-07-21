@@ -3,10 +3,31 @@ name: Release
 on:
   push:
     tags:
-      - "v*"
+      - "eslint-config-v*"
 
 jobs:
+  verify-generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check generated Oxlint config
+        run: pnpm check:oxlint-generated
+
   release:
+    needs: verify-generated
     uses: sxzz/workflows/.github/workflows/release.yml@v1
     with:
       publish: true

@@ -88,5 +88,10 @@ export const GLOB_EXCLUDE = [
   "**/auto-import?(s).d.ts",
   "**/components.d.ts",
 
+  "**/.context",
+  "**/.claude",
+  "**/.agents",
+  "**/.*/skills",
+
   "**/routeTree.gen.ts",
 ];

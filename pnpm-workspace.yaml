@@ -12,6 +12,7 @@ catalogs:
     "@antfu/ni": ^30.0.0
     "@eslint/config-inspector": ^1.5.0
     "@naturacosmeticos/eslint-plugin-i18n-checker": ^1.0.1
+    "@oxlint/migrate": 1.73.0
     "@types/eslint-plugin-jsx-a11y": ^6.10.1
     "@types/fs-extra": ^11.0.4
     "@types/node": ^25.5.0
@@ -28,6 +29,8 @@ catalogs:
     fs-extra: ^11.3.4
     jiti: 2.6.1
     lint-staged: ^16.4.0
+    oxlint: 1.73.0
+    oxlint-tsgolint: 0.24.0
     rimraf: ^6.1.3
     simple-git-hooks: ^2.13.1
     tsdown: ^0.21.6
@@ -58,7 +61,6 @@ catalogs:
     eslint-plugin-format: ^2.0.1
     eslint-plugin-import-zod: ^1.2.1
     eslint-plugin-jsx-a11y: ^6.10.2
-    eslint-plugin-react: ^7.37.5
     eslint-plugin-react-refresh: ^0.5.2
     eslint-plugin-react-you-might-not-need-an-effect: ^0.9.2
     eslint-plugin-solid: ^0.14.5
