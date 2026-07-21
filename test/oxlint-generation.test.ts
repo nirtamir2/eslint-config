@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   diffOxlintArtifacts,
+  normalizeOxlintArtifactPath,
   renderOxlintArtifacts,
   writeOxlintArtifacts,
 } from "../scripts/oxlint/generate";
@@ -20,6 +21,14 @@ afterEach(async () => {
 });
 
 describe("oxlint artifact generation", () => {
+  it("normalizes Windows artifact paths to committed POSIX paths", () => {
+    expect(
+      normalizeOxlintArtifactPath(
+        String.raw`src\generated\oxlint\fragments.ts`,
+      ),
+    ).toBe("src/generated/oxlint/fragments.ts");
+  });
+
   it("renders the same native-only artifacts twice", async () => {
     const first = await renderOxlintArtifacts();
     const second = await renderOxlintArtifacts();

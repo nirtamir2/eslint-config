@@ -610,6 +610,10 @@ async function listFiles(directory: string): Promise<Array<string>> {
   return files.flat().toSorted((left, right) => left.localeCompare(right));
 }
 
+export function normalizeOxlintArtifactPath(relativePath: string): string {
+  return relativePath.replaceAll(path.win32.sep, path.posix.sep);
+}
+
 export async function diffOxlintArtifacts(
   root: string,
   rendered: RenderedArtifacts,
@@ -636,7 +640,7 @@ export async function diffOxlintArtifacts(
   const actualFiles = await listFiles(path.join(root, generatedDirectory));
   const expected = new Set(expectedFiles);
   const unexpected = actualFiles
-    .map((file) => path.relative(root, file))
+    .map((file) => normalizeOxlintArtifactPath(path.relative(root, file)))
     .filter((file) => !expected.has(file))
     .toSorted((left, right) => left.localeCompare(right));
 
