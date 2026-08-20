@@ -4,7 +4,7 @@ import path from "node:path";
 import process from "node:process";
 import c from "picocolors";
 import { dependenciesMap, pkgJson as packageJson } from "../constants";
-import type { PromptResult } from "../types";
+import type { PackageJsonLike, PromptResult } from "../types";
 
 const ESLINT_TS_PATCH_SUFFIX_PATTERN = /-\d+$/;
 
@@ -16,7 +16,7 @@ export async function updatePackageJson(result: PromptResult) {
   p.log.step(c.cyan(`Bumping @nirtamir2/eslint-config to v${packageJson.version}`));
 
   const packageContent = await fsp.readFile(pathPackageJSON, "utf8");
-  const package_: Record<string, any> = JSON.parse(packageContent);
+  const package_: PackageJsonLike = JSON.parse(packageContent);
 
   package_.devDependencies ??= {};
   package_.devDependencies["@nirtamir2/eslint-config"] = `^${packageJson.version}`;

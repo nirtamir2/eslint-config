@@ -8,6 +8,7 @@ const rules = {
 } satisfies OxlintRules;
 
 const options = {
+  antiSlop: { level: "warn", overrides: rules, specifier: "./vendored/index.ts" },
   ignores: ["generated/**"],
   jsdoc: { overrides: rules },
   jsx: true,
@@ -34,3 +35,9 @@ oxlint({ typescript: { tsconfigPath: "tsconfig.json" } });
 oxlint({ ignores: (defaults: Array<string>) => defaults });
 // @ts-expect-error trailing configs must use the Oxlint schema
 oxlint({}, { languageOptions: { parserOptions: {} } });
+// @ts-expect-error anti-slop level is limited to Oxlint severities
+oxlint({ antiSlop: { level: "info" } });
+// @ts-expect-error anti-slop specifier must be a string
+oxlint({ antiSlop: { specifier: 5 } });
+// @ts-expect-error anti-slop has no allRecommended switch
+oxlint({ antiSlop: { allRecommended: true } });

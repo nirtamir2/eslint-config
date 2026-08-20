@@ -13,6 +13,7 @@ const nirOverridesConfig: TypedFlatConfigItem["rules"] = {
 export async function regexp(
   options: OptionsRegExp & OptionsOverrides = {},
 ): Promise<Array<TypedFlatConfigItem>> {
+  // SAFETY: eslint-plugin-regexp types its presets loosely; this preset is a flat config.
   const config = configs["flat/recommended"] as TypedFlatConfigItem;
   const rules = {
     ...config.rules,

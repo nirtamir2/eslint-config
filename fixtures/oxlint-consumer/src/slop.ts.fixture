@@ -1,0 +1,3 @@
+export function readOwned(owner: Record<string, string>, key: string) {
+  return Reflect.get(owner, key);
+}

@@ -57,12 +57,17 @@ const ignoreConfigs = new Set([
 
 function serializeConfigs(
   configs: Array<TypedFlatConfigItem>,
+  // Snapshot rows are heterogeneous summaries, not a typed domain object.
+  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- snapshot summary
 ): Array<Record<string, any>> {
   return configs.map((config) => {
     if (config.name && ignoreConfigs.has(config.name)) {
       return { name: "[ignored]" };
     }
 
+    // SAFETY: the clone is a snapshot scratch object whose fields are replaced with
+    // serializable summaries below, so it deliberately drops the flat-config type.
+    // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type, anti-slop/no-known-value-widening -- snapshot summary
     const clone = { ...config } as Record<string, any>;
 
     if (config.plugins) {
@@ -75,6 +80,8 @@ function serializeConfigs(
         typeof config.languageOptions.parser !== "string"
       ) {
         clone.languageOptions.parser =
+          // SAFETY: narrowed to a parser object above; `meta` and `name` are optional
+          // in practice, which is why both are probed before falling back.
           (config.languageOptions.parser as any).meta?.name ||
           (config.languageOptions.parser as any).name ||
           "unknown";
@@ -90,6 +97,7 @@ function serializeConfigs(
     }
 
     if (config.processor && typeof config.processor !== "string") {
+      // SAFETY: narrowed to a processor object above; `meta` is optional in practice.
       clone.processor = (config.processor as any).meta?.name || "unknown";
     }
 

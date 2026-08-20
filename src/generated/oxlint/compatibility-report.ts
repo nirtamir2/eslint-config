@@ -976,6 +976,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "skippedRules": {
         "js-plugins": [
           "erasable-syntax-only/enums",
+          "erasable-syntax-only/export-aliases",
           "erasable-syntax-only/import-aliases",
           "erasable-syntax-only/namespaces",
           "erasable-syntax-only/parameter-properties"
@@ -1002,6 +1003,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "skippedRules": {
         "js-plugins": [
           "erasable-syntax-only/enums",
+          "erasable-syntax-only/export-aliases",
           "erasable-syntax-only/import-aliases",
           "erasable-syntax-only/namespaces",
           "erasable-syntax-only/parameter-properties",
@@ -1035,6 +1037,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "skippedRules": {
         "js-plugins": [
           "erasable-syntax-only/enums",
+          "erasable-syntax-only/export-aliases",
           "erasable-syntax-only/import-aliases",
           "erasable-syntax-only/namespaces",
           "erasable-syntax-only/parameter-properties"
@@ -1061,6 +1064,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "skippedRules": {
         "js-plugins": [
           "erasable-syntax-only/enums",
+          "erasable-syntax-only/export-aliases",
           "erasable-syntax-only/import-aliases",
           "erasable-syntax-only/namespaces",
           "erasable-syntax-only/parameter-properties",
@@ -1544,7 +1548,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     }
   },
   "versions": {
-    "migrate": "1.78.0",
-    "oxlint": "1.78.0"
+    "migrate": "1.79.0",
+    "oxlint": "1.79.0"
   }
 };

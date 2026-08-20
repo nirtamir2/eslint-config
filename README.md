@@ -148,6 +148,7 @@ The initial Oxlint API supports:
   `jsdoc`.
 - Integration `overrides` for native Oxlint rules.
 - `typescript.typeAware` for Oxlint's type-aware linting.
+- `antiSlop` for the vendored anti-slop rules (see below).
 
 Type-aware linting additionally requires `oxlint-tsgolint`:
 
@@ -158,13 +159,75 @@ pnpm i -D oxlint-tsgolint
 Unknown options and ESLint-only options throw an `Unsupported Oxlint option`
 error instead of being ignored.
 
+### anti-slop
+
+[anti-slop](https://github.com/dmmulroy/anti-slop) by Dillon Mulroy is a set of
+opinionated rules that reject low-evidence TypeScript: `unknown` parameters and
+return types, type assertions with no stated invariant, `Record<string, unknown>`
+dictionaries, `Reflect.get`, module mocking, and ad-hoc `typeof` narrowing.
+
+It is not published to npm — upstream asks that it be vendored — so the rules are
+vendored into this package under `src/oxlint-plugins/anti-slop/`, kept byte-identical
+to upstream, and shipped compiled. Consumers install nothing extra:
+
+```ts
+// oxlint.config.ts
+import nirtamir2 from "@nirtamir2/eslint-config/oxlint";
+
+export default nirtamir2({ antiSlop: true });
+```
+
+It is **off by default**, and turning it on will report a lot in an existing
+codebase. Start with warnings, or disable the rules you disagree with:
+
+```ts
+export default nirtamir2({
+  antiSlop: {
+    level: "warn",
+    overrides: {
+      // Hard to satisfy if your public API uses `boolean | Options` unions.
+      "anti-slop/no-runtime-typeof": "off",
+    },
+  },
+});
+```
+
+The same rules are available to ESLint, since anti-slop wraps them with
+`eslintCompatPlugin`:
+
+```js
+// eslint.config.js
+import nirtamir2 from "@nirtamir2/eslint-config";
+
+export default nirtamir2({ antiSlop: true });
+```
+
+`antiSlop.specifier` points Oxlint at your own vendored copy instead of the bundled
+one, which is useful once you start editing the rules — which upstream encourages:
+
+```ts
+export default nirtamir2({
+  antiSlop: { specifier: "./tools/oxlint/anti-slop/index.ts" },
+});
+```
+
+anti-slop is MIT licensed; the license is kept alongside the vendored rules, and
+`pnpm sync:anti-slop` re-vendors them from a pinned upstream commit.
+
 ### Compatibility scope
 
-The first Oxlint release is native-only: the generator includes rules that
+The generated fragments are native-only: the generator includes rules that
 the pinned Oxlint migrator maps to native Oxlint implementations and records
 the remaining rules in the committed compatibility report. It does not load
-JavaScript ESLint-plugin fallbacks. Consequently, an enabled integration can
-be partial when Oxlint does not yet implement every source rule.
+JavaScript ESLint-plugin fallbacks for them. Consequently, an enabled
+integration can be partial when Oxlint does not yet implement every source
+rule.
+
+`antiSlop` is the one exception, and it is opt-in. It is a hand-written
+fragment rather than a generated one, and enabling it registers a JS plugin
+through Oxlint's `jsPlugins`. Oxlint's JS plugin support is in alpha and is
+explicitly not covered by semver, and running JS rules costs lint time that
+native Rust rules do not. Nothing loads unless you ask for it.
 
 For maintainers, rule changes are made only in the ESLint source and then
 materialized with `pnpm generate:oxlint`. The generated fragments and report

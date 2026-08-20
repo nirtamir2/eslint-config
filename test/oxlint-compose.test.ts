@@ -57,7 +57,10 @@ describe("composeOxlintConfigs", () => {
     expect(base.overrides).toHaveLength(1);
 
     const result = composeOxlintConfigs(base);
+    // SAFETY: `base` above declares eqeqeq as a tuple and react.version as a string;
+    // these mutations prove the composer deep-cloned rather than aliased them.
     (result.rules?.eqeqeq as Array<unknown>)[0] = "off";
+    // SAFETY: as above, for the settings block.
     (result.settings?.react as { version: string }).version = "changed";
     expect(base.rules.eqeqeq).toEqual(["error", "always"]);
     expect(base.settings.react.version).toBe("18");
@@ -128,6 +131,9 @@ describe("composeOxlintConfigs", () => {
       "Cyclic Oxlint config extends",
     );
     expect(() =>
+      // SAFETY: string `extends` entries are exactly what this test asserts are
+      // rejected, so the value cannot be expressed in the public config type.
+      // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- invalid by design
       composeOxlintConfigs({ extends: ["./base.json"] } as unknown as OxlintConfig),
     ).toThrow("Import extended Oxlint configs as objects");
   });

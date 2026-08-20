@@ -5,8 +5,10 @@ import { generatedOxlintFragments } from "../generated/oxlint";
 import type { FeatureEnvironment } from "../feature-plan";
 import { resolveSharedFeaturePlan } from "../feature-plan";
 import { isInEditorEnv as isInEditorEnvironment } from "../editor-environment";
+import { createAntiSlopConfig } from "./anti-slop";
 import { composeOxlintConfigs } from "./compose";
 import type {
+  OxlintAntiSlopOptions,
   OxlintOptions,
   OxlintOverridesOptions,
   OxlintRules,
@@ -15,6 +17,7 @@ import type {
 } from "./types";
 
 const optionKeys = new Set<keyof OxlintOptions>([
+  "antiSlop",
   "ignores",
   "jsdoc",
   "jsx",
@@ -28,10 +31,12 @@ const optionKeys = new Set<keyof OxlintOptions>([
   "vue",
 ]);
 
+const antiSlopOptionKeys = new Set(["level", "overrides", "specifier"]);
 const overrideOptionKeys = new Set(["overrides"]);
 const typeScriptOptionKeys = new Set(["overrides", "typeAware"]);
 const unicornOptionKeys = new Set(["allRecommended", "overrides"]);
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters, anti-slop/no-unsafe-dictionary-type -- this is the boundary parser anti-slop asks for: it is the only place untyped user input enters, and it narrows before anything else reads it
 function isRecord(value: unknown): value is Record<string, unknown> {
   return (
     !Object.is(value, null) &&
@@ -40,11 +45,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   );
 }
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- this is the boundary parser anti-slop asks for: it is the only place untyped user input enters, and it narrows before anything else reads it
 function assertRules(value: unknown, path: string): asserts value is OxlintRules {
   if (value !== undefined && !isRecord(value))
     throw new TypeError(`Oxlint option "${path}" must be a rules object`);
 }
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- this is the boundary parser anti-slop asks for: it is the only place untyped user input enters, and it narrows before anything else reads it
 function assertBoolean(value: unknown, path: string): void {
   if (value !== undefined && typeof value !== "boolean")
     throw new TypeError(`Oxlint option "${path}" must be a boolean`);
@@ -52,6 +59,7 @@ function assertBoolean(value: unknown, path: string): void {
 
 function assertFeatureOption(
   name: string,
+  // oxlint-disable-next-line anti-slop/no-unknown-parameters -- this is the boundary parser anti-slop asks for: it is the only place untyped user input enters, and it narrows before anything else reads it
   value: unknown,
   allowedKeys: ReadonlySet<string>,
 ): void {
@@ -67,11 +75,13 @@ function assertFeatureOption(
   assertRules(value.overrides, `${name}.overrides`);
 }
 
+// oxlint-disable-next-line anti-slop/no-unknown-parameters -- this is the boundary parser anti-slop asks for: it is the only place untyped user input enters, and it narrows before anything else reads it
 function validateOptions(options: unknown): asserts options is OxlintOptions {
   if (!isRecord(options))
     throw new TypeError("Oxlint options must be an object");
 
   for (const key of Object.keys(options)) {
+    // SAFETY: the membership test is the check; a miss throws on the next line.
     if (!optionKeys.has(key as keyof OxlintOptions))
       throw new Error(`Unsupported Oxlint option "${key}"`);
   }
@@ -93,6 +103,7 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
 
   assertRules(options.rules, "rules");
   assertBoolean(options.jsx, "jsx");
+  assertFeatureOption("antiSlop", options.antiSlop, antiSlopOptionKeys);
   assertFeatureOption("jsdoc", options.jsdoc, overrideOptionKeys);
   assertFeatureOption("nextjs", options.nextjs, overrideOptionKeys);
   assertFeatureOption("react", options.react, overrideOptionKeys);
@@ -105,6 +116,15 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
   assertFeatureOption("unicorn", options.unicorn, unicornOptionKeys);
   assertFeatureOption("vue", options.vue, overrideOptionKeys);
 
+  if (isRecord(options.antiSlop)) {
+    const { level, specifier } = options.antiSlop;
+    if (level !== undefined && level !== "error" && level !== "warn")
+      throw new TypeError(
+        'Oxlint option "antiSlop.level" must be "error" or "warn"',
+      );
+    if (specifier !== undefined && typeof specifier !== "string")
+      throw new TypeError('Oxlint option "antiSlop.specifier" must be a string');
+  }
   if (isRecord(options.typescript))
     assertBoolean(options.typescript.typeAware, "typescript.typeAware");
   if (isRecord(options.unicorn))
@@ -112,6 +132,8 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
 }
 
 function subOptions<T>(value: boolean | T | undefined): T {
+  // SAFETY: a boolean or absent feature option means "use this feature's defaults",
+  // which every OxlintOptions sub-option type models as an all-optional object.
   return isRecord(value) ? (value) : ({} as T);
 }
 
@@ -246,6 +268,11 @@ export function createOxlintConfig(
       }
     }
   }
+
+  if (options.antiSlop !== undefined && options.antiSlop !== false)
+    configs.push(
+      createAntiSlopConfig(subOptions<OxlintAntiSlopOptions>(options.antiSlop)),
+    );
 
   const userIgnores = options.ignores;
   if (userIgnores && userIgnores.length > 0)

@@ -15,6 +15,7 @@ import { test } from "../../src/configs/test";
 import { typescript } from "../../src/configs/typescript";
 import { unicorn } from "../../src/configs/unicorn";
 import { vue } from "../../src/configs/vue";
+import type { ConfigValue } from "./normalize";
 import {
   GLOB_JSX,
   GLOB_SRC,
@@ -248,6 +249,7 @@ async function generateFragment(
 }
 
 async function readPackageVersion(url: URL): Promise<string> {
+  // SAFETY: only `version` is read, and the guard below rejects a non-string value.
   const packageJson = JSON.parse(await fs.readFile(url, "utf8")) as {
     version?: unknown;
   };
@@ -495,8 +497,10 @@ async function generateData(): Promise<GeneratedData> {
   };
 }
 
-function renderValue(value: unknown): string {
-  return JSON.stringify(sortGeneratedValue(value), null, 2);
+function renderValue<TValue>(value: TValue): string {
+  // SAFETY: every caller passes generated artifact data, which is plain JSON by
+  // construction — it is about to be serialized with JSON.stringify either way.
+  return JSON.stringify(sortGeneratedValue(value as ConfigValue), null, 2);
 }
 
 function renderFragments(fragments: GeneratedData["fragments"]): string {
@@ -595,6 +599,7 @@ async function listFiles(directory: string): Promise<Array<string>> {
   try {
     entries = await fs.readdir(directory, { withFileTypes: true });
   } catch (error) {
+    // SAFETY: fs.readdir rejects with a NodeJS.ErrnoException.
     if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
     throw error;
   }
@@ -627,6 +632,7 @@ export async function diffOxlintArtifacts(
       const actual = await fs.readFile(path.join(root, relativePath), "utf8");
       if (actual !== rendered.get(relativePath)) changed.push(relativePath);
     } catch (error) {
+      // SAFETY: fs.readFile rejects with a NodeJS.ErrnoException.
       if ((error as NodeJS.ErrnoException).code === "ENOENT") {
         missing.push(relativePath);
         continue;

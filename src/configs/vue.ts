@@ -81,6 +81,8 @@ export async function vue(
             jsx: true,
           },
           extraFileExtensions: [".vue"],
+          // SAFETY: vue-eslint-parser types `parser` as its own narrower shape;
+          // any ESLint parser is accepted at runtime.
           parser: options.typescript
             ? ((await interopDefault(
                 import("@typescript-eslint/parser"),
@@ -104,21 +106,29 @@ export async function vue(
               }),
             ]),
       rules: {
+        // SAFETY: every `as any` below widens eslint-plugin-vue's preset rule maps,
+        // which are typed as its own legacy config shape rather than as rule records.
         ...(pluginVue.configs.base.rules as any),
 
         ...(vueVersion === 2
           ? {
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["vue2-essential"].rules as any),
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["vue2-strongly-recommended"].rules as any),
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["vue2-recommended"].rules as any),
             }
           : {
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["flat/essential"]
                 .map((c) => c.rules)
                 .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["flat/strongly-recommended"]
                 .map((c) => c.rules)
                 .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),
+              // SAFETY: eslint-plugin-vue types its preset rule maps as its own legacy config shape.
               ...(pluginVue.configs["flat/recommended"]
                 .map((c) => c.rules)
                 .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),

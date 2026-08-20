@@ -6,7 +6,7 @@ import process from "node:process";
 // @ts-expect-error missing types
 import parse from "parse-gitignore";
 import c from "picocolors";
-import type { PromptResult } from "../types";
+import type { PackageJsonLike, PromptResult } from "../types";
 import { getEslintConfigContent } from "../utils";
 
 const LEGACY_CONFIG_FILE_PATTERN = /eslint|prettier/;
@@ -17,7 +17,7 @@ export async function updateEslintFiles(result: PromptResult) {
   const pathPackageJSON = path.join(cwd, "package.json");
 
   const packageContent = await fsp.readFile(pathPackageJSON, "utf8");
-  const package_: Record<string, any> = JSON.parse(packageContent);
+  const package_: PackageJsonLike = JSON.parse(packageContent);
 
   const configFileName =
     package_.type === "module" ? "eslint.config.js" : "eslint.config.mjs";

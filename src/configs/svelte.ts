@@ -40,6 +40,8 @@ export async function svelte(
         parser: parserSvelte,
         parserOptions: {
           extraFileExtensions: [".svelte"],
+          // SAFETY: svelte-eslint-parser types `parser` as its own narrower shape;
+          // any ESLint parser is accepted at runtime.
           parser: options.typescript
             ? ((await interopDefault(
                 import("@typescript-eslint/parser"),

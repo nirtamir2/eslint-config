@@ -229,6 +229,12 @@ const diagnosticCases = [
     options: { jsdoc: true },
     rule: "require-param-name",
   },
+  {
+    file: "anti-slop/low-evidence.ts",
+    name: "anti-slop JS plugin",
+    options: { antiSlop: true },
+    rule: "no-reflect-get",
+  },
 ] satisfies Array<DiagnosticCase>;
 
 afterEach(async () => {
@@ -295,6 +301,7 @@ describe("generated Oxlint config compatibility", () => {
         rules: { "typescript/no-explicit-any": "off" },
         typescript: true,
       } satisfies Partial<OxlintOptions>,
+      // SAFETY: an empty literal needs the annotation to join the case union below.
       userConfigs: [] as Array<OxlintConfig>,
     },
     {
@@ -443,6 +450,7 @@ async function runOxlint(
 
   let output: OxlintJsonResult;
   try {
+    // SAFETY: `--format json` output; a parse failure is caught and rethrown below.
     output = JSON.parse(processResult.stdout) as OxlintJsonResult;
   } catch {
     throw new Error(formatProcessFailure(processResult));

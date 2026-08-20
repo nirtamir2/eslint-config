@@ -7,6 +7,7 @@ import type { VendoredPrettierOptions } from "./vender/prettier-types";
 
 export type Awaitable<T> = T | Promise<T>;
 
+// oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- mirrors ESLint's own Linter type, which is deliberately open: plugins and rule options are third-party shapes this package cannot enumerate
 export type Rules = Record<string, any>;
 
 export type TypedFlatConfigItem = Omit<
@@ -19,12 +20,14 @@ export type TypedFlatConfigItem = Omit<
    *
    * @see [Using plugins in your configuration](https://eslint.org/docs/latest/user-guide/configuring/configuration-files-new#using-plugins-in-your-configuration)
    */
+  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- mirrors ESLint's own Linter type, which is deliberately open: plugins and rule options are third-party shapes this package cannot enumerate
   plugins?: Record<string, any>;
 
   /**
    * An object containing the configured rules. When `files` or `ignores` are
    * specified, these rule configurations are only available to the matching files.
    */
+  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- mirrors ESLint's own Linter type, which is deliberately open: plugins and rule options are third-party shapes this package cannot enumerate
   rules?: Rules;
 };
 
@@ -135,6 +138,8 @@ export interface OptionsFormatters {
    *
    * By default it's controlled by our own config.
    */
+  // Options are defined by whichever dprint plugins the user installs.
+  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- third-party shape
   dprintOptions?: boolean | Record<string, unknown>;
 
   /**
@@ -257,6 +262,13 @@ export interface OptionsProjectType {
   type?: "app" | "lib";
 }
 
+export interface OptionsAntiSlop extends OptionsFiles {
+  /**
+   * Override rule levels
+   */
+  level?: "error" | "warn";
+}
+
 export interface OptionsRegExp {
   /**
    * Override rulelevels
@@ -347,6 +359,15 @@ export interface OptionsConfig
    * @default false
    */
   lessOpinionated?: boolean;
+
+  /**
+   * Enable Dillon Mulroy's anti-slop rules, which reject low-evidence TypeScript
+   * such as `unknown` parameters, unjustified type assertions and `Record<string, unknown>`.
+   *
+   * @see https://github.com/dmmulroy/anti-slop
+   * @default false
+   */
+  antiSlop?: boolean | (OptionsAntiSlop & OptionsOverrides);
 
   tailwindcss?: TailwindCSSOptions;
   storybook?: boolean;

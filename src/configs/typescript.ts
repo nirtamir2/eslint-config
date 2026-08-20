@@ -147,6 +147,8 @@ export async function typescript(
     };
   }
 
+  // SAFETY: the literal below is a flat-config array; the assertion only pins the
+  // rule-name unions that TypeScript widens to `string` inside object literals.
   return [
     {
       // Install the plugins without globs, so they can be configured separately.
@@ -274,6 +276,7 @@ export async function typescript(
             },
             rules: {
               "erasable-syntax-only/enums": "error",
+              "erasable-syntax-only/export-aliases": "error",
               "erasable-syntax-only/import-aliases": "error",
               "erasable-syntax-only/namespaces": "error",
               "erasable-syntax-only/parameter-properties": "error",

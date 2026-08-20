@@ -1,6 +1,44 @@
 import type { OxlintConfig, OxlintOverride } from "oxlint";
 import type { TypedFlatConfigItem } from "../../src/types";
 
+/**
+ * Any value that can appear inside an Oxlint or ESLint config once it has been reduced
+ * to plain JSON, which is the only shape this module walks.
+ */
+export type ConfigValue =
+  | Array<ConfigValue>
+  | boolean
+  | null
+  | number
+  | string
+  | { [key: string]: ConfigValue | undefined };
+
+/**
+A config section keyed by property name, such as a rule map.
+*/
+export type ConfigRecord = Record<string, ConfigValue | undefined>;
+
+/**
+ * Reinterpret a schema-typed config object as the plain JSON this module walks.
+ *
+ * Oxlint and ESLint config types are JSON schema types — no methods, classes or
+ * symbols — but TypeScript will not assign an interface to an index-signature type,
+ * so the conversion is stated once here instead of at every call site.
+ */
+function asConfigValue<TValue>(value: TValue): ConfigValue {
+  // SAFETY: callers pass config data that is about to be serialized as JSON.
+  return value as ConfigValue;
+}
+
+/**
+Array form of {@link asConfigValue}.
+*/
+function asConfigValues<TValue>(
+  values: ReadonlyArray<TValue>,
+): Array<ConfigValue> {
+  return values.map((value) => asConfigValue(value));
+}
+
 const scopeMarkerPrefix = "__nirtamir2_oxlint_scope_";
 const mergeableObjectKeys = [
   "categories",
@@ -68,6 +106,7 @@ function normalizeSourceFiles(
     );
   }
 
+  // SAFETY: the guard above rejected every nested AND-glob array, so only strings remain.
   return files as Array<string>;
 }
 
@@ -153,7 +192,8 @@ export function restoreMigrationScopes(
   };
 }
 
-function normalizeRuleValue(value: unknown): unknown {
+// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
+function normalizeRuleValue(value: ConfigValue): ConfigValue {
   const disabledRuleValues = new Set<unknown>([0, "allow", "off"]);
   if (
     Array.isArray(value) &&
@@ -165,28 +205,29 @@ function normalizeRuleValue(value: unknown): unknown {
 }
 
 function normalizeRules(
-  rules: Record<string, unknown> | undefined,
-): Record<string, unknown> | undefined {
+  rules: ConfigRecord | undefined,
+): ConfigRecord | undefined {
   if (rules == null) return undefined;
   return Object.fromEntries(
     Object.entries(rules).map(([rule, value]) => [
       rule,
-      normalizeRuleValue(value),
+      value === undefined ? undefined : normalizeRuleValue(value),
     ]),
   );
 }
 
 function normalizeDisabledRuleArrays(config: OxlintConfig): OxlintConfig {
+  // SAFETY: only rule maps are rewritten below; every other key is spread through.
   return {
     ...config,
-    ...(config.rules != null && { rules: normalizeRules(config.rules) }),
+    // SAFETY: a rule map is a plain JSON object keyed by rule id.
+    ...(config.rules != null && { rules: normalizeRules(config.rules as ConfigRecord) }),
     ...(config.overrides != null && {
           overrides: config.overrides.map((override) => ({
             ...override,
             ...(override.rules != null && {
-                  rules: normalizeRules(
-                    override.rules as Record<string, unknown>,
-                  ),
+                  // SAFETY: Oxlint override rule maps are plain JSON objects.
+                  rules: normalizeRules(override.rules as ConfigRecord),
                 }),
           })),
         }),
@@ -223,7 +264,8 @@ function stripMigrationBaseline(config: OxlintConfig): OxlintConfig {
   };
 }
 
-function removeEmptyValues(value: unknown): unknown {
+// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
+function removeEmptyValues(value: ConfigValue): ConfigValue | undefined {
   if (Array.isArray(value)) {
     const entries = value
       .map((entry) => removeEmptyValues(entry))
@@ -233,7 +275,10 @@ function removeEmptyValues(value: unknown): unknown {
 
   if (value != null && typeof value === "object") {
     const entries = Object.entries(value)
-      .map(([key, entry]) => [key, removeEmptyValues(entry)] as const)
+      .map(
+        ([key, entry]) =>
+          [key, entry === undefined ? undefined : removeEmptyValues(entry)] as const,
+      )
       .filter(([, entry]) => entry !== undefined);
     return entries.length === 0 ? undefined : Object.fromEntries(entries);
   }
@@ -241,11 +286,11 @@ function removeEmptyValues(value: unknown): unknown {
   return value;
 }
 
-function stableValueKey(value: unknown): string {
+function stableValueKey(value: ConfigValue): string {
   return JSON.stringify(value);
 }
 
-function sortArrayValues(values: Array<unknown>): Array<unknown> {
+function sortArrayValues(values: Array<ConfigValue>): Array<ConfigValue> {
   return [
     ...new Map(
       values.map((value) => [stableValueKey(value), value]),
@@ -255,10 +300,11 @@ function sortArrayValues(values: Array<unknown>): Array<unknown> {
   );
 }
 
+// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
 export function sortGeneratedValue(
-  value: unknown,
+  value: ConfigValue,
   parentKey?: string,
-): unknown {
+): ConfigValue {
   if (Array.isArray(value)) {
     const entries = value.map((entry) => sortGeneratedValue(entry));
     return parentKey === "jsPlugins" || parentKey === "plugins"
@@ -270,7 +316,10 @@ export function sortGeneratedValue(
     return Object.fromEntries(
       Object.entries(value)
         .toSorted(([left], [right]) => left.localeCompare(right))
-        .map(([key, entry]) => [key, sortGeneratedValue(entry, key)]),
+        .map(([key, entry]) => [
+          key,
+          entry === undefined ? undefined : sortGeneratedValue(entry, key),
+        ]),
     );
   }
 
@@ -281,6 +330,7 @@ export function normalizeOxlintConfig(
   input: OxlintConfig,
   stripBaseline: boolean,
 ): OxlintConfig {
+  // SAFETY: widening by one optional key that the Oxlint schema permits but omits.
   const withoutSchema = { ...input } as OxlintConfig & {
     $schema?: string;
   };
@@ -291,15 +341,16 @@ export function normalizeOxlintConfig(
     ? stripMigrationBaseline(normalizedRules)
     : normalizedRules;
   const translatedGlobs = translateConfigGlobs(withoutBaseline);
-  const withoutEmptyValues = removeEmptyValues(translatedGlobs) ?? {};
+  const withoutEmptyValues = removeEmptyValues(asConfigValue(translatedGlobs)) ?? {};
 
+  // SAFETY: sorting and pruning preserve the config shape; only key order changes.
   return sortGeneratedValue(withoutEmptyValues) as OxlintConfig;
 }
 
 function appendUnique(
-  current: Array<unknown> | undefined,
-  incoming: Array<unknown>,
-): Array<unknown> {
+  current: Array<ConfigValue> | undefined,
+  incoming: Array<ConfigValue>,
+): Array<ConfigValue> {
   const values = [...(current ?? []), ...incoming];
   return [...new Map(values.map((value) => [stableValueKey(value), value])).values()];
 }
@@ -307,30 +358,35 @@ function appendUnique(
 export function mergeOxlintConfigs(
   configs: Array<OxlintConfig>,
 ): OxlintConfig {
-  const result = {} as Record<string, unknown>;
+  const result: ConfigRecord = {};
 
   for (const config of configs) {
-    const record = config as Record<string, unknown>;
+    // SAFETY: OxlintConfig is a JSON schema type, so it is structurally a ConfigRecord.
+    const record = config as ConfigRecord;
 
     for (const key of mergeableObjectKeys) {
       const value = record[key];
       if (value == null) continue;
       result[key] = {
-        ...(result[key] as Record<string, unknown> | undefined),
-        ...(value as Record<string, unknown>),
+        // SAFETY: mergeableObjectKeys only names keys whose schema type is an object.
+        ...(result[key] as ConfigRecord | undefined),
+        // SAFETY: as above, for the incoming config's value at the same key.
+        ...(value as ConfigRecord),
       };
     }
 
     for (const key of mergeableArrayKeys) {
       const value = record[key];
       if (!Array.isArray(value)) continue;
-      result[key] = appendUnique(result[key] as Array<unknown>, value);
+      // SAFETY: mergeableArrayKeys only names keys whose schema type is an array.
+      result[key] = appendUnique(result[key] as Array<ConfigValue>, value);
     }
 
     if (config.overrides != null) {
       result.overrides = [
-        ...((result.overrides as Array<OxlintOverride> | undefined) ?? []),
-        ...config.overrides,
+        // SAFETY: `overrides` is only ever written by this branch, as an override array.
+        ...((result.overrides as Array<ConfigValue> | undefined) ?? []),
+        ...asConfigValues(config.overrides),
       ];
     }
   }

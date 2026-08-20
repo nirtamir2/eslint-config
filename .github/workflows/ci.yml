@@ -41,6 +41,9 @@ jobs:
       - name: Lint
         run: nr lint:check
 
+      - name: Lint with Oxlint
+        run: nr lint:oxlint
+
       - name: Typecheck
         run: nr typecheck
 

@@ -6,6 +6,11 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
+/**
+The subset of a package manifest's `exports` map this script inspects.
+*/
+type PackageExports = Record<string, string | undefined>;
+
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const fixtureRoot = path.join(repoRoot, "fixtures", "oxlint-consumer");
 const temporaryRoot = await fs.mkdtemp(
@@ -30,6 +35,10 @@ try {
   await fs.rename(
     path.join(consumerRoot, "src", "invalid.ts.fixture"),
     path.join(consumerRoot, "src", "invalid.ts"),
+  );
+  await fs.rename(
+    path.join(consumerRoot, "src", "slop.ts.fixture"),
+    path.join(consumerRoot, "src", "slop.ts"),
   );
   await fs.writeFile(
     path.join(consumerRoot, "package.json"),
@@ -72,13 +81,18 @@ try {
     "@nirtamir2",
     "eslint-config",
   );
+  // SAFETY: only `exports` is read, and each lookup is compared against a literal.
   const installedManifest = JSON.parse(
     await fs.readFile(path.join(installedPackageRoot, "package.json"), "utf8"),
-  ) as { exports?: Record<string, unknown> };
+  ) as { exports?: PackageExports };
 
   assert.equal(
     installedManifest.exports?.["./oxlint"],
     "./dist/oxlint.mjs",
+  );
+  assert.equal(
+    installedManifest.exports?.["./oxlint-anti-slop"],
+    "./dist/oxlint-anti-slop.mjs",
   );
 
   await execa("pnpm", ["exec", "tsc", "--noEmit"], {
@@ -90,6 +104,10 @@ try {
   await assertRuntimeGraphIsLightweight(
     installedPackageRoot,
     path.join(installedPackageRoot, "dist", "oxlint.mjs"),
+  );
+  await assertRuntimeGraphIsLightweight(
+    installedPackageRoot,
+    path.join(installedPackageRoot, "dist", "oxlint-anti-slop.mjs"),
   );
 
   const recommendedRun = await execa(
@@ -124,6 +142,23 @@ try {
   );
   assert.notEqual(factoryRun.exitCode, 0, "Expected Oxlint to report an error");
   assert.match(factoryRun.all, /no-debugger/u);
+
+  // Proves the vendored JS plugin resolves and loads from a real node_modules install.
+  const antiSlopRun = await execa(
+    "pnpm",
+    ["exec", "oxlint", "--config", "oxlint.anti-slop.config.ts", "src/slop.ts"],
+    {
+      all: true,
+      cwd: consumerRoot,
+      reject: false,
+    },
+  );
+  assert.notEqual(
+    antiSlopRun.exitCode,
+    0,
+    `Expected the packed anti-slop plugin to report an error:\n${antiSlopRun.all}`,
+  );
+  assert.match(antiSlopRun.all, /anti-slop\(no-reflect-get\)/u);
 
   process.stdout.write("Packed Oxlint consumer passed.\n");
 } finally {
@@ -188,6 +223,7 @@ function isForbiddenRuntimeImport(specifier: string): boolean {
 async function readInstalledPackageVersion(
   packageName: string,
 ): Promise<string> {
+  // SAFETY: only `version` is read, and the guard below rejects a non-string value.
   const manifest = JSON.parse(
     await fs.readFile(
       path.join(repoRoot, "node_modules", packageName, "package.json"),

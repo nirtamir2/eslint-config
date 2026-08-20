@@ -55,6 +55,8 @@ export async function angular(
     {
       files: [GLOB_TS],
       name: "antfu/angular/rules/ts",
+      // SAFETY: eslint-plugin-angular-template ships this processor untyped; it is a
+      // standard ESLint processor object.
       processor: pluginAngularTemplate.processors[
         "extract-inline-html"
       ] as TypedFlatConfigItem["processor"],

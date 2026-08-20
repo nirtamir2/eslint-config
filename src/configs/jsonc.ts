@@ -27,7 +27,8 @@ export async function jsonc(
     {
       name: "antfu/jsonc/setup",
       plugins: {
-        jsonc: pluginJsonc as any,
+        // SAFETY: eslint-plugin-jsonc's exported type predates the flat-config plugin shape.
+      jsonc: pluginJsonc as any,
       },
     },
     {

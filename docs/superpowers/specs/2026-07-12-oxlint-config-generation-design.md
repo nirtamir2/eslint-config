@@ -477,3 +477,52 @@ require package-specific declarations even when rule conversion is generic.
   https://oxc.rs/docs/guide/usage/linter/config.html#extend-shared-configs
 - Oxlint JavaScript plugins:
   https://oxc.rs/docs/guide/usage/linter/js-plugins.html
+
+---
+
+## Addendum — hand-written fragments and the native-only constraint (2026-08-20)
+
+The original design states that the Oxlint config is native-only and loads no
+JavaScript plugins. That constraint is relaxed by one opt-in option, `antiSlop`.
+
+### What changed
+
+- **Hand-written fragments are now a supported category.** Every fragment used to come
+  from `scripts/oxlint/generate.ts` via `@oxlint/migrate`. `src/oxlint/anti-slop.ts` is
+  written by hand instead, because anti-slop has no ESLint source config to migrate
+  from. It does not participate in `pnpm generate:oxlint`, and
+  `pnpm check:oxlint-generated` is unaffected.
+- **`jsPlugins` is now emitted.** `composeOxlintConfigs` already merged `jsPlugins`
+  (dedupe by name, `null` clears); `antiSlop` is its first producer.
+- **The package now publishes a plugin, not only a config.** `./oxlint-anti-slop`
+  exports the compiled plugin. `@oxlint/plugins` is a devDependency so tsdown inlines
+  it, leaving the plugin bundle free of runtime imports and consumers with nothing
+  extra to install.
+
+### Why it stays opt-in
+
+Oxlint's JS plugin support is alpha and outside semver, JS rules cost lint time that
+native Rust rules do not, and the rules themselves are aggressive enough to fail most
+existing codebases. `recommended` is unchanged, and the default factory output is
+unchanged.
+
+### Plugin resolution
+
+`resolveAntiSlopSpecifier()` returns an absolute path, picking the first of
+`./oxlint-anti-slop.mjs` (published layout, beside the bundled `dist/oxlint.mjs`) and
+`../oxlint-plugins/anti-slop/index.ts` (source layout, so Vitest works pre-build) that
+exists on disk.
+
+Oxlint 1.79 does resolve bare subpath specifiers through package `exports` — this was
+verified — but an absolute path cannot be affected by hoisting, by pnpm's strict
+`node_modules`, or by a workspace package that inherits this config without depending
+on it directly. `antiSlop.specifier` overrides it for consumers who vendor their own
+copy, which is what upstream recommends.
+
+### Vendoring
+
+`src/oxlint-plugins/anti-slop/` is byte-identical to upstream and excluded from this
+repo's Prettier and ESLint runs so it stays diffable. `src/oxlint-plugins/anti-slop-rule-names.ts`
+is the single source of truth for the rule list, and `test/anti-slop.test.ts` fails if
+it drifts from the plugin. `pnpm sync:anti-slop` re-vendors from a pinned commit
+recorded in `UPSTREAM.md`; it is a maintainer tool and is not run in CI.

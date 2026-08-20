@@ -191,19 +191,27 @@ describe("oxlint config factory", () => {
 
   it("rejects unsupported and malformed options with targeted errors", () => {
     expect(() =>
+      // SAFETY: the cast is the point of the test — it feeds deliberately invalid
+    // input past the compiler so the runtime validator can be exercised.
       createOxlintConfig({ markdown: true } as never, [], noPackages),
     ).toThrow('Unsupported Oxlint option "markdown"');
     expect(() =>
       createOxlintConfig(
+        // SAFETY: the cast is the point of the test — it feeds deliberately invalid
+    // input past the compiler so the runtime validator can be exercised.
         { typescript: { tsconfigPath: "tsconfig.json" } } as never,
         [],
         noPackages,
       ),
     ).toThrow('Unsupported Oxlint option "typescript.tsconfigPath"');
     expect(() =>
+      // SAFETY: the cast is the point of the test — it feeds deliberately invalid
+    // input past the compiler so the runtime validator can be exercised.
       createOxlintConfig({ ignores: "dist/**" } as never, [], noPackages),
     ).toThrow('Oxlint option "ignores" must be an array of strings');
     expect(() =>
+      // SAFETY: the cast is the point of the test — it feeds deliberately invalid
+    // input past the compiler so the runtime validator can be exercised.
       createOxlintConfig({ jsx: {} } as never, [], noPackages),
     ).toThrow('Oxlint option "jsx" must be a boolean');
   });
