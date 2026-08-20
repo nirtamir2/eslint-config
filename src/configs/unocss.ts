@@ -20,16 +20,12 @@ export async function unocss(
       },
       rules: {
         "unocss/order": "warn",
-        ...(attributify
-          ? {
+        ...(attributify && {
               "unocss/order-attributify": "warn",
-            }
-          : {}),
-        ...(strict
-          ? {
+            }),
+        ...(strict && {
               "unocss/blocklist": "error",
-            }
-          : {}),
+            }),
       },
     },
   ];

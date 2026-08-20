@@ -38,12 +38,10 @@ export async function jsdoc(
         "jsdoc/require-returns-description": "warn",
         "jsdoc/require-yields-check": "warn",
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "jsdoc/check-alignment": "warn",
               "jsdoc/multiline-blocks": "warn",
-            }
-          : {}),
+            }),
 
         "jsdoc/require-jsdoc": "off",
         ...overrides,

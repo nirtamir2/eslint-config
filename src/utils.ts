@@ -91,8 +91,8 @@ export function renamePluginInConfigs(
   configs: Array<TypedFlatConfigItem>,
   map: Record<string, string>,
 ): Array<TypedFlatConfigItem> {
-  return configs.map((i) => {
-    const clone = { ...i };
+  return configs.map((index) => {
+    const clone = { ...index };
     if (clone.rules) clone.rules = renameRules(clone.rules, map);
     if (clone.plugins) {
       clone.plugins = Object.fromEntries(
@@ -164,7 +164,7 @@ export async function ensurePackages(packages: Array<string | undefined>) {
   if (process.env.CI || !process.stdout.isTTY || !isCwdInScope) return;
 
   const nonExistingPackages = packages.filter(
-    (i) => i && !isPackageInScope(i),
+    (index) => index && !isPackageInScope(index),
   ) as Array<string>;
   if (nonExistingPackages.length === 0) return;
 
@@ -177,8 +177,8 @@ export async function ensurePackages(packages: Array<string | undefined>) {
     )}. Do you want to install them?`,
   });
   if (result)
-    await import("@antfu/install-pkg").then((i) =>
-      i.installPackage(nonExistingPackages, { dev: true }),
+    await import("@antfu/install-pkg").then((index) =>
+      index.installPackage(nonExistingPackages, { dev: true }),
     );
 }
 

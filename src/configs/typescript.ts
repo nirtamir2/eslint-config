@@ -5,7 +5,7 @@ import process from "node:process";
 import { GLOB_ASTRO_TS, GLOB_MARKDOWN, GLOB_TS, GLOB_TSX } from "../globs";
 import { pluginAntfu } from "../plugins";
 import type {
-  OptionsComponentExts,
+  OptionsComponentExts as OptionsComponentExtensions,
   OptionsFiles,
   OptionsOverrides,
   OptionsProjectType,
@@ -18,7 +18,7 @@ import { interopDefault } from "../utils";
 
 export async function typescript(
   options: OptionsFiles &
-    OptionsComponentExts &
+    OptionsComponentExtensions &
     OptionsOverrides &
     OptionsTypeScriptWithTypes &
     OptionsTypeScriptParserOptions &
@@ -26,7 +26,7 @@ export async function typescript(
     OptionsTypeScriptErasableOnly = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
-    componentExts = [],
+    componentExts: componentExtensions = [],
     overrides = {},
     overridesTypeAware = {},
     parserOptions = {},
@@ -37,7 +37,7 @@ export async function typescript(
   const files = options.files ?? [
     GLOB_TS,
     GLOB_TSX,
-    ...componentExts.map((ext) => `**/*.${ext}`),
+    ...componentExtensions.map((extension) => `**/*.${extension}`),
   ];
 
   const filesTypeAware = options.filesTypeAware ?? [GLOB_TS, GLOB_TSX];
@@ -45,8 +45,7 @@ export async function typescript(
     `${GLOB_MARKDOWN}/**`,
     GLOB_ASTRO_TS,
   ];
-  const tsconfigPath =
-    options?.tsconfigPath == null ? undefined : options.tsconfigPath;
+  const tsconfigPath = options?.tsconfigPath ?? undefined;
   const isTypeAware = tsconfigPath != null;
 
   const typeAwareRules: TypedFlatConfigItem["rules"] = {
@@ -128,21 +127,19 @@ export async function typescript(
   ): TypedFlatConfigItem {
     return {
       files,
-      ...(ignores ? { ignores } : {}),
+      ...(ignores && { ignores }),
       languageOptions: {
         parser: parserTs,
         parserOptions: {
-          extraFileExtensions: componentExts.map((ext) => `.${ext}`),
+          extraFileExtensions: componentExtensions.map((extension) => `.${extension}`),
           sourceType: "module",
-          ...(typeAware
-            ? {
+          ...(typeAware && {
                 projectService: {
                   allowDefaultProject: ["./*.js"],
                   defaultProject: tsconfigPath,
                 },
                 tsconfigRootDir: process.cwd(),
-              }
-            : {}),
+              }),
           ...parserOptions,
         },
       },
@@ -220,8 +217,7 @@ export async function typescript(
         "@typescript-eslint/triple-slash-reference": "off",
         "@typescript-eslint/unified-signatures": "off",
 
-        ...(type === "lib"
-          ? {
+        ...((type === "lib") && {
               "@typescript-eslint/explicit-function-return-type": [
                 "error",
                 {
@@ -230,8 +226,7 @@ export async function typescript(
                   allowIIFEs: true,
                 },
               ],
-            }
-          : {}),
+            }),
         ...overrides,
       },
     },
@@ -523,7 +518,7 @@ export async function typescript(
 
         "array-callback-return": "off", // https://github.com/typescript-eslint/typescript-eslint/issues/2841 - false positive with TypeScript
         ...(isTypeAware ? typeAwareOverrideRules : nonTypeAwareFallbackRules),
-        ...(isTypeAware ? {} : pluginTs.configs["disable-type-checked"].rules),
+        ...(!isTypeAware && pluginTs.configs["disable-type-checked"].rules),
       },
     },
     {

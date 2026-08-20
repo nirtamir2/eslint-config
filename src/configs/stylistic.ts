@@ -60,7 +60,7 @@ export async function stylistic(
       rules: {
         ...config.rules,
 
-        ...(experimental ? {} : { "antfu/consistent-list-newline": "error" }),
+        ...(!experimental && { "antfu/consistent-list-newline": "error" }),
 
         "antfu/consistent-chaining": "error",
 

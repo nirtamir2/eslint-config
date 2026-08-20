@@ -4,7 +4,7 @@ import type { GeneratedFragment } from "../generated/oxlint";
 import { generatedOxlintFragments } from "../generated/oxlint";
 import type { FeatureEnvironment } from "../feature-plan";
 import { resolveSharedFeaturePlan } from "../feature-plan";
-import { isInEditorEnv } from "../editor-environment";
+import { isInEditorEnv as isInEditorEnvironment } from "../editor-environment";
 import { composeOxlintConfigs } from "./compose";
 import type {
   OxlintOptions,
@@ -112,7 +112,7 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
 }
 
 function subOptions<T>(value: boolean | T | undefined): T {
-  return isRecord(value) ? (value as T) : ({} as T);
+  return isRecord(value) ? (value) : ({} as T);
 }
 
 function addFragment(
@@ -129,9 +129,7 @@ function addFragment(
     overrides: [
       {
         ...fragment.overrideTarget,
-        ...(fragment.overrideTarget.excludeFiles
-          ? { excludeFiles: [...fragment.overrideTarget.excludeFiles] }
-          : {}),
+        ...(fragment.overrideTarget.excludeFiles && { excludeFiles: [...fragment.overrideTarget.excludeFiles] }),
         files: [...fragment.overrideTarget.files],
         rules: { ...overrides },
       },
@@ -163,10 +161,10 @@ export function createOxlintConfig(
     options.typescript,
   );
   const unicornOptions = subOptions<OxlintUnicornOptions>(options.unicorn);
-  const typeAware =
+  const isTypeAware =
     plan.enabled.typescript && Object.is(typeScriptOptions.typeAware, true);
 
-  if (typeAware && !environment.hasPackage("oxlint-tsgolint"))
+  if (isTypeAware && !environment.hasPackage("oxlint-tsgolint"))
     throw new Error(
       "Install oxlint-tsgolint to use typescript.typeAware in the Oxlint config",
     );
@@ -194,7 +192,7 @@ export function createOxlintConfig(
         const variants = generatedOxlintFragments.typescript[plan.type];
         addFragment(
           configs,
-          typeAware ? variants.typeAware : variants.standard,
+          isTypeAware ? variants.typeAware : variants.standard,
           typeScriptOptions.overrides,
         );
         break;
@@ -223,7 +221,7 @@ export function createOxlintConfig(
       case "react": {
         addFragment(
           configs,
-          typeAware
+          isTypeAware
             ? generatedOxlintFragments.react.typeAware
             : generatedOxlintFragments.react.standard,
           subOptions<OxlintOverridesOptions>(options.react).overrides,
@@ -270,6 +268,6 @@ export function nirtamir2(
 ): OxlintConfig {
   return createOxlintConfig(options, userConfigs, {
     hasPackage: isPackageExists,
-    isInEditor: isInEditorEnv(),
+    isInEditor: isInEditorEnvironment(),
   });
 }

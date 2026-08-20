@@ -17,7 +17,7 @@ export async function e18e(
     type = "app",
     isInEditor = false,
   } = options;
-  const moduleReplacements =
+  const isModuleReplacements =
     options.moduleReplacements ?? (type === "lib" && isInEditor);
 
   const configs = pluginE18e.configs as Record<string, Linter.Config>;
@@ -29,12 +29,10 @@ export async function e18e(
         e18e: pluginE18e,
       },
       rules: {
-        ...(modernization ? { ...configs.modernization.rules } : {}),
-        ...(moduleReplacements ? { ...configs.moduleReplacements?.rules } : {}),
-        ...(performanceImprovements
-          ? { ...configs.performanceImprovements?.rules }
-          : {}),
-        ...(type === "lib" ? {} : { "e18e/prefer-static-regex": "off" }),
+        ...(modernization && { ...configs.modernization.rules }),
+        ...(isModuleReplacements && { ...configs.moduleReplacements?.rules }),
+        ...(performanceImprovements && { ...configs.performanceImprovements?.rules }),
+        ...(type !== "lib" && { "e18e/prefer-static-regex": "off" }),
         "e18e/prefer-array-at": "off",
         "e18e/prefer-array-from-map": "off",
         "e18e/prefer-array-to-reversed": "off",

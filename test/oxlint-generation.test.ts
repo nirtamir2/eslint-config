@@ -13,8 +13,10 @@ import { translateOxlintGlob } from "../scripts/oxlint/normalize";
 const temporaryDirectories: Array<string> = [];
 
 afterEach(async () => {
+  const directories = [...temporaryDirectories];
+  temporaryDirectories.length = 0;
   await Promise.all(
-    temporaryDirectories.splice(0).map((directory) =>
+    directories.map((directory) =>
       fs.rm(directory, { force: true, recursive: true }),
     ),
   );

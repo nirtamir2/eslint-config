@@ -12,7 +12,7 @@ const people: Array<Person> = [
 ];
 
  
-const {log} = console;
+let {log} = console;
 
 // Use a for...of loop to iterate over the array
 for (const person of people) {
@@ -20,8 +20,8 @@ for (const person of people) {
 }
 
 // Define a generic function
-function identity<T>(arg: T): T {
-  return arg;
+function identity<T>(argument: T): T {
+  return argument;
 }
 
 // Use the generic function with type inference
@@ -73,8 +73,8 @@ class Dog extends Animal {
 const dog = new Dog("Buddy");
 dog.bark();
 
-const fn = (): string => {
-  return `hello${  1}`;
+let function_ = (): string => {
+  return `hello1`;
 };
 
-log(car1, car2, favoriteFruit, numericValue, fn());
+log(car1, car2, favoriteFruit, numericValue, function_());

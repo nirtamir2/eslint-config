@@ -6,8 +6,8 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
-const fixtureRoot = path.join(repositoryRoot, "fixtures", "oxlint-consumer");
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const fixtureRoot = path.join(repoRoot, "fixtures", "oxlint-consumer");
 const temporaryRoot = await fs.mkdtemp(
   path.join(os.tmpdir(), "nirtamir2-oxlint-package-"),
 );
@@ -22,7 +22,7 @@ try {
   );
 
   await execa("pnpm", ["pack", "--out", tarballPath], {
-    cwd: repositoryRoot,
+    cwd: repoRoot,
     stdio: "inherit",
   });
 
@@ -190,7 +190,7 @@ async function readInstalledPackageVersion(
 ): Promise<string> {
   const manifest = JSON.parse(
     await fs.readFile(
-      path.join(repositoryRoot, "node_modules", packageName, "package.json"),
+      path.join(repoRoot, "node_modules", packageName, "package.json"),
       "utf8",
     ),
   ) as { version?: unknown };

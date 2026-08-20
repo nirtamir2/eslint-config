@@ -41,7 +41,8 @@ function mergeJsPlugins(
 ): NonNullable<OxlintConfig["jsPlugins"]> {
   const plugins = new Map<string, ExternalPluginEntry>();
 
-  for (const plugin of current ?? [])
+  const currentPlugins = current ?? [];
+  for (const plugin of currentPlugins)
     plugins.set(jsPluginKey(plugin), cloneValue(plugin));
   for (const plugin of incoming)
     plugins.set(jsPluginKey(plugin), cloneValue(plugin));
@@ -59,7 +60,8 @@ function replayRootRulePrecedence(
 ): void {
   const incomingRuleEntries = incomingRules as Record<string, unknown>;
 
-  for (const override of overrides ?? []) {
+  const currentOverrides = overrides ?? [];
+  for (const override of currentOverrides) {
     if (!override.rules) continue;
 
     const scopedRuleEntries = override.rules as Record<string, unknown>;
@@ -116,7 +118,8 @@ function mergeConfig(
   if (ancestors.has(config)) throw new Error("Cyclic Oxlint config extends");
 
   ancestors.add(config);
-  for (const extended of config.extends ?? []) {
+  const extendedConfigs = config.extends ?? [];
+  for (const extended of extendedConfigs) {
     if (extended == null || typeof extended !== "object" || Array.isArray(extended))
       throw new TypeError(
         "Import extended Oxlint configs as objects before passing them to nirtamir2()",

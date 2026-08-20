@@ -3,8 +3,8 @@ import type { TypedFlatConfigItem } from "../src";
 
 // Make sure they are compatible
 ((): Linter.Config => {
-  return {} as TypedFlatConfigItem;
+  return {};
 })();
 ((): TypedFlatConfigItem => {
-  return {} as Linter.Config;
+  return {};
 })();

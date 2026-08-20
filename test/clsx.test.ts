@@ -30,7 +30,7 @@ async function createESLint(options: FactoryOptions = {}) {
   );
 
   return new ESLint({
-    overrideConfig: configs as any,
+    overrideConfig: configs,
     overrideConfigFile: true,
   });
 }

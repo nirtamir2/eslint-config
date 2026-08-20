@@ -234,9 +234,7 @@ async function generateFragment(
       config,
       overrideTarget: {
         ...overrideTarget,
-        ...(overrideTarget?.excludeFiles == null
-          ? {}
-          : {
+        ...(overrideTarget?.excludeFiles != null && {
               excludeFiles: translateOxlintGlobs(
                 overrideTarget.excludeFiles,
               ),
@@ -348,14 +346,14 @@ async function generateData(): Promise<GeneratedData> {
   });
   variants["typescript.app.typeAware"] =
     typescriptAppTypeAware.compatibility;
-  const typescriptLibStandard = await generateFragment({
+  const typescriptLibraryStandard = await generateFragment({
     defaultRuleFiles: [GLOB_TS, GLOB_TSX],
     source: await typescript({ erasableOnly: true, type: "lib" }),
     sourceName: "typescript",
   });
   variants["typescript.lib.standard"] =
-    typescriptLibStandard.compatibility;
-  const typescriptLibTypeAware = await generateFragment({
+    typescriptLibraryStandard.compatibility;
+  const typescriptLibraryTypeAware = await generateFragment({
     defaultRuleFiles: [GLOB_TS, GLOB_TSX],
     source: await typescript({
       erasableOnly: true,
@@ -366,7 +364,7 @@ async function generateData(): Promise<GeneratedData> {
     typeAware: true,
   });
   variants["typescript.lib.typeAware"] =
-    typescriptLibTypeAware.compatibility;
+    typescriptLibraryTypeAware.compatibility;
 
   const testDefault = await generateFragment({
     defaultRuleFiles: GLOB_TESTS,
@@ -461,8 +459,8 @@ async function generateData(): Promise<GeneratedData> {
           typeAware: typescriptAppTypeAware.fragment,
         },
         lib: {
-          standard: typescriptLibStandard.fragment,
-          typeAware: typescriptLibTypeAware.fragment,
+          standard: typescriptLibraryStandard.fragment,
+          typeAware: typescriptLibraryTypeAware.fragment,
         },
       },
       test: {
@@ -611,7 +609,7 @@ async function listFiles(directory: string): Promise<Array<string>> {
 }
 
 export function normalizeOxlintArtifactPath(relativePath: string): string {
-  return relativePath.replaceAll(path.win32.sep, path.posix.sep);
+  return relativePath.replaceAll(path.win32.sep, () => path.posix.sep);
 }
 
 export async function diffOxlintArtifacts(

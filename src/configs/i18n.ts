@@ -17,7 +17,7 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
   ] as const);
 
   return [
-    i18next.configs["flat/recommended"] as TypedFlatConfigItem,
+    i18next.configs["flat/recommended"],
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:i18next/recommended"],

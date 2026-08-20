@@ -64,8 +64,7 @@ export async function jsonc(
         "jsonc/valid-json-number": "error",
         "jsonc/vue-custom-block/no-parsing-error": "error",
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "jsonc/array-bracket-spacing": ["error", "never"],
               "jsonc/comma-dangle": ["error", "never"],
               "jsonc/comma-style": ["error", "last"],
@@ -85,8 +84,7 @@ export async function jsonc(
               ],
               "jsonc/quote-props": "error",
               "jsonc/quotes": "error",
-            }
-          : {}),
+            }),
 
         ...overrides,
       },

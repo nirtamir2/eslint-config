@@ -59,10 +59,10 @@ export async function react(
 
   const isUsingNext = environment.hasPackage("next");
   const isAllowConstantExport =
-    ReactRefreshAllowConstantExportPackages.some((i) =>
-      environment.hasPackage(i),
+    ReactRefreshAllowConstantExportPackages.some((index) =>
+      environment.hasPackage(index),
     ) && !isUsingNext;
-  const isUsingRemix = RemixPackages.some((i) => environment.hasPackage(i));
+  const isUsingRemix = RemixPackages.some((index) => environment.hasPackage(index));
   const eslintReactConfig = isTypeAware
     ? pluginReact.configs["strict-type-checked"]
     : pluginReact.configs["strict-typescript"];
@@ -162,7 +162,7 @@ export async function react(
         rules: {
           "ssr-friendly/no-dom-globals-in-react-cc-render": "off", // I don't use class components
         },
-      }) as never,
+      }),
     ),
     ...a11y(),
   ];

@@ -55,11 +55,11 @@ interface VariantLoadCase {
 }
 
 const require = createRequire(import.meta.url);
-const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
-const fixtureRoot = path.join(repositoryRoot, "fixtures", "oxlint-native");
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const fixtureRoot = path.join(repoRoot, "fixtures", "oxlint-native");
 const oxlintPackageRoot = path.dirname(require.resolve("oxlint/package.json"));
 const oxlintCli = path.join(oxlintPackageRoot, "bin", "oxlint");
-const localBinDirectory = path.join(repositoryRoot, "node_modules", ".bin");
+const localBinDirectory = path.join(repoRoot, "node_modules", ".bin");
 const temporaryDirectories: Array<string> = [];
 const timeout = process.platform === "win32" ? 120_000 : 60_000;
 const compareNames = (left: string, right: string) =>
@@ -232,8 +232,10 @@ const diagnosticCases = [
 ] satisfies Array<DiagnosticCase>;
 
 afterEach(async () => {
+  const directories = [...temporaryDirectories];
+  temporaryDirectories.length = 0;
   await Promise.all(
-    temporaryDirectories.splice(0).map((directory) =>
+    directories.map((directory) =>
       fs.rm(directory, { force: true, recursive: true }),
     ),
   );

@@ -45,8 +45,7 @@ export async function toml(
 
         "toml/vue-custom-block/no-parsing-error": "error",
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "toml/array-bracket-newline": "error",
               "toml/array-bracket-spacing": "error",
               "toml/array-element-newline": "error",
@@ -58,8 +57,7 @@ export async function toml(
               "toml/quoted-keys": "error",
               "toml/spaced-comment": "error",
               "toml/table-bracket-spacing": "error",
-            }
-          : {}),
+            }),
 
         ...overrides,
       },

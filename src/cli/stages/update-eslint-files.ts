@@ -16,11 +16,11 @@ export async function updateEslintFiles(result: PromptResult) {
   const pathESLintIgnore = path.join(cwd, ".eslintignore");
   const pathPackageJSON = path.join(cwd, "package.json");
 
-  const pkgContent = await fsp.readFile(pathPackageJSON, "utf8");
-  const pkg: Record<string, any> = JSON.parse(pkgContent);
+  const packageContent = await fsp.readFile(pathPackageJSON, "utf8");
+  const package_: Record<string, any> = JSON.parse(packageContent);
 
   const configFileName =
-    pkg.type === "module" ? "eslint.config.js" : "eslint.config.mjs";
+    package_.type === "module" ? "eslint.config.js" : "eslint.config.mjs";
   const pathFlatConfig = path.join(cwd, configFileName);
 
   const eslintIgnores: Array<string> = [];
@@ -54,7 +54,7 @@ export async function updateEslintFiles(result: PromptResult) {
   for (const framework of result.frameworks)
     configLines.push(`${framework}: true,`);
 
-  const mainConfig = configLines.map((i) => `  ${i}`).join("\n");
+  const mainConfig = configLines.map((index) => `  ${index}`).join("\n");
   const additionalConfig: Array<string> = [];
 
   const eslintConfigContent: string = getEslintConfigContent(

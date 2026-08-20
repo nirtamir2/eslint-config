@@ -42,7 +42,7 @@ export interface PreparedMigrationSource {
 export function translateOxlintGlob(glob: string): string {
   let translated = glob;
   for (const [extglob, braceGlob] of oxlintGlobTranslations) {
-    translated = translated.replaceAll(extglob, braceGlob);
+    translated = translated.replaceAll(extglob, () => braceGlob);
   }
 
   if (translated.includes("?(")) {
@@ -84,9 +84,7 @@ export function prepareMigrationSource(
     .map((config, index) => {
       const clone = {
         ...config,
-        ...(config.rules == null
-          ? {}
-          : {
+        ...(config.rules != null && {
               rules: Object.fromEntries(
                 Object.entries(config.rules).map(([rule, value]) => [
                   rule,
@@ -108,9 +106,7 @@ export function prepareMigrationSource(
       const files = normalizeSourceFiles(clone.files);
       const marker = `${scopeMarkerPrefix}${String(index).padStart(4, "0")}__`;
       scopes.set(marker, {
-        ...(clone.ignores == null
-          ? {}
-          : { excludeFiles: [...clone.ignores] }),
+        ...(clone.ignores != null && { excludeFiles: [...clone.ignores] }),
         files: [...files],
       });
       clone.files = [...files, marker];
@@ -158,9 +154,10 @@ export function restoreMigrationScopes(
 }
 
 function normalizeRuleValue(value: unknown): unknown {
+  const disabledRuleValues = new Set<unknown>([0, "allow", "off"]);
   if (
     Array.isArray(value) &&
-    (value[0] === 0 || value[0] === "allow" || value[0] === "off")
+    disabledRuleValues.has(value[0])
   ) {
     return "off";
   }
@@ -182,17 +179,11 @@ function normalizeRules(
 function normalizeDisabledRuleArrays(config: OxlintConfig): OxlintConfig {
   return {
     ...config,
-    ...(config.rules == null
-      ? {}
-      : { rules: normalizeRules(config.rules as Record<string, unknown>) }),
-    ...(config.overrides == null
-      ? {}
-      : {
+    ...(config.rules != null && { rules: normalizeRules(config.rules) }),
+    ...(config.overrides != null && {
           overrides: config.overrides.map((override) => ({
             ...override,
-            ...(override.rules == null
-              ? {}
-              : {
+            ...(override.rules != null && {
                   rules: normalizeRules(
                     override.rules as Record<string, unknown>,
                   ),
@@ -205,17 +196,11 @@ function normalizeDisabledRuleArrays(config: OxlintConfig): OxlintConfig {
 function translateConfigGlobs(config: OxlintConfig): OxlintConfig {
   return {
     ...config,
-    ...(config.ignorePatterns == null
-      ? {}
-      : { ignorePatterns: translateOxlintGlobs(config.ignorePatterns) }),
-    ...(config.overrides == null
-      ? {}
-      : {
+    ...(config.ignorePatterns != null && { ignorePatterns: translateOxlintGlobs(config.ignorePatterns) }),
+    ...(config.overrides != null && {
           overrides: config.overrides.map((override) => ({
             ...override,
-            ...(override.excludeFiles == null
-              ? {}
-              : {
+            ...(override.excludeFiles != null && {
                   excludeFiles: translateOxlintGlobs(override.excludeFiles),
                 }),
             files: translateOxlintGlobs(override.files),
@@ -226,15 +211,15 @@ function translateConfigGlobs(config: OxlintConfig): OxlintConfig {
 
 function stripMigrationBaseline(config: OxlintConfig): OxlintConfig {
   const categories = { ...config.categories };
-  const env = { ...config.env };
+  const environment = { ...config.env };
 
   if (categories.correctness === "off") delete categories.correctness;
-  if (env.builtin === true) delete env.builtin;
+  if (environment.builtin === true) delete environment.builtin;
 
   return {
     ...config,
     categories,
-    env,
+    env: environment,
   };
 }
 
@@ -350,7 +335,7 @@ export function mergeOxlintConfigs(
     }
   }
 
-  return normalizeOxlintConfig(result as OxlintConfig, false);
+  return normalizeOxlintConfig(result, false);
 }
 
 export function countConfiguredRules(config: OxlintConfig): number {
