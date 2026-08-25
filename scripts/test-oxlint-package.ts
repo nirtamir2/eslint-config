@@ -15,11 +15,13 @@ const consumerRoot = path.join(temporaryRoot, "consumer");
 const tarballPath = path.join(temporaryRoot, "eslint-config.tgz");
 
 try {
-  const [eslintVersion, oxlintVersion, typescriptVersion] = await Promise.all(
-    ["eslint", "oxlint", "typescript"].map((packageName) =>
-      readInstalledPackageVersion(packageName),
-    ),
-  );
+  const [eslintVersion, oxlintVersion, typescriptVersion, packageManager] =
+    await Promise.all([
+      ...["eslint", "oxlint", "typescript"].map((packageName) =>
+        readInstalledPackageVersion(packageName),
+      ),
+      readPackageManager(),
+    ]);
 
   await execa("pnpm", ["pack", "--out", tarballPath], {
     cwd: repoRoot,
@@ -38,6 +40,7 @@ try {
         name: "oxlint-packed-consumer",
         private: true,
         type: "module",
+        packageManager,
         devDependencies: {
           "@nirtamir2/eslint-config": `file:${tarballPath}`,
           eslint: eslintVersion,
@@ -49,12 +52,15 @@ try {
       2,
     )}\n`,
   );
+  await fs.writeFile(
+    path.join(consumerRoot, "pnpm-workspace.yaml"),
+    "allowBuilds:\n  unrs-resolver: true\n",
+  );
 
   await execa(
     "pnpm",
     [
       "install",
-      "--ignore-workspace",
       "--no-frozen-lockfile",
       "--no-lockfile",
       // Keep the workspace trust policy focused on recently published packages.
@@ -260,4 +266,13 @@ async function readInstalledPackageVersion(
   if (typeof manifest.version !== "string")
     throw new TypeError(`${packageName} has no string version`);
   return manifest.version;
+}
+
+async function readPackageManager(): Promise<string> {
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(repoRoot, "package.json"), "utf8"),
+  ) as { packageManager?: unknown };
+  if (typeof manifest.packageManager !== "string")
+    throw new TypeError("package.json has no string packageManager");
+  return manifest.packageManager;
 }
