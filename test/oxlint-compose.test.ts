@@ -36,7 +36,7 @@ describe("composeOxlintConfigs", () => {
       categories: { correctness: "error", suspicious: "warn" },
       env: { browser: false, node: true },
       globals: { BASE: "readonly", EXTENSION: "writable" },
-      ignorePatterns: ["dist/**", "generated/**"],
+      ignorePatterns: ["dist/**", "dist/**", "generated/**"],
       jsPlugins: [
         { name: "legacy", specifier: "eslint-plugin-b" },
         "eslint-plugin-extra",
@@ -57,13 +57,19 @@ describe("composeOxlintConfigs", () => {
     expect(base.overrides).toHaveLength(1);
 
     const result = composeOxlintConfigs(base);
-    // SAFETY: `base` above declares eqeqeq as a tuple and react.version as a string;
-    // these mutations prove the composer deep-cloned rather than aliased them.
     (result.rules?.eqeqeq as Array<unknown>)[0] = "off";
-    // SAFETY: as above, for the settings block.
     (result.settings?.react as { version: string }).version = "changed";
     expect(base.rules.eqeqeq).toEqual(["error", "always"]);
     expect(base.settings.react.version).toBe("18");
+  });
+
+  it("preserves ordered ignore negations and repeated re-inclusions", () => {
+    expect(
+      composeOxlintConfigs(
+        { ignorePatterns: ["foo"] },
+        { ignorePatterns: ["!foo", "foo"] },
+      ).ignorePatterns,
+    ).toEqual(["foo", "!foo", "foo"]);
   });
 
   it("resolves imported object extends depth-first", () => {
@@ -131,10 +137,9 @@ describe("composeOxlintConfigs", () => {
       "Cyclic Oxlint config extends",
     );
     expect(() =>
-      // SAFETY: string `extends` entries are exactly what this test asserts are
-      // rejected, so the value cannot be expressed in the public config type.
-      // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- invalid by design
-      composeOxlintConfigs({ extends: ["./base.json"] } as unknown as OxlintConfig),
+      composeOxlintConfigs({
+        extends: ["./base.json"],
+      } as unknown as OxlintConfig),
     ).toThrow("Import extended Oxlint configs as objects");
   });
 });

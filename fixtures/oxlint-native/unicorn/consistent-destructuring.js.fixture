@@ -1,0 +1,4 @@
+export function describeUser(user) {
+  const { name } = user;
+  return `${name}: ${user.name}`;
+}

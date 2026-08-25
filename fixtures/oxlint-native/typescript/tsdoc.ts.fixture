@@ -1,0 +1,2 @@
+/** @unknownTag This tag is not part of TSDoc. */
+export const documented = true;

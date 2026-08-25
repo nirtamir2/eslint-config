@@ -30,4 +30,4 @@ jobs:
       - name: Test packed Oxlint entry
         run: pnpm test:oxlint-package
 
-      - run: pnpx pkg-pr-new publish --pnpm
+      - run: pnpm exec pkg-pr-new publish --pnpm

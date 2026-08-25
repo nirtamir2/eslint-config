@@ -3,7 +3,6 @@ import { FlatConfigComposer } from "eslint-flat-config-utils";
 import { isPackageExists } from "local-pkg";
 import {
   angular,
-  antiSlop,
   astro,
   command,
   comments,
@@ -109,7 +108,6 @@ export function nirtamir2(
   });
 
   const {
-    antiSlop: enableAntiSlop = false,
     angular: enableAngular = false,
     astro: enableAstro = false,
     // autoRenamePlugins = true,
@@ -242,15 +240,6 @@ export function nirtamir2(
         ...stylisticOptions,
         lessOpinionated: options.lessOpinionated,
         overrides: getOverrides(options, "stylistic"),
-      }),
-    );
-  }
-
-  if (enableAntiSlop) {
-    configs.push(
-      antiSlop({
-        ...resolveSubOptions(options, "antiSlop"),
-        overrides: getOverrides(options, "antiSlop"),
       }),
     );
   }
@@ -458,11 +447,7 @@ export function nirtamir2(
   // We pick the known keys as ESLint would do schema validation
   const fusedConfig = flatConfigProperties.reduce<TypedFlatConfigItem>(
     (accumulator, key) => {
-      if (key in options)
-        // SAFETY: `key` is a flat-config property name, so options[key] already has
-        // the type the accumulator expects; `never` sidesteps the per-key correlation
-        // TypeScript cannot express here.
-        accumulator[key] = options[key] as never;
+      if (key in options) accumulator[key] = options[key] as never;
       return accumulator;
     },
     {},
@@ -471,8 +456,6 @@ export function nirtamir2(
 
   let composer = new FlatConfigComposer<TypedFlatConfigItem, ConfigNames>();
 
-  // SAFETY: userConfigs is the caller's own flat-config input, which the composer
-  // validates; its declared union is wider than the composer's parameter type.
   composer = composer.append(...configs, ...(userConfigs as any));
 
   // if (autoRenamePlugins) {
@@ -505,8 +488,6 @@ export function resolveSubOptions<K extends keyof OptionsConfig>(
   options: OptionsConfig,
   key: K,
 ): ResolvedOptions<OptionsConfig[K]> {
-  // SAFETY: a boolean or absent sub-option means "use the defaults", which is the
-  // empty object; the per-key return type cannot be correlated with K here.
   return typeof options[key] === "boolean"
     ? ({} as any)
     : options[key] || ({} as any);
@@ -517,7 +498,6 @@ export function getOverrides<K extends keyof OptionsConfig>(
 ) {
   const sub = resolveSubOptions(options, key);
   return {
-    // SAFETY: `overrides` is keyed by config name; the value type varies per key.
     ...(options.overrides as any)?.[key],
     ...(("overrides" in sub) && sub.overrides),
   };

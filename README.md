@@ -83,7 +83,12 @@ For example:
 
 This package also publishes a synchronous Oxlint config factory. Its rule
 fragments are generated from the ESLint config during development, so the
-ESLint rules remain the single manually maintained source.
+ESLint rules remain the single manually maintained source. The export aims for
+the maximum executable JavaScript and TypeScript parity that Oxlint currently
+allows: native Oxlint rules where migration preserves the intended semantics,
+`oxlint-tsgolint` for native type-aware rules, and package-anchored
+JavaScript-plugin paths for compatible ESLint rules and deliberately retained
+plugin behavior.
 
 Install Oxlint alongside this package:
 
@@ -91,9 +96,12 @@ Install Oxlint alongside this package:
 pnpm i -D eslint oxlint @nirtamir2/eslint-config
 ```
 
-The ESLint peer is still part of the package's installation footprint in this
-initial same-package release. The compiled `./oxlint` entry itself does not
-load ESLint, ESLint plugins, or `@oxlint/migrate` when Oxlint starts.
+The ESLint peer remains part of this package's installation footprint. The
+compiled `./oxlint` entry does not load ESLint or `@oxlint/migrate` when
+Oxlint starts. Generated JavaScript-plugin specifiers are resolved from the
+installed `@nirtamir2/eslint-config` package, rather than relative to the
+consumer's `oxlint.config.ts`, so bundled fallback plugins also work with
+strict package-manager layouts.
 
 Create an `oxlint.config.ts` and call the factory:
 
@@ -103,7 +111,6 @@ import nirtamir2 from "@nirtamir2/eslint-config/oxlint";
 
 export default nirtamir2(
   {
-    react: true,
     typescript: true,
     ignores: ["generated/**"],
     rules: {
@@ -135,20 +142,61 @@ export default recommended;
 ```
 
 `recommended` contains the application base and its default Unicorn rules. It
-does not enable JSX, tests, TypeScript, React, Next.js, Vue, JSDoc, or other
-detected integrations. Use the factory when you want integration selection
-and familiar options.
+also includes the command rules, the application/non-editor e18e variant,
+RegExp rules at error level, default-import-name, and the compatible Prettier
+and file-scoped rule disables. It does not enable JSX, tests, TypeScript,
+React, Next.js, Vue, JSDoc, or detected integrations. Use the factory when you
+want integration selection and familiar options. Unlike the factory, the
+static preset does not inspect the consumer filesystem or load `.gitignore`.
 
 ### Oxlint options
 
-The initial Oxlint API supports:
+The factory accepts these public options:
 
-- `type`, `ignores`, and root `rules`.
-- `typescript`, `jsx`, `react`, `nextjs`, `test`, `vue`, `unicorn`, and
-  `jsdoc`.
-- Integration `overrides` for native Oxlint rules.
-- `typescript.typeAware` for Oxlint's type-aware linting.
-- `antiSlop` for the vendored anti-slop rules (see below).
+| Option            | Default and details                                                                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`            | `"app"`; use `"lib"` for library TypeScript and e18e variants.                                                                                                  |
+| `isInEditor`      | Auto-detected; pass a boolean for deterministic editor/non-editor severity variants.                                                                            |
+| `gitignore`       | Enabled with `strict: false`; accepts `eslint-config-flat-gitignore` options or `false`.                                                                        |
+| `ignores`         | An array appends project-relative globs; a function receives and replaces the generated default-ignore list.                                                    |
+| `javascript`      | Always enabled; accepts `overrides`, composed at the same producer boundary as ESLint.                                                                          |
+| `rules`           | Root Oxlint rule overrides, applied after every generated fragment.                                                                                             |
+| `lessOpinionated` | `false`; selects the less-opinionated branch when Stylistic is enabled.                                                                                         |
+| `angular`         | Disabled; accepts `overrides` for the executable TypeScript rule subset. HTML and inline templates are not linted.                                              |
+| `unicorn`         | Enabled; accepts `allRecommended` (default `true`) and `overrides`.                                                                                             |
+| `jsx`             | Enabled; boolean only.                                                                                                                                          |
+| `typescript`      | Detected from `typescript`; accepts `erasableOnly` (default `true`), `typeAware`, `filesTypeAware`, `ignoresTypeAware`, `overrides`, and `overridesTypeAware`.  |
+| `test`            | Enabled; accepts `overrides`.                                                                                                                                   |
+| `vue`             | Detected from Vue, Nuxt, VitePress, or Slidev; accepts `vueVersion` (`2` or `3`, default `3`) and `overrides`.                                                  |
+| `react`           | Disabled; accepts `overrides`.                                                                                                                                  |
+| `nextjs`          | Detected from `next`; accepts `overrides`.                                                                                                                      |
+| `jsdoc`           | Disabled; accepts `overrides`.                                                                                                                                  |
+| `e18e`            | Enabled; accepts `modernization`, `moduleReplacements`, `performanceImprovements`, and `overrides`.                                                             |
+| `regexp`          | Enabled; accepts `level: "error"` or `"warn"` and `overrides`.                                                                                                  |
+| `perfectionist`   | Disabled; accepts `overrides`.                                                                                                                                  |
+| `query`           | Detected from TanStack React Query or Solid Query; accepts `overrides`.                                                                                         |
+| `security`        | Disabled; accepts `overrides`.                                                                                                                                  |
+| `solid`           | Disabled; accepts `overrides`.                                                                                                                                  |
+| `storybook`       | Detected from Storybook packages; boolean only.                                                                                                                 |
+| `stylistic`       | Disabled; accepts `braceStyle`, `experimental`, numeric-or-tab `indent`, `jsx`, `quotes`, `semi`, and `overrides`. This is rule coverage, not formatter parity. |
+| `tailwindcss`     | Detected from `tailwindcss`; accepts `entryPoint` and `overrides`.                                                                                              |
+| `tsdoc`           | Disabled; accepts `overrides`.                                                                                                                                  |
+| `unocss`          | Disabled; accepts `attributify` (default `true`), `strict` (default `false`), and `overrides`.                                                                  |
+| `i18n`            | Disabled; enables i18next literal-string checks for JavaScript and TypeScript, including JSX/TSX. Locale JSON and validator rules are not linted.               |
+| `zod`             | Detected when both `zod` and `next` are present; accepts `overrides`.                                                                                           |
+
+Feature `overrides` must use Oxlint rule IDs and values. A boolean `false`
+also disables an auto-detected or default-enabled feature. Unknown options and
+unsupported ESLint-only options throw an `Unsupported Oxlint option` error
+instead of being ignored.
+
+The factory reads `.gitignore` and `.gitmodules` synchronously and converts
+them to Oxlint ignore patterns before generated fragments are composed. Pass
+`gitignore: false` to disable this factory conversion, or an options object to
+select files, a working directory, recursive discovery, or strict missing-file
+behavior. Oxlint's own directory discovery still honors `.gitignore` and
+cannot currently be disabled with a CLI flag, although an explicitly named
+file may still be selected.
 
 Type-aware linting additionally requires `oxlint-tsgolint`:
 
@@ -156,78 +204,88 @@ Type-aware linting additionally requires `oxlint-tsgolint`:
 pnpm i -D oxlint-tsgolint
 ```
 
-Unknown options and ESLint-only options throw an `Unsupported Oxlint option`
-error instead of being ignored.
+`typescript.typeAware` enables Oxlint's native type-aware rules. It does not
+make JavaScript ESLint plugins type-aware because their TypeScript parser
+services are not supported. `filesTypeAware` retargets the type-aware source
+scope, while `overridesTypeAware` applies rules to it. Matching the ESLint
+producer, `ignoresTypeAware` also excludes the final TypeScript rule maps when
+type-aware linting is disabled.
 
-### anti-slop
+Editor-mode rule severities are preserved. Oxlint has no equivalent for
+ESLint's per-rule autofix suppression, so `isInEditor` cannot disable fixes for
+individual rules such as unused-import cleanup or test-only guards.
 
-[anti-slop](https://github.com/dmmulroy/anti-slop) by Dillon Mulroy is a set of
-opinionated rules that reject low-evidence TypeScript: `unknown` parameters and
-return types, type assertions with no stated invariant, `Record<string, unknown>`
-dictionaries, `Reflect.get`, module mocking, and ad-hoc `typeof` narrowing.
+Most fallback plugins used by the base, Unicorn, JSX, TypeScript, tests, Vue,
+JSDoc, e18e, i18n, RegExp, Stylistic, TSDoc, and the tail fragment are package
+dependencies and need no separate installation. These opt-in or detected
+features use optional peers; install the matching peer before enabling them:
 
-It is not published to npm — upstream asks that it be vendored — so the rules are
-vendored into this package under `src/oxlint-plugins/anti-slop/`, kept byte-identical
-to upstream, and shipped compiled. Consumers install nothing extra:
+| Feature         | Required optional peer packages                                                                                 |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| `angular`       | `@angular-eslint/eslint-plugin`                                                                                 |
+| `react`         | `@eslint-react/eslint-plugin`, `eslint-plugin-react-you-might-not-need-an-effect`                               |
+| `nextjs`        | `@next/eslint-plugin-next`                                                                                      |
+| `perfectionist` | `eslint-plugin-perfectionist`                                                                                   |
+| `query`         | `@tanstack/eslint-plugin-query`                                                                                 |
+| `security`      | `eslint-plugin-security`                                                                                        |
+| `solid`         | `eslint-plugin-solid` (`@eslint-react/eslint-plugin` is already required when Solid and React are both enabled) |
+| `storybook`     | `eslint-plugin-storybook`                                                                                       |
+| `tailwindcss`   | `eslint-plugin-better-tailwindcss`                                                                              |
+| `unocss`        | `@unocss/eslint-plugin`                                                                                         |
+| `zod`           | `eslint-plugin-import-zod`                                                                                      |
 
-```ts
-// oxlint.config.ts
-import nirtamir2 from "@nirtamir2/eslint-config/oxlint";
-
-export default nirtamir2({ antiSlop: true });
-```
-
-It is **off by default**, and turning it on will report a lot in an existing
-codebase. Start with warnings, or disable the rules you disagree with:
-
-```ts
-export default nirtamir2({
-  antiSlop: {
-    level: "warn",
-    overrides: {
-      // Hard to satisfy if your public API uses `boolean | Options` unions.
-      "anti-slop/no-runtime-typeof": "off",
-    },
-  },
-});
-```
-
-The same rules are available to ESLint, since anti-slop wraps them with
-`eslintCompatPlugin`:
-
-```js
-// eslint.config.js
-import nirtamir2 from "@nirtamir2/eslint-config";
-
-export default nirtamir2({ antiSlop: true });
-```
-
-`antiSlop.specifier` points Oxlint at your own vendored copy instead of the bundled
-one, which is useful once you start editing the rules — which upstream encourages:
-
-```ts
-export default nirtamir2({
-  antiSlop: { specifier: "./tools/oxlint/anti-slop/index.ts" },
-});
-```
-
-anti-slop is MIT licensed; the license is kept alongside the vendored rules, and
-`pnpm sync:anti-slop` re-vendors them from a pinned upstream commit.
+If an enabled or auto-detected integration is missing its plugin, the factory
+names that package in an `Unable to resolve Oxlint JavaScript plugin` error.
+Install the peer or explicitly set that feature to `false`. A missing
+`oxlint-tsgolint` has a separate install error when `typescript.typeAware` is
+enabled.
 
 ### Compatibility scope
 
-The generated fragments are native-only: the generator includes rules that
-the pinned Oxlint migrator maps to native Oxlint implementations and records
-the remaining rules in the committed compatibility report. It does not load
-JavaScript ESLint-plugin fallbacks for them. Consequently, an enabled
-integration can be partial when Oxlint does not yet implement every source
-rule.
+Oxlint's [JavaScript-plugin API](https://oxc.rs/docs/guide/usage/linter/js-plugins)
+is currently alpha. Native implementations remain the fastest and most stable
+path; JavaScript-plugin performance and compatibility depend on each plugin's
+code and its ESLint API usage. This config uses plugins for reviewed compatible
+rules when migration or semantic parity requires them, including aliased
+fallbacks for reserved native plugin names and the full RegExp producer.
 
-`antiSlop` is the one exception, and it is opt-in. It is a hand-written
-fragment rather than a generated one, and enabling it registers a JS plugin
-through Oxlint's `jsPlugins`. Oxlint's JS plugin support is in alpha and is
-explicitly not covered by semver, and running JS rules costs lint time that
-native Rust rules do not. Nothing loads unless you ask for it.
+The factory turns off every generated JavaScript-plugin rule for
+`**/*.d.{ts,mts,cts}` because Oxlint's current JavaScript-plugin runtime can
+crash on declaration-only AST nodes. Native TypeScript rules, including native
+type-aware rules from `oxlint-tsgolint`, still run on declaration files. Root
+`rules` and trailing configs compose after this safety override, so they can
+explicitly re-enable a rule when appropriate.
+
+The public `oxlintCapabilities` manifest documents every config producer from
+the ESLint factory, including its support level, ESLint default/detection
+behavior, runtime packages, and known limitations:
+
+```ts
+import { oxlintCapabilities } from "@nirtamir2/eslint-config/oxlint";
+
+console.log(oxlintCapabilities.vue);
+```
+
+The boundary is intentionally about executable behavior, not merely serializing
+every ESLint rule. Oxlint does not currently provide parity for JSON, JSONC,
+JSON5, YAML, TOML, or Markdown linting; custom parsers and processors; framework
+templates or custom blocks; or formatter execution. Therefore Astro, Svelte,
+pnpm workspace files, JSON/package/tsconfig sorting, Markdown, and formatter
+producers are not exposed as Oxlint options. Compatible Prettier disables are
+retained, but Prettier itself is not run.
+
+Vue support covers supported JavaScript and TypeScript inside script blocks;
+Angular support covers TypeScript rules but not external or inline templates;
+and i18n support covers i18next literal-string checks in JavaScript and
+TypeScript, including JSX/TSX, but not locale JSON, translation-path validators,
+or prefix checks. Processor-dependent
+Storybook formats and type-aware JavaScript-plugin rules have the same upstream
+boundary. Known individual incompatibilities,
+such as `eslint-plugin-expect-type`,
+`eslint-plugin-sort-destructure-keys-typescript`,
+`eslint-plugin-classname-components`, and the legacy
+`eslint-plugin-ssr-friendly` API, are recorded in `oxlintCapabilities` rather
+than emitted as broken rules.
 
 For maintainers, rule changes are made only in the ESLint source and then
 materialized with `pnpm generate:oxlint`. The generated fragments and report
@@ -235,20 +293,12 @@ are committed for review. `pnpm build`, `prepack`, and CI use the non-mutating
 `check:oxlint-generated` command so stale output fails instead of being
 rewritten during packaging.
 
-Vue support covers supported script-block rules and does not promise ESLint
-template-processor parity. ESLint features whose defining behavior needs
-custom parsers, processors, or formatter execution are not exposed here;
-this includes `angular`, `formatters`, `jsonc`, `markdown`, `pnpm`,
-`stylistic`, `toml`, and `yaml`. Formatting remains a separate concern, such
-as Oxfmt or Prettier.
-
-React refresh package detection is intentionally frozen in the generated
-native v1 config. The React fragment does not dynamically vary
-`react/only-export-components` for installed Next.js, Vite, or Remix
-packages. Enabling `nextjs` still applies its separately generated Next.js
-fragment; for Vite- or Remix-specific refresh options, set a native
-`react.overrides` rule until environment-specific generated variants are
-available.
+React Refresh package detection is intentionally frozen in the generated
+config. The React fragment does not dynamically vary
+`react/only-export-components` for installed Next.js, Vite, or Remix packages.
+Enabling `nextjs` still applies its separately generated Next.js fragment; for
+Vite- or Remix-specific refresh options, set a `react.overrides` rule until
+environment-specific generated variants are available.
 
 For example, add a package script like this:
 

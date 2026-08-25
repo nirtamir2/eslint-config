@@ -66,10 +66,7 @@ export async function i18n(): Promise<Array<TypedFlatConfigItem>> {
           },
         ],
       }),
-    ).map(
-    // SAFETY: the i18n plugin presets are flat configs with a looser exported type.
-    (config) => config as TypedFlatConfigItem,
-  ),
+    ).map((config) => config as TypedFlatConfigItem),
     {
       name: "nirtamir2/i18n/storybook",
       files: ["**.stories.tsx"],

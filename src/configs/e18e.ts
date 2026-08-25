@@ -20,8 +20,6 @@ export async function e18e(
   const isModuleReplacements =
     options.moduleReplacements ?? (type === "lib" && isInEditor);
 
-  // SAFETY: @e18e/eslint-plugin exports its preset map untyped; the values are
-  // ordinary flat configs.
   const configs = pluginE18e.configs as Record<string, Linter.Config>;
 
   return [

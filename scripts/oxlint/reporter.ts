@@ -8,13 +8,9 @@ export const skippedRuleCategories = [
 
 export type SkippedRuleCategory = (typeof skippedRuleCategories)[number];
 
-export type SkippedRulesByCategory = Record<
-  SkippedRuleCategory,
-  Array<string>
->;
+export type SkippedRulesByCategory = Record<SkippedRuleCategory, Array<string>>;
 
 export class MigrationReporter {
-  // SAFETY: one entry is built per member of skippedRuleCategories, so every key exists.
   private readonly skippedRules = Object.fromEntries(
     skippedRuleCategories.map((category) => [category, new Set<string>()]),
   ) as Record<SkippedRuleCategory, Set<string>>;
@@ -26,7 +22,6 @@ export class MigrationReporter {
   }
 
   getSkippedRulesByCategory(): SkippedRulesByCategory {
-    // SAFETY: mapped from skippedRuleCategories, so every category key is present.
     return Object.fromEntries(
       skippedRuleCategories.map((category) => [
         category,

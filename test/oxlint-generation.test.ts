@@ -8,7 +8,12 @@ import {
   renderOxlintArtifacts,
   writeOxlintArtifacts,
 } from "../scripts/oxlint/generate";
-import { translateOxlintGlob } from "../scripts/oxlint/normalize";
+import {
+  markDisabledRulesForMigration,
+  mergeOxlintConfigs,
+  restoreDisabledRulesAfterMigration,
+  translateOxlintGlob,
+} from "../scripts/oxlint/normalize";
 
 const temporaryDirectories: Array<string> = [];
 
@@ -31,7 +36,7 @@ describe("oxlint artifact generation", () => {
     ).toBe("src/generated/oxlint/fragments.ts");
   });
 
-  it("renders the same native-only artifacts twice", async () => {
+  it("renders the same complete JavaScript artifacts twice", async () => {
     const first = await renderOxlintArtifacts();
     const second = await renderOxlintArtifacts();
 
@@ -41,20 +46,19 @@ describe("oxlint artifact generation", () => {
       "src/generated/oxlint/fragments.ts",
       "src/generated/oxlint/index.ts",
     ]);
-    expect(first.get("src/generated/oxlint/fragments.ts")).not.toContain("?(");
+    expect(first.get("src/generated/oxlint/fragments.ts")).not.toMatch(
+      /[!+?*@]\(/u,
+    );
   });
 
   it("records only generator toolchain versions and frozen React detection", async () => {
     const rendered = await renderOxlintArtifacts();
-    const report = rendered.get(
-      "src/generated/oxlint/compatibility-report.ts",
-    );
+    const report = rendered.get("src/generated/oxlint/compatibility-report.ts");
 
-    expect(report).toContain(
-      "versions: { migrate: string; oxlint: string }",
-    );
+    expect(report).toContain("versions: { migrate: string; oxlint: string }");
     expect(report).not.toContain("config: string");
     expect(report).not.toContain('"config":');
+    expect(report).toContain('"jsPlugins": true');
     expect(report).toContain('"id": "react-refresh-environment-detection"');
   });
 
@@ -65,21 +69,64 @@ describe("oxlint artifact generation", () => {
     expect(translateOxlintGlob("**/*.{test,spec}.ts?(x)")).toBe(
       "**/*.{test,spec}.{ts,tsx}",
     );
+    expect(translateOxlintGlob("**/*.{test,spec}.([tj])s?(x)")).toBe(
+      "**/*.{test,spec}.{js,jsx,ts,tsx}",
+    );
     expect(translateOxlintGlob("**/auto-import?(s).d.ts")).toBe(
       "**/{auto-import,auto-imports}.d.ts",
     );
+    expect(translateOxlintGlob("**/*.stories.@(ts|tsx|js|jsx|mjs|cjs)")).toBe(
+      "**/*.stories.{ts,tsx,js,jsx,mjs,cjs}",
+    );
+  });
+
+  it("keeps generated ignore patterns ordered, including duplicates", () => {
+    expect(
+      mergeOxlintConfigs([
+        { ignorePatterns: ["foo"] },
+        { ignorePatterns: ["!foo", "foo"] },
+      ]).ignorePatterns,
+    ).toEqual(["foo", "!foo", "foo"]);
+  });
+
+  it("round-trips disabled rules through migration-safe markers", () => {
+    const [marked] = markDisabledRulesForMigration([
+      {
+        rules: {
+          "example/enabled": "error",
+          "example/disabled": "off",
+        },
+      },
+    ]);
+    const markedDisabledRule = marked?.rules?.["example/disabled"];
+    expect(markedDisabledRule).toEqual([
+      "warn",
+      { __nirtamir2_oxlint_disabled_rule__: true },
+    ]);
+
+    expect(
+      restoreDisabledRulesAfterMigration({
+        rules: {
+          "mapped/disabled": markedDisabledRule,
+          "mapped/enabled": marked?.rules?.["example/enabled"],
+        },
+      }).rules,
+    ).toEqual({
+      "mapped/disabled": "off",
+      "mapped/enabled": "error",
+    });
   });
 
   it("matches the committed canonical artifacts", async () => {
     const rendered = await renderOxlintArtifacts();
 
-    await expect(
-      diffOxlintArtifacts(process.cwd(), rendered),
-    ).resolves.toEqual({
-      changed: [],
-      missing: [],
-      unexpected: [],
-    });
+    await expect(diffOxlintArtifacts(process.cwd(), rendered)).resolves.toEqual(
+      {
+        changed: [],
+        missing: [],
+        unexpected: [],
+      },
+    );
   });
 
   it("reports changed, missing, and unexpected files without writing", async () => {

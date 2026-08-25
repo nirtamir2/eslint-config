@@ -52,8 +52,6 @@ afterAll(async () => {
 it("package.json updated", async () => {
   const { stdout } = await run();
 
-  // Asserting on an arbitrary generated manifest is the point of this test.
-  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- generated manifest
   const packageContent: Record<string, any> = await fs.readJSON(
     join(genPath, "package.json"),
   );

@@ -5,6 +5,10 @@ settings:
   excludeLinksFromLockfile: false
 
 catalogs:
+  default:
+    pkg-pr-new:
+      specifier: 0.0.88
+      version: 0.0.88
   dev:
     '@antfu/ni':
       specifier: ^30.5.0
@@ -16,9 +20,6 @@ catalogs:
       specifier: ^1.0.1
       version: 1.0.1
     '@oxlint/migrate':
-      specifier: 1.79.0
-      version: 1.79.0
-    '@oxlint/plugins':
       specifier: 1.79.0
       version: 1.79.0
     '@types/eslint-plugin-jsx-a11y':
@@ -453,6 +454,9 @@ importers:
       eslint-plugin-github:
         specifier: catalog:prod
         version: 6.1.2(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
+      eslint-plugin-i18next:
+        specifier: catalog:inline
+        version: 6.1.5
       eslint-plugin-import-x:
         specifier: catalog:prod
         version: 4.17.1(@typescript-eslint/utils@8.67.0(@typescript/typescript6@6.0.2)(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))(eslint-import-resolver-node@0.3.10(supports-color@7.2.0))(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
@@ -580,9 +584,6 @@ importers:
       '@oxlint/migrate':
         specifier: catalog:dev
         version: 1.79.0
-      '@oxlint/plugins':
-        specifier: catalog:dev
-        version: 1.79.0
       '@prettier/plugin-xml':
         specifier: catalog:peer
         version: 3.4.2(prettier@3.9.6)
@@ -643,9 +644,6 @@ importers:
       eslint-plugin-i18n-prefix:
         specifier: catalog:dev
         version: 0.0.6(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))
-      eslint-plugin-i18next:
-        specifier: catalog:inline
-        version: 6.1.5
       eslint-plugin-import-zod:
         specifier: catalog:peer
         version: 1.2.1(@typescript-eslint/utils@8.67.0(@typescript/typescript6@6.0.2)(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0))(eslint@10.8.1(jiti@2.7.0)(supports-color@7.2.0))
@@ -703,6 +701,9 @@ importers:
       oxlint-tsgolint:
         specifier: catalog:dev
         version: 7.0.2001
+      pkg-pr-new:
+        specifier: 'catalog:'
+        version: 0.0.88
       prettier-plugin-astro:
         specifier: catalog:peer
         version: 0.14.1
@@ -2000,10 +2001,6 @@ packages:
   '@oxlint/migrate@1.79.0':
     resolution: {integrity: sha512-6bNtxWlBlcGWSIQ0MD1NBzvFaiJMYwprCZmvMpsRrbH7Ex7IrlYhKXICyDVAHc4BB6WlNWmCj/pI3E3ktqNmvQ==}
     hasBin: true
-
-  '@oxlint/plugins@1.79.0':
-    resolution: {integrity: sha512-S0uyoxakDINJ4DPgqxGlEEvrdSMeQb7Z2lKVjxoY2gwsbZbfg2Xr8Klfeo5ZeraHmmdBCELFUHkSe6KEmBpMvg==}
-    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
   '@pkgr/core@0.3.6':
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
@@ -3932,6 +3929,7 @@ packages:
   eslint@9.39.5:
     resolution: {integrity: sha512-DgZS62aPLXKlnxILS/AYCoRvHaZeXceIzlXPkkGGzJWSow1aEk0lbTlxUSlyjC8jcaKxAdOnTDz+o1JFSBsyjw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -5135,6 +5133,10 @@ packages:
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
+
+  pkg-pr-new@0.0.88:
+    resolution: {integrity: sha512-Xc6PMJ2gher0WZP+rtjefFk26hIb7V1PTLL30bmy1Z2vsRmSvqiss7Ag1XUdyplTGYzIlFNJp4L3vMNmK44N6g==}
+    hasBin: true
 
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
@@ -7128,8 +7130,6 @@ snapshots:
       globals: 17.11.0
       oxc-parser: 0.144.0
       tinyglobby: 0.2.17
-
-  '@oxlint/plugins@1.79.0': {}
 
   '@pkgr/core@0.3.6': {}
 
@@ -10775,6 +10775,8 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.5: {}
+
+  pkg-pr-new@0.0.88: {}
 
   pkg-types@1.3.1:
     dependencies:

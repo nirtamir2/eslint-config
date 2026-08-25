@@ -38,31 +38,20 @@ export interface SharedFeaturePlan {
   type: "app" | "lib";
 }
 
-/**
- * Resolve a feature switch that a user may write as a boolean or as a sub-options object.
- *
- * Generic over the caller's own option type so each feature keeps its declared shape
- * instead of being widened at this boundary.
- */
-function resolveEnabled<TOption>(option: TOption, fallback: boolean): boolean {
-  if (option == null) return fallback;
-  return !Object.is(option, false);
+function resolveEnabled(option: unknown, fallback: boolean): boolean {
+  return option == null ? fallback : option !== false;
 }
 
 export function resolveSharedFeaturePlan(
   input: SharedFeatureInput,
   environment: FeatureEnvironment,
 ): SharedFeaturePlan {
-  // SAFETY: one entry is built per feature name, so the record covers every key.
   const enabled = Object.fromEntries([
     ["unicorn", resolveEnabled(input.unicorn, true)],
     ["jsx", resolveEnabled(input.jsx, true)],
     [
       "typescript",
-      resolveEnabled(
-        input.typescript,
-        environment.hasPackage("typescript"),
-      ),
+      resolveEnabled(input.typescript, environment.hasPackage("typescript")),
     ],
     ["test", resolveEnabled(input.test, true)],
     [

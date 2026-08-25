@@ -10,13 +10,18 @@ packages:
 overrides:
   "@typescript-eslint/utils": 8.67.0
   semver: ^7.8.5
+allowBuilds:
+  esbuild: true
+  simple-git-hooks: true
+  unrs-resolver: true
+catalog:
+  pkg-pr-new: 0.0.88
 catalogs:
   dev:
     "@antfu/ni": ^30.5.0
     "@eslint/config-inspector": ^3.3.0
     "@naturacosmeticos/eslint-plugin-i18n-checker": ^1.0.1
     "@oxlint/migrate": 1.79.0
-    "@oxlint/plugins": 1.79.0
     "@types/eslint-plugin-jsx-a11y": ^6.10.1
     "@types/fs-extra": ^11.0.4
     "@types/node": ^26.2.0
@@ -138,7 +143,3 @@ catalogs:
     vue-eslint-parser: ^10.4.1
     yaml-eslint-parser: ^2.1.0
     yargs: ^18.1.0
-allowBuilds:
-  esbuild: true
-  simple-git-hooks: true
-  unrs-resolver: true

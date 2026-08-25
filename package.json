@@ -15,7 +15,6 @@
     ".": "./dist/index.mjs",
     "./cli": "./dist/cli.mjs",
     "./oxlint": "./dist/oxlint.mjs",
-    "./oxlint-anti-slop": "./dist/oxlint-anti-slop.mjs",
     "./package.json": "./package.json"
   },
   "types": "./dist/index.d.mts",
@@ -38,7 +37,6 @@
     "prepare": "simple-git-hooks",
     "release": "bumpp --tag eslint-config-v%s",
     "stub": "tsdown",
-    "sync:anti-slop": "tsx scripts/sync-anti-slop.ts",
     "test": "vitest",
     "test:oxlint-package": "tsx scripts/test-oxlint-package.ts",
     "type-check": "tsc --noEmit",
@@ -51,6 +49,7 @@
     "@angular-eslint/eslint-plugin-template": "^22.1.0",
     "@angular-eslint/template-parser": "^22.1.0",
     "@eslint-react/eslint-plugin": "^5.18.6",
+    "@next/eslint-plugin-next": "^16.3.1",
     "@prettier/plugin-xml": "^3.4.2",
     "@tanstack/eslint-plugin-query": "^5.101.4",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
@@ -66,6 +65,7 @@
     "eslint-plugin-perfectionist": "^5.10.1",
     "eslint-plugin-react-refresh": "^0.5.4",
     "eslint-plugin-react-you-might-not-need-an-effect": "^1.0.1",
+    "eslint-plugin-security": "^4.0.1",
     "eslint-plugin-solid": "^0.15.0",
     "eslint-plugin-storybook": "^10.5.9",
     "eslint-plugin-svelte": "^3.23.0",
@@ -200,6 +200,7 @@
     "eslint-plugin-eslint-comments": "catalog:prod",
     "eslint-plugin-expect-type": "catalog:prod",
     "eslint-plugin-github": "catalog:prod",
+    "eslint-plugin-i18next": "catalog:inline",
     "eslint-plugin-import-x": "catalog:prod",
     "eslint-plugin-jsdoc": "catalog:prod",
     "eslint-plugin-jsonc": "catalog:prod",
@@ -244,7 +245,6 @@
     "@next/eslint-plugin-next": "catalog:peer",
     "@nirtamir2/eslint-config": "workspace:*",
     "@oxlint/migrate": "catalog:dev",
-    "@oxlint/plugins": "catalog:dev",
     "@prettier/plugin-xml": "catalog:peer",
     "@tanstack/eslint-plugin-query": "catalog:peer",
     "@trivago/prettier-plugin-sort-imports": "catalog:peer",
@@ -265,7 +265,6 @@
     "eslint-plugin-i18n-checker": "catalog:dev",
     "eslint-plugin-i18n-json": "catalog:dev",
     "eslint-plugin-i18n-prefix": "catalog:dev",
-    "eslint-plugin-i18next": "catalog:inline",
     "eslint-plugin-import-zod": "catalog:peer",
     "eslint-plugin-jsx-a11y": "catalog:peer",
     "eslint-plugin-perfectionist": "catalog:prod",
@@ -285,6 +284,7 @@
     "lint-staged": "catalog:dev",
     "oxlint": "catalog:dev",
     "oxlint-tsgolint": "catalog:dev",
+    "pkg-pr-new": "catalog:",
     "prettier-plugin-astro": "catalog:peer",
     "prettier-plugin-slidev": "catalog:peer",
     "rimraf": "catalog:dev",
@@ -308,10 +308,5 @@
   },
   "lint-staged": {
     "*": "eslint --fix"
-  },
-  "inlinedDependencies": {
-    "@oxlint/plugins": "1.79.0",
-    "eslint-plugin-i18next": "6.1.5",
-    "requireindex": "1.1.0"
   }
 }

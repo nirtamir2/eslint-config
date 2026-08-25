@@ -1,0 +1,4 @@
+const alpha = 1;
+const zebra = 2;
+
+export { zebra, alpha };

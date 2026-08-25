@@ -1,0 +1,7 @@
+<script setup>
+await Promise.resolve();
+</script>
+
+<template>
+  <main />
+</template>

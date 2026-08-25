@@ -1,45 +1,8 @@
 import type { OxlintConfig, OxlintOverride } from "oxlint";
 import type { TypedFlatConfigItem } from "../../src/types";
 
-/**
- * Any value that can appear inside an Oxlint or ESLint config once it has been reduced
- * to plain JSON, which is the only shape this module walks.
- */
-export type ConfigValue =
-  | Array<ConfigValue>
-  | boolean
-  | null
-  | number
-  | string
-  | { [key: string]: ConfigValue | undefined };
-
-/**
-A config section keyed by property name, such as a rule map.
-*/
-export type ConfigRecord = Record<string, ConfigValue | undefined>;
-
-/**
- * Reinterpret a schema-typed config object as the plain JSON this module walks.
- *
- * Oxlint and ESLint config types are JSON schema types — no methods, classes or
- * symbols — but TypeScript will not assign an interface to an index-signature type,
- * so the conversion is stated once here instead of at every call site.
- */
-function asConfigValue<TValue>(value: TValue): ConfigValue {
-  // SAFETY: callers pass config data that is about to be serialized as JSON.
-  return value as ConfigValue;
-}
-
-/**
-Array form of {@link asConfigValue}.
-*/
-function asConfigValues<TValue>(
-  values: ReadonlyArray<TValue>,
-): Array<ConfigValue> {
-  return values.map((value) => asConfigValue(value));
-}
-
 const scopeMarkerPrefix = "__nirtamir2_oxlint_scope_";
+const disabledRuleMarker = "__nirtamir2_oxlint_disabled_rule__";
 const mergeableObjectKeys = [
   "categories",
   "env",
@@ -48,16 +11,10 @@ const mergeableObjectKeys = [
   "rules",
   "settings",
 ] as const;
-const mergeableArrayKeys = [
-  "ignorePatterns",
-  "jsPlugins",
-  "plugins",
-] as const;
+const mergeableArrayKeys = ["jsPlugins", "plugins"] as const;
 const oxlintGlobTranslations = [
-  [
-    "?([cm])[jt]s?(x)",
-    "{js,jsx,mjs,mjsx,cjs,cjsx,ts,tsx,mts,mtsx,cts,ctsx}",
-  ],
+  ["([tj])s?(x)", "{js,jsx,ts,tsx}"],
+  ["?([cm])[jt]s?(x)", "{js,jsx,mjs,mjsx,cjs,cjsx,ts,tsx,mts,mtsx,cts,ctsx}"],
   ["?([cm])jsx", "{jsx,mjsx,cjsx}"],
   ["?([cm])tsx", "{tsx,mtsx,ctsx}"],
   ["?([cm])js", "{js,mjs,cjs}"],
@@ -77,13 +34,130 @@ export interface PreparedMigrationSource {
   scopes: ReadonlyMap<string, SourceScope>;
 }
 
+function isDisabledRuleValue(value: unknown): boolean {
+  const severity = Array.isArray(value) ? value[0] : value;
+  return severity === 0 || severity === "off";
+}
+
+function splitPluginRuleName(
+  rule: string,
+): { pluginName: string; ruleName: string } | undefined {
+  const segments = rule.split("/");
+  if (segments.length < 2) return undefined;
+  const pluginSegments = rule.startsWith("@") ? 2 : 1;
+  return {
+    pluginName: segments.slice(0, pluginSegments).join("/"),
+    ruleName: segments.slice(pluginSegments).join("/"),
+  };
+}
+
+function registeredPluginRuleNames(
+  source: Array<TypedFlatConfigItem>,
+): ReadonlyMap<string, ReadonlySet<string> | undefined> {
+  const plugins = new Map<string, ReadonlySet<string> | undefined>();
+  for (const config of source) {
+    const configuredPlugins = Object.entries(config.plugins ?? {});
+    for (const [name, plugin] of configuredPlugins) {
+      const rules =
+        plugin != null &&
+        typeof plugin === "object" &&
+        "rules" in plugin &&
+        plugin.rules != null &&
+        typeof plugin.rules === "object"
+          ? new Set(Object.keys(plugin.rules))
+          : undefined;
+      plugins.set(name, rules);
+    }
+  }
+  return plugins;
+}
+
+function canMarkDisabledRule(
+  rule: string,
+  pluginRules: ReadonlyMap<string, ReadonlySet<string> | undefined>,
+): boolean {
+  const pluginRule = splitPluginRuleName(rule);
+  if (pluginRule == null) return true;
+  const registeredRules = pluginRules.get(pluginRule.pluginName);
+  return registeredRules == null
+    ? !pluginRules.has(pluginRule.pluginName)
+    : registeredRules.has(pluginRule.ruleName);
+}
+
+export function markDisabledRulesForMigration(
+  source: Array<TypedFlatConfigItem>,
+): Array<TypedFlatConfigItem> {
+  const pluginRules = registeredPluginRuleNames(source);
+  return source.map((config) => ({
+    ...config,
+    ...(config.rules != null && {
+      rules: Object.fromEntries(
+        Object.entries(config.rules).map(([rule, value]) => [
+          rule,
+          isDisabledRuleValue(value) && canMarkDisabledRule(rule, pluginRules)
+            ? ["warn", { [disabledRuleMarker]: true }]
+            : value,
+        ]),
+      ),
+    }),
+  }));
+}
+
+function hasDisabledRuleMarker(value: unknown): boolean {
+  return (
+    Array.isArray(value) &&
+    value.some(
+      (entry) =>
+        entry != null &&
+        typeof entry === "object" &&
+        Object.hasOwn(entry, disabledRuleMarker),
+    )
+  );
+}
+
+function restoreDisabledRuleMarkers(
+  rules: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+  return rules == null
+    ? undefined
+    : Object.fromEntries(
+        Object.entries(rules).map(([rule, value]) => [
+          rule,
+          hasDisabledRuleMarker(value) ? "off" : value,
+        ]),
+      );
+}
+
+export function restoreDisabledRulesAfterMigration(
+  config: OxlintConfig,
+): OxlintConfig {
+  return {
+    ...config,
+    ...(config.rules != null && {
+      rules: restoreDisabledRuleMarkers(config.rules),
+    }),
+    ...(config.overrides != null && {
+      overrides: config.overrides.map((override) => ({
+        ...override,
+        ...(override.rules != null && {
+          rules: restoreDisabledRuleMarkers(override.rules),
+        }),
+      })),
+    }),
+  } as OxlintConfig;
+}
+
 export function translateOxlintGlob(glob: string): string {
   let translated = glob;
   for (const [extglob, braceGlob] of oxlintGlobTranslations) {
     translated = translated.replaceAll(extglob, () => braceGlob);
   }
+  translated = translated.replaceAll(
+    /@\(([^()]*)\)/gu,
+    (_match, alternatives) => `{${String(alternatives).replaceAll("|", ",")}}`,
+  );
 
-  if (translated.includes("?(")) {
+  if (/[!+?*@]\(/u.test(translated)) {
     throw new Error(`Unsupported ESLint extglob in Oxlint generation: ${glob}`);
   }
   return translated;
@@ -106,7 +180,6 @@ function normalizeSourceFiles(
     );
   }
 
-  // SAFETY: the guard above rejected every nested AND-glob array, so only strings remain.
   return files as Array<string>;
 }
 
@@ -124,13 +197,13 @@ export function prepareMigrationSource(
       const clone = {
         ...config,
         ...(config.rules != null && {
-              rules: Object.fromEntries(
-                Object.entries(config.rules).map(([rule, value]) => [
-                  rule,
-                  Array.isArray(value) ? [...value] : value,
-                ]),
-              ),
-            }),
+          rules: Object.fromEntries(
+            Object.entries(config.rules).map(([rule, value]) => [
+              rule,
+              Array.isArray(value) ? [...value] : value,
+            ]),
+          ),
+        }),
       };
 
       if (clone.files == null && defaultRuleFiles != null && hasRules(clone)) {
@@ -163,7 +236,9 @@ function restoreOverrideScope(
   const markers = override.files.filter((file) => scopes.has(file));
   if (markers.length === 0) return override;
   if (markers.length > 1) {
-    throw new Error("A migrated Oxlint override contains multiple scope markers");
+    throw new Error(
+      "A migrated Oxlint override contains multiple scope markers",
+    );
   }
 
   const scope = scopes.get(markers[0]);
@@ -192,61 +267,56 @@ export function restoreMigrationScopes(
   };
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
-function normalizeRuleValue(value: ConfigValue): ConfigValue {
+function normalizeRuleValue(value: unknown): unknown {
   const disabledRuleValues = new Set<unknown>([0, "allow", "off"]);
-  if (
-    Array.isArray(value) &&
-    disabledRuleValues.has(value[0])
-  ) {
+  if (Array.isArray(value) && disabledRuleValues.has(value[0])) {
     return "off";
   }
   return value;
 }
 
 function normalizeRules(
-  rules: ConfigRecord | undefined,
-): ConfigRecord | undefined {
+  rules: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
   if (rules == null) return undefined;
   return Object.fromEntries(
     Object.entries(rules).map(([rule, value]) => [
       rule,
-      value === undefined ? undefined : normalizeRuleValue(value),
+      normalizeRuleValue(value),
     ]),
   );
 }
 
 function normalizeDisabledRuleArrays(config: OxlintConfig): OxlintConfig {
-  // SAFETY: only rule maps are rewritten below; every other key is spread through.
   return {
     ...config,
-    // SAFETY: a rule map is a plain JSON object keyed by rule id.
-    ...(config.rules != null && { rules: normalizeRules(config.rules as ConfigRecord) }),
+    ...(config.rules != null && { rules: normalizeRules(config.rules) }),
     ...(config.overrides != null && {
-          overrides: config.overrides.map((override) => ({
-            ...override,
-            ...(override.rules != null && {
-                  // SAFETY: Oxlint override rule maps are plain JSON objects.
-                  rules: normalizeRules(override.rules as ConfigRecord),
-                }),
-          })),
+      overrides: config.overrides.map((override) => ({
+        ...override,
+        ...(override.rules != null && {
+          rules: normalizeRules(override.rules as Record<string, unknown>),
         }),
+      })),
+    }),
   } as OxlintConfig;
 }
 
 function translateConfigGlobs(config: OxlintConfig): OxlintConfig {
   return {
     ...config,
-    ...(config.ignorePatterns != null && { ignorePatterns: translateOxlintGlobs(config.ignorePatterns) }),
+    ...(config.ignorePatterns != null && {
+      ignorePatterns: translateOxlintGlobs(config.ignorePatterns),
+    }),
     ...(config.overrides != null && {
-          overrides: config.overrides.map((override) => ({
-            ...override,
-            ...(override.excludeFiles != null && {
-                  excludeFiles: translateOxlintGlobs(override.excludeFiles),
-                }),
-            files: translateOxlintGlobs(override.files),
-          })),
+      overrides: config.overrides.map((override) => ({
+        ...override,
+        ...(override.excludeFiles != null && {
+          excludeFiles: translateOxlintGlobs(override.excludeFiles),
         }),
+        files: translateOxlintGlobs(override.files),
+      })),
+    }),
   };
 }
 
@@ -264,8 +334,7 @@ function stripMigrationBaseline(config: OxlintConfig): OxlintConfig {
   };
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
-function removeEmptyValues(value: ConfigValue): ConfigValue | undefined {
+function removeEmptyValues(value: unknown): unknown {
   if (Array.isArray(value)) {
     const entries = value
       .map((entry) => removeEmptyValues(entry))
@@ -275,10 +344,7 @@ function removeEmptyValues(value: ConfigValue): ConfigValue | undefined {
 
   if (value != null && typeof value === "object") {
     const entries = Object.entries(value)
-      .map(
-        ([key, entry]) =>
-          [key, entry === undefined ? undefined : removeEmptyValues(entry)] as const,
-      )
+      .map(([key, entry]) => [key, removeEmptyValues(entry)] as const)
       .filter(([, entry]) => entry !== undefined);
     return entries.length === 0 ? undefined : Object.fromEntries(entries);
   }
@@ -286,25 +352,22 @@ function removeEmptyValues(value: ConfigValue): ConfigValue | undefined {
   return value;
 }
 
-function stableValueKey(value: ConfigValue): string {
+function stableValueKey(value: unknown): string {
   return JSON.stringify(value);
 }
 
-function sortArrayValues(values: Array<ConfigValue>): Array<ConfigValue> {
+function sortArrayValues(values: Array<unknown>): Array<unknown> {
   return [
-    ...new Map(
-      values.map((value) => [stableValueKey(value), value]),
-    ).values(),
+    ...new Map(values.map((value) => [stableValueKey(value), value])).values(),
   ].toSorted((left, right) =>
     stableValueKey(left).localeCompare(stableValueKey(right)),
   );
 }
 
-// eslint-disable-next-line sonarjs/function-return-type -- walks arbitrary config JSON
 export function sortGeneratedValue(
-  value: ConfigValue,
+  value: unknown,
   parentKey?: string,
-): ConfigValue {
+): unknown {
   if (Array.isArray(value)) {
     const entries = value.map((entry) => sortGeneratedValue(entry));
     return parentKey === "jsPlugins" || parentKey === "plugins"
@@ -316,10 +379,7 @@ export function sortGeneratedValue(
     return Object.fromEntries(
       Object.entries(value)
         .toSorted(([left], [right]) => left.localeCompare(right))
-        .map(([key, entry]) => [
-          key,
-          entry === undefined ? undefined : sortGeneratedValue(entry, key),
-        ]),
+        .map(([key, entry]) => [key, sortGeneratedValue(entry, key)]),
     );
   }
 
@@ -330,7 +390,6 @@ export function normalizeOxlintConfig(
   input: OxlintConfig,
   stripBaseline: boolean,
 ): OxlintConfig {
-  // SAFETY: widening by one optional key that the Oxlint schema permits but omits.
   const withoutSchema = { ...input } as OxlintConfig & {
     $schema?: string;
   };
@@ -341,52 +400,52 @@ export function normalizeOxlintConfig(
     ? stripMigrationBaseline(normalizedRules)
     : normalizedRules;
   const translatedGlobs = translateConfigGlobs(withoutBaseline);
-  const withoutEmptyValues = removeEmptyValues(asConfigValue(translatedGlobs)) ?? {};
+  const withoutEmptyValues = removeEmptyValues(translatedGlobs) ?? {};
 
-  // SAFETY: sorting and pruning preserve the config shape; only key order changes.
   return sortGeneratedValue(withoutEmptyValues) as OxlintConfig;
 }
 
 function appendUnique(
-  current: Array<ConfigValue> | undefined,
-  incoming: Array<ConfigValue>,
-): Array<ConfigValue> {
+  current: Array<unknown> | undefined,
+  incoming: Array<unknown>,
+): Array<unknown> {
   const values = [...(current ?? []), ...incoming];
-  return [...new Map(values.map((value) => [stableValueKey(value), value])).values()];
+  return [
+    ...new Map(values.map((value) => [stableValueKey(value), value])).values(),
+  ];
 }
 
-export function mergeOxlintConfigs(
-  configs: Array<OxlintConfig>,
-): OxlintConfig {
-  const result: ConfigRecord = {};
+export function mergeOxlintConfigs(configs: Array<OxlintConfig>): OxlintConfig {
+  const result = {} as Record<string, unknown>;
 
   for (const config of configs) {
-    // SAFETY: OxlintConfig is a JSON schema type, so it is structurally a ConfigRecord.
-    const record = config as ConfigRecord;
+    const record = config as Record<string, unknown>;
+
+    if (config.ignorePatterns != null)
+      result.ignorePatterns = [
+        ...((result.ignorePatterns as Array<string> | undefined) ?? []),
+        ...config.ignorePatterns,
+      ];
 
     for (const key of mergeableObjectKeys) {
       const value = record[key];
       if (value == null) continue;
       result[key] = {
-        // SAFETY: mergeableObjectKeys only names keys whose schema type is an object.
-        ...(result[key] as ConfigRecord | undefined),
-        // SAFETY: as above, for the incoming config's value at the same key.
-        ...(value as ConfigRecord),
+        ...(result[key] as Record<string, unknown> | undefined),
+        ...(value as Record<string, unknown>),
       };
     }
 
     for (const key of mergeableArrayKeys) {
       const value = record[key];
       if (!Array.isArray(value)) continue;
-      // SAFETY: mergeableArrayKeys only names keys whose schema type is an array.
-      result[key] = appendUnique(result[key] as Array<ConfigValue>, value);
+      result[key] = appendUnique(result[key] as Array<unknown>, value);
     }
 
     if (config.overrides != null) {
       result.overrides = [
-        // SAFETY: `overrides` is only ever written by this branch, as an override array.
-        ...((result.overrides as Array<ConfigValue> | undefined) ?? []),
-        ...asConfigValues(config.overrides),
+        ...((result.overrides as Array<OxlintOverride> | undefined) ?? []),
+        ...config.overrides,
       ];
     }
   }

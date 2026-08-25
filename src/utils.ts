@@ -58,7 +58,6 @@ export async function combine(
  * ```
  */
 export function renameRules(
-  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- mirrors ESLint's own Linter type, which is deliberately open: plugins and rule options are third-party shapes this package cannot enumerate
   rules: Record<string, any>,
   map: Record<string, string>,
 ) {
@@ -151,7 +150,6 @@ export async function interopDefault<T>(
   m: Awaitable<T>,
 ): Promise<T extends { default: infer U } ? U : T> {
   const resolved = await m;
-  // SAFETY: the return type already encodes the "unwrap .default if present" branch.
   return (resolved as any).default || resolved;
 }
 
@@ -165,7 +163,6 @@ export function isPackageInScope(name: string): boolean {
 export async function ensurePackages(packages: Array<string | undefined>) {
   if (process.env.CI || !process.stdout.isTTY || !isCwdInScope) return;
 
-  // SAFETY: the predicate drops every undefined entry.
   const nonExistingPackages = packages.filter(
     (index) => index && !isPackageInScope(index),
   ) as Array<string>;

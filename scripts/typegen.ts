@@ -4,7 +4,6 @@ import { builtinRules } from "eslint/use-at-your-own-risk";
 import {
   a11y,
   angular,
-  antiSlop,
   astro,
   combine,
   command,
@@ -56,7 +55,6 @@ const configs = await combine(
   ],
   a11y(),
   angular(),
-  antiSlop(),
   astro(),
   command(),
   comments(),
@@ -95,7 +93,6 @@ const configs = await combine(
   yaml(),
 );
 
-// SAFETY: filter(Boolean) removed every undefined name.
 const configNames = configs
   .map((index) => index?.name)
   .filter(Boolean) as Array<string>;

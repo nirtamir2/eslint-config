@@ -8,6 +8,8 @@ Implemented and verified.
 
 2026-07-12
 
+Last reconciled with the implementation on 2026-08-24.
+
 ## Context
 
 `@nirtamir2/eslint-config` is an ESLint 10 flat-config package whose public
@@ -48,8 +50,10 @@ explicit maintainer generation workflow rather than the user runtime.
   behavior.
 - Reject ESLint-only or unsupported options instead of silently ignoring them.
 - Keep ESLint rules and presets as the sole manually maintained rule source.
-- Ship native Oxlint rules only in v1. Defer JavaScript-plugin fallbacks until
-  their runtime compatibility is proven separately.
+- Export the maximum executable JavaScript and TypeScript coverage: prefer
+  native Oxlint rules, add native type-aware rules through `oxlint-tsgolint`,
+  and use reviewed JavaScript-plugin fallbacks where Oxlint lacks a native
+  implementation.
 - Produce deterministic generated artifacts and a reviewable compatibility
   report.
 - Prevent a release from silently losing previously supported rules or
@@ -143,9 +147,12 @@ import { recommended } from "@nirtamir2/eslint-config/oxlint";
 export default recommended;
 ```
 
-`recommended` contains the application base plus the default Unicorn fragment.
-It includes no JSX, test, or framework fragment and performs no package
-auto-detection.
+`recommended` contains the default application base, the full recommended
+Unicorn fragment, command rules, the application/non-editor e18e variant,
+RegExp rules at error level, and the tail fragment containing
+default-import-name plus compatible Prettier and file-scoped disables. It
+includes no JSX, test, TypeScript, or framework fragment and performs no
+package auto-detection or consumer-filesystem gitignore discovery.
 
 ### Option contract
 
@@ -153,40 +160,64 @@ auto-detection.
 `Partial<OptionsConfig>`. This ensures that ESLint-only options do not become
 accidental public promises.
 
-The initial required option surface covers:
+The public option surface covers:
 
-- Structural behavior: `type`, `ignores`, and root `rules`.
-- Native-capable integrations: `typescript`, `jsx`, `react`, `nextjs`, `test`,
-  `vue`, `unicorn`, and `jsdoc`.
-- `overrides` sub-options where the corresponding integration supports native
-  Oxlint rule overrides.
-- `typescript.typeAware` rather than ESLint's `tsconfigPath`.
+- Structural behavior: `type`, `isInEditor`, `gitignore`, `ignores`,
+  `javascript.overrides`, `lessOpinionated`, and root `rules`. Ignore arrays
+  append to generated defaults; an ignore transformer can replace that default
+  list.
+- Native, mixed, and JavaScript-plugin-backed integrations: `angular`, `e18e`,
+  `i18n`, `jsdoc`, `jsx`, `nextjs`, `perfectionist`, `query`, `react`, `regexp`,
+  `security`, `solid`, `storybook`, `stylistic`, `tailwindcss`, `test`,
+  `typescript`, `tsdoc`, `unocss`, `unicorn`, `vue`, and `zod`.
+- `overrides` sub-options for integrations whose generated shape supports rule
+  overrides.
+- TypeScript controls: `erasableOnly`, native `typeAware` rather than ESLint's
+  `tsconfigPath`, `filesTypeAware`, `ignoresTypeAware`, and
+  `overridesTypeAware`.
+- Integration-specific controls: the three e18e rule families,
+  `unicorn.allRecommended`, `regexp.level`, `vue.vueVersion`, Stylistic brace,
+  experimental, indentation, JSX, quote, and semicolon choices,
+  `tailwindcss.entryPoint`, and `unocss.attributify`/`unocss.strict`.
+
+`isInEditor` preserves the source config's editor severity variants. Oxlint
+does not expose ESLint's per-rule autofix suppression, so editor mode cannot
+turn off fixes independently of a rule's severity.
 
 All other current ESLint integrations are compatibility candidates. A
 candidate enters `OxlintOptions` only through an intentional API change after
-its native fragment passes the compatibility gates in this document. A future
-JavaScript fallback would require a separately reviewed policy change. The
-public type never changes merely because a new migrator version happens to
-emit more rules.
+its native or JavaScript-plugin-backed fragment passes the compatibility gates
+in this document. The public type never changes merely because a new migrator
+version happens to emit more rules.
 
-The initial API explicitly excludes options whose defining behavior depends
+The API explicitly excludes options whose defining behavior depends entirely
 on unsupported custom languages, parsers, processors, or formatter execution,
-including `angular`, `formatters`, `jsonc`, `markdown`, `pnpm`, `stylistic`,
-`toml`, and `yaml`. Other candidates remain excluded until admitted by the
-same compatibility process.
+including `astro`, `formatters`, `jsonc`, `markdown`, `pnpm`, `svelte`, `toml`,
+and `yaml`. JSON/package/tsconfig sorting is also excluded because it depends on
+JSONC parsing. Angular exports its TypeScript-only subset, while i18n exports its
+JavaScript/TypeScript literal-string subset, including JSX/TSX; their template,
+JSON, validator, and processor behavior stays explicitly out of scope.
 
-Vue support is documented as script-block support. It does not promise ESLint
-template-processor parity.
+Vue support is documented as script-block support, Angular as TypeScript-only,
+and i18n as JavaScript/TypeScript, including JSX/TSX. None promises template,
+JSON, validator, or processor parity. More generally, the export covers
+JavaScript, TypeScript, JSX, TSX, and supported Vue script blocks. It does not
+claim
+executable parity for JSON, JSONC, JSON5, YAML, TOML, or Markdown; custom
+framework templates or blocks; processor-created virtual files; or formatter
+execution.
 
 User-provided `rules` and trailing configs use Oxlint-native plugin and rule
 names. No migration runs at user startup.
 
 ### Auto-detection
 
-The factory conditionally adds the default Unicorn and JSX/test fragments,
-then adds supported TypeScript, Next.js, and Vue fragments using the existing
-package auto-detection behavior when their options are omitted. React and
-JSDoc remain opt-in. Unsupported integrations are never auto-enabled.
+The factory conditionally adds the default Unicorn, JSX, test, e18e, and
+RegExp fragments, then adds supported TypeScript, Next.js, Vue, Query,
+Storybook, Tailwind CSS, and Zod fragments using package auto-detection when
+their options are omitted. Angular, i18n, React, JSDoc, Perfectionist, Security,
+Solid, Stylistic, TSDoc, and UnoCSS remain opt-in. Unsupported integrations are
+never auto-enabled.
 
 To avoid maintaining orchestration twice, extract shared, linter-independent
 feature detection and ordering from the current ESLint factory. Both factories
@@ -208,14 +239,14 @@ It contains no ESLint plugin objects, Oxlint plugin names, or rule maps.
 
 ### 2. Capability manifest
 
-A small handwritten Oxlint capability manifest owns semantic decisions that a
-migration tool cannot infer:
+A small handwritten, publicly exported `oxlintCapabilities` manifest owns
+semantic decisions that a migration tool cannot infer. It has one entry for
+every ESLint config producer and records:
 
-- Public option key.
-- Native, partial, or unsupported classification.
-- Required peer dependency, when applicable.
-- Supported generated variants.
-- Documented limitations.
+- Native, JavaScript-plugin, mixed, or unsupported classification.
+- ESLint default and package/file detection behavior.
+- Runtime plugin packages, when applicable.
+- Documented semantic limitations.
 
 The manifest contains no rule lists. It is adapter metadata, not a second
 configuration.
@@ -230,21 +261,38 @@ feature boundaries and makes compatibility changes attributable.
 The generator must:
 
 1. Resolve only declared variants.
-2. Use native Oxlint implementations only in v1.
+2. Run the pinned migrator per variant with JavaScript plugins and nursery
+   coverage enabled; select type-aware migration only for declared type-aware
+   TypeScript variants.
 3. Preserve source `files` and `ignores` scopes in the generated fragment
    metadata and Oxlint overrides.
-4. Normalize disabled rule arrays such as `["off", options]` to a bare
+4. Temporarily mark explicit disabled rules with a valid severity so the
+   migrator can map native IDs, aliases, and only rules it recognizes, then
+   restore the mapped values to a bare `off`. Validate rule names exposed by
+   source-registered JavaScript plugins before marking them; migrate the
+   Prettier producer in native-only mode so compatible disables do not pull in
+   formatting-only plugin packages.
+5. Normalize disabled rule arrays such as `["off", options]` to a bare
    disabled severity so Oxlint does not validate inactive ESLint-only options.
-5. Translate supported ESLint extglobs to Oxlint-compatible brace globs and
+6. Translate supported ESLint extglobs to Oxlint-compatible brace globs and
    fail on any unrecognized extglob instead of emitting an inert file scope.
-6. Normalize output deterministically.
-7. Feed the normalized config to pinned CLI compatibility validation.
-8. Emit config fragments and compatibility metadata.
-9. Fail on unreviewed compatibility drift.
+7. Normalize output deterministically.
+8. Preserve compatible per-variant JavaScript-plugin entries emitted by the
+   migrator.
+9. Recover reviewed rules from native/reserved plugin namespaces through
+   explicit aliases when Oxlint does not yet implement them natively.
+10. Exclude rules that require unsupported parsers, processors, TypeScript
+    parser services in JavaScript plugins, or legacy ESLint APIs.
+11. Feed the normalized config to pinned CLI compatibility validation.
+12. Emit config fragments and compatibility metadata.
+13. Fail on unreviewed compatibility drift.
 
-JavaScript-plugin output from the migrator is discarded in v1. A future
-fallback must use an explicitly reviewed package specifier and alias rather
-than trusting a guessed migrator value.
+The effective migration settings are `withNursery: true`, the variant's
+declared type-aware setting, and `jsPlugins: true` for executable linter
+producers. The Prettier compatibility source is deliberately native-only;
+reviewed Unicorn aliases are recovered separately. Plugin aliases and manually
+recovered rules are reviewed adaptations, not unbounded guesses based on
+package names.
 
 ### 4. Generated artifacts
 
@@ -256,7 +304,9 @@ Generated output lives under a clearly marked directory such as
 - Oxlint and migrator versions.
 - Per-integration migrated and skipped rule counts.
 - Skipped rules grouped by reason.
-- Supported, partial, and unsupported capability classifications.
+- Explicit migration warnings and deliberate adaptations.
+- Supported or partial variant classifications. A variant is partial whenever
+  it has skipped rules, a migration warning, or a deliberate omission.
 
 Generated modules are TypeScript data modules so the normal build can bundle
 and type-check them. Every generated file starts with a do-not-edit notice.
@@ -270,18 +320,36 @@ The runtime Oxlint factory imports only:
 
 - Generated Oxlint data.
 - Shared feature detection and ordering.
-- Lightweight option validation and composition helpers.
+- Lightweight option validation, synchronous gitignore conversion,
+  JavaScript-plugin resolution, and composition helpers.
 
-It must not import ESLint, ESLint plugins, or `@oxlint/migrate`.
+It must not import this package's ESLint config producer modules, ESLint itself,
+or `@oxlint/migrate`. The runtime additionally uses
+`eslint-config-flat-gitignore` to materialize project ignore patterns; Oxlint
+loads only the explicitly generated JavaScript-plugin packages required by the
+selected fragments.
 
 The factory:
 
 1. Validates option keys and values.
 2. Resolves supported auto-detection.
-3. Selects generated fragments and variants in shared order.
-4. Applies root ignores and rules.
-5. Appends user configs.
-6. Returns one plain Oxlint config object.
+3. Loads `.gitignore`/`.gitmodules` patterns by default with non-strict missing
+   file behavior; `gitignore: false` disables this filesystem step, while
+   Oxlint's own directory discovery still honors `.gitignore` independently
+   and currently has no switch to disable that filtering; explicitly named
+   files may still be selected.
+4. Selects generated fragments and variants in shared order.
+5. Resolves generated JavaScript-plugin specifiers relative to the installed
+   package, preserving aliases and leaving user-supplied trailing configs
+   untouched.
+6. Adds a safety override that disables generated JavaScript-plugin rules for
+   `**/*.d.{ts,mts,cts}` while leaving native TypeScript and native type-aware
+   rules enabled.
+7. Applies root rules after the safety override. Ignore customization is
+   folded into the base before feature fragments are composed.
+8. Appends user configs, allowing an explicit later rule to re-enable a
+   JavaScript-plugin rule for declaration files.
+9. Returns one plain Oxlint config object.
 
 ## Variant strategy
 
@@ -291,7 +359,16 @@ that change emitted rules or config shape.
 Examples include:
 
 - Application versus library rule deltas.
-- TypeScript disabled, enabled, and type-aware behavior.
+- TypeScript standard, type-aware, erasable/non-erasable, and sentinel-based
+  custom type-aware scope templates. Runtime substitution changes only the
+  source `filesTypeAware`/`ignoresTypeAware` positions, preserving declaration,
+  test, and CommonJS override ordering. In standard mode, custom
+  `ignoresTypeAware` values retarget the final TypeScript rule maps that consume
+  the same source option even without parser services.
+- Editor/non-editor base and test behavior; independently composable e18e
+  modernization, module-replacement, and performance families.
+- Vue 2 and Vue 3 script variants, plus JavaScript/TypeScript branches.
+- Stylistic opinionation, JSX, and primitive customization deltas.
 - Framework JavaScript versus TypeScript fragments where the source config
   differs.
 
@@ -303,8 +380,7 @@ the option can be published.
 
 Native Oxlint plugins always take precedence over ESLint JavaScript plugins.
 
-The initial release does not publish JavaScript-plugin fallbacks. A future
-fallback may be admitted only when:
+JavaScript-plugin fallback rules are admitted only when:
 
 - No adequate native implementation covers the selected rules.
 - The plugin handles file kinds that Oxlint supports for that integration.
@@ -313,9 +389,26 @@ fallback may be admitted only when:
 - Relevant fixtures produce expected diagnostics.
 - Its known limitations are published.
 
-Any future supported JavaScript plugin would be a peer dependency because
-package specifiers inside imported Oxlint config objects resolve in the
-consumer environment. This policy does not add such peers in v1.
+Generated plugin specifiers are converted to package-anchored absolute module
+paths with `import.meta.resolve`, so bundled fallbacks resolve correctly under
+strict package-manager layouts regardless of the consumer config's location.
+Fallbacks used by always-on and package-owned fragments are regular package
+dependencies. Plugins used only by opt-in or auto-detected external
+integrations remain optional peers, and the runtime reports the exact missing
+package with an install-or-disable error.
+
+JavaScript plugins remain an alpha Oxlint capability. Their compatibility and
+performance depend on their ESLint API usage and implementation. They cannot
+provide custom parsers or processors, and JavaScript-plugin rules requiring
+TypeScript parser services remain unsupported even when native type-aware
+linting is enabled.
+
+Oxlint's JavaScript-plugin runtime currently crashes on some declaration-only
+AST nodes. The factory therefore turns off every generated JavaScript-plugin
+rule for `**/*.d.{ts,mts,cts}`. This does not disable native TypeScript or
+`oxlint-tsgolint` rules. Root user rules and trailing configs are deliberately
+composed afterward so consumers can opt back in when a specific plugin/runtime
+combination is known to be safe.
 
 ## Failure and compatibility policy
 
@@ -323,7 +416,8 @@ Generation fails closed on:
 
 - Migrator crashes.
 - Invalid Oxlint configuration.
-- Unexpected JavaScript-plugin output in a native-only artifact.
+- JavaScript plugins that fail to load or exercise unsupported APIs in a
+  declared supported fragment.
 - Schema or load failures.
 - Unexpected skipped-rule drift.
 - A compatibility regression in an already supported integration.
@@ -334,6 +428,9 @@ At runtime:
   error.
 - Features requiring an optional runtime companion, such as type-aware
   linting, produce a targeted installation error when it is unavailable.
+- Enabled fragments whose optional JavaScript plugin cannot be resolved name
+  the missing package and instruct the user to install it or disable the
+  integration.
 - User rule configuration is left to Oxlint's own validation.
 - The factory never silently falls back to ESLint.
 
@@ -358,7 +455,8 @@ Compatibility changes follow public API semantics:
 
 ### Compatibility tests
 
-- Every native integration loads under pinned Oxlint.
+- Every native, mixed, and JavaScript-plugin integration loads under pinned
+  Oxlint.
 - Representative fixtures assert diagnostics, not only successful parsing.
 - Framework combinations cover ordering interactions such as React with
   TypeScript and Vue with TypeScript.
@@ -371,6 +469,8 @@ Compatibility changes follow public API semantics:
   overrides, and ordering.
 - A consumer fixture imports the published `./oxlint` entry from a real
   `oxlint.config.ts`.
+- The consumer fixture verifies that generated JavaScript plugins resolve from
+  the installed package under a strict dependency layout.
 - The static `recommended` export and factory-with-no-options behavior are
   tested separately.
 
@@ -405,7 +505,7 @@ documents:
 - Unsupported ESLint features.
 - Peer dependency requirements.
 
-The initial `./oxlint` export is additive. Subsequent capability removals obey
+The `./oxlint` export is additive. Subsequent capability removals obey
 the package's breaking-change policy.
 
 ## Alternatives considered
@@ -454,7 +554,7 @@ require package-specific declarations even when rule conversion is generic.
 - The package can add Oxlint capabilities incrementally without overpromising
   unsupported ESLint behavior.
 - The published runtime does not import ESLint or the migrator, although the
-  same-package v1 retains the package's existing ESLint install footprint.
+  same package retains its existing ESLint install footprint.
 
 ### Costs
 
@@ -462,8 +562,8 @@ require package-specific declarations even when rule conversion is generic.
   fixtures.
 - Oxlint and migrator upgrades require deliberate regeneration and review.
 - Some familiar ESLint options remain unavailable in the Oxlint entry.
-- JavaScript-plugin fallbacks remain deferred work requiring peer dependency
-  and compatibility maintenance if later adopted.
+- JavaScript-plugin fallbacks add runtime dependency, compatibility, and
+  performance maintenance.
 - Shared feature detection requires a targeted refactor of the current ESLint
   factory.
 
@@ -477,52 +577,3 @@ require package-specific declarations even when rule conversion is generic.
   https://oxc.rs/docs/guide/usage/linter/config.html#extend-shared-configs
 - Oxlint JavaScript plugins:
   https://oxc.rs/docs/guide/usage/linter/js-plugins.html
-
----
-
-## Addendum — hand-written fragments and the native-only constraint (2026-08-20)
-
-The original design states that the Oxlint config is native-only and loads no
-JavaScript plugins. That constraint is relaxed by one opt-in option, `antiSlop`.
-
-### What changed
-
-- **Hand-written fragments are now a supported category.** Every fragment used to come
-  from `scripts/oxlint/generate.ts` via `@oxlint/migrate`. `src/oxlint/anti-slop.ts` is
-  written by hand instead, because anti-slop has no ESLint source config to migrate
-  from. It does not participate in `pnpm generate:oxlint`, and
-  `pnpm check:oxlint-generated` is unaffected.
-- **`jsPlugins` is now emitted.** `composeOxlintConfigs` already merged `jsPlugins`
-  (dedupe by name, `null` clears); `antiSlop` is its first producer.
-- **The package now publishes a plugin, not only a config.** `./oxlint-anti-slop`
-  exports the compiled plugin. `@oxlint/plugins` is a devDependency so tsdown inlines
-  it, leaving the plugin bundle free of runtime imports and consumers with nothing
-  extra to install.
-
-### Why it stays opt-in
-
-Oxlint's JS plugin support is alpha and outside semver, JS rules cost lint time that
-native Rust rules do not, and the rules themselves are aggressive enough to fail most
-existing codebases. `recommended` is unchanged, and the default factory output is
-unchanged.
-
-### Plugin resolution
-
-`resolveAntiSlopSpecifier()` returns an absolute path, picking the first of
-`./oxlint-anti-slop.mjs` (published layout, beside the bundled `dist/oxlint.mjs`) and
-`../oxlint-plugins/anti-slop/index.ts` (source layout, so Vitest works pre-build) that
-exists on disk.
-
-Oxlint 1.79 does resolve bare subpath specifiers through package `exports` — this was
-verified — but an absolute path cannot be affected by hoisting, by pnpm's strict
-`node_modules`, or by a workspace package that inherits this config without depending
-on it directly. `antiSlop.specifier` overrides it for consumers who vendor their own
-copy, which is what upstream recommends.
-
-### Vendoring
-
-`src/oxlint-plugins/anti-slop/` is byte-identical to upstream and excluded from this
-repo's Prettier and ESLint runs so it stays diffable. `src/oxlint-plugins/anti-slop-rule-names.ts`
-is the single source of truth for the rule list, and `test/anti-slop.test.ts` fails if
-it drifts from the plugin. `pnpm sync:anti-slop` re-vendors from a pinned commit
-recorded in `UPSTREAM.md`; it is a maintainer tool and is not run in CI.

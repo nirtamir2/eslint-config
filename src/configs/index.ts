@@ -1,5 +1,4 @@
 export * from "./a11y";
-export * from "./anti-slop";
 export * from "./angular";
 export * from "./astro";
 export * from "./command";

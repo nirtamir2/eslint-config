@@ -1,0 +1,3 @@
+export function Link() {
+  return <a href="javascript:alert('unsafe')">Open</a>;
+}

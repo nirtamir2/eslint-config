@@ -70,12 +70,12 @@ export default nirtamir2(
     },
     {
       ignores: [
-        // Vendored verbatim from dmmulroy/anti-slop; kept byte-identical upstream.
-        "src/oxlint-plugins/anti-slop",
+        "fixtures/oxlint-native",
         "fixtures/input",
         "fixtures/jsx-a11y-errors",
         "fixtures/jsx-a11y-valid",
         "_fixtures",
+        "src/generated",
       ],
     },
   ],

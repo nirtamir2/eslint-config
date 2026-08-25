@@ -1,25 +1,4 @@
-import type {
-  ExternalPluginEntry,
-  OxlintConfig,
-  OxlintOverride,
-} from "oxlint";
-
-/**
-A config section keyed by property name, such as a rule map or a settings block.
-*/
-type ConfigEntries = Record<string, ConfigEntryValue>;
-
-/**
-Any value reachable inside an Oxlint config, which is plain JSON by construction.
-*/
-type ConfigEntryValue =
-  | Array<ConfigEntryValue>
-  | boolean
-  | null
-  | number
-  | string
-  | { [key: string]: ConfigEntryValue | undefined }
-  | undefined;
+import type { ExternalPluginEntry, OxlintConfig, OxlintOverride } from "oxlint";
 
 function mergeUnique<T>(
   current: Array<T> | undefined,
@@ -33,22 +12,15 @@ function jsPluginKey(plugin: ExternalPluginEntry): string {
 }
 
 function cloneValue<T>(value: T): T {
-  if (Array.isArray(value))
-    // SAFETY: mapping an array of T's element type yields the same array type.
-    return value.map((item) => cloneValue(item)) as T;
+  if (Array.isArray(value)) return value.map((item) => cloneValue(item)) as T;
   if (Object.is(value, null) || typeof value !== "object") return value;
 
   const prototype = Object.getPrototypeOf(value);
-  if (
-    !Object.is(prototype, Object.prototype) &&
-    !Object.is(prototype, null)
-  )
+  if (!Object.is(prototype, Object.prototype) && !Object.is(prototype, null))
     return value;
 
-  // SAFETY: the guards above narrowed `value` to a plain object literal, and cloning
-  // each entry preserves its type.
   return Object.fromEntries(
-    Object.entries(value as ConfigEntries).map(([key, item]) => [
+    Object.entries(value as Record<string, unknown>).map(([key, item]) => [
       key,
       cloneValue(item),
     ]),
@@ -78,20 +50,16 @@ function replayRootRulePrecedence(
   overrides: OxlintConfig["overrides"],
   incomingRules: NonNullable<OxlintConfig["rules"]>,
 ): void {
-  // SAFETY: an Oxlint rule map is a plain object keyed by rule id.
-  const incomingRuleEntries = incomingRules as ConfigEntries;
+  const incomingRuleEntries = incomingRules as Record<string, unknown>;
 
   const currentOverrides = overrides ?? [];
   for (const override of currentOverrides) {
     if (!override.rules) continue;
 
-    // SAFETY: an override's rule map is a plain object keyed by rule id.
-    const scopedRuleEntries = override.rules as ConfigEntries;
+    const scopedRuleEntries = override.rules as Record<string, unknown>;
     for (const ruleName of Object.keys(scopedRuleEntries)) {
       if (Object.hasOwn(incomingRuleEntries, ruleName))
-        scopedRuleEntries[ruleName] = cloneValue(
-          incomingRuleEntries[ruleName],
-        );
+        scopedRuleEntries[ruleName] = cloneValue(incomingRuleEntries[ruleName]);
     }
   }
 }
@@ -102,15 +70,14 @@ function mergeDirectConfig(result: OxlintConfig, config: OxlintConfig): void {
       ...result.categories,
       ...cloneValue(config.categories),
     };
-  if (config.env)
-    result.env = { ...result.env, ...cloneValue(config.env) };
+  if (config.env) result.env = { ...result.env, ...cloneValue(config.env) };
   if (config.globals)
     result.globals = { ...result.globals, ...cloneValue(config.globals) };
   if (config.ignorePatterns)
-    result.ignorePatterns = mergeUnique(
-      result.ignorePatterns,
-      config.ignorePatterns,
-    );
+    result.ignorePatterns = [
+      ...(result.ignorePatterns ?? []),
+      ...cloneValue(config.ignorePatterns),
+    ];
   if (Object.is(config.jsPlugins, null)) result.jsPlugins = null;
   else if (config.jsPlugins)
     result.jsPlugins = mergeJsPlugins(result.jsPlugins, config.jsPlugins);
@@ -142,7 +109,11 @@ function mergeConfig(
   ancestors.add(config);
   const extendedConfigs = config.extends ?? [];
   for (const extended of extendedConfigs) {
-    if (extended == null || typeof extended !== "object" || Array.isArray(extended))
+    if (
+      extended == null ||
+      typeof extended !== "object" ||
+      Array.isArray(extended)
+    )
       throw new TypeError(
         "Import extended Oxlint configs as objects before passing them to nirtamir2()",
       );

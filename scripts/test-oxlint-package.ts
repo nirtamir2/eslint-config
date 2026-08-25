@@ -6,11 +6,6 @@ import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
 
-/**
-The subset of a package manifest's `exports` map this script inspects.
-*/
-type PackageExports = Record<string, string | undefined>;
-
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const fixtureRoot = path.join(repoRoot, "fixtures", "oxlint-consumer");
 const temporaryRoot = await fs.mkdtemp(
@@ -35,10 +30,6 @@ try {
   await fs.rename(
     path.join(consumerRoot, "src", "invalid.ts.fixture"),
     path.join(consumerRoot, "src", "invalid.ts"),
-  );
-  await fs.rename(
-    path.join(consumerRoot, "src", "slop.ts.fixture"),
-    path.join(consumerRoot, "src", "slop.ts"),
   );
   await fs.writeFile(
     path.join(consumerRoot, "package.json"),
@@ -81,19 +72,11 @@ try {
     "@nirtamir2",
     "eslint-config",
   );
-  // SAFETY: only `exports` is read, and each lookup is compared against a literal.
   const installedManifest = JSON.parse(
     await fs.readFile(path.join(installedPackageRoot, "package.json"), "utf8"),
-  ) as { exports?: PackageExports };
+  ) as { exports?: Record<string, unknown> };
 
-  assert.equal(
-    installedManifest.exports?.["./oxlint"],
-    "./dist/oxlint.mjs",
-  );
-  assert.equal(
-    installedManifest.exports?.["./oxlint-anti-slop"],
-    "./dist/oxlint-anti-slop.mjs",
-  );
+  assert.equal(installedManifest.exports?.["./oxlint"], "./dist/oxlint.mjs");
 
   await execa("pnpm", ["exec", "tsc", "--noEmit"], {
     cwd: consumerRoot,
@@ -105,9 +88,11 @@ try {
     installedPackageRoot,
     path.join(installedPackageRoot, "dist", "oxlint.mjs"),
   );
-  await assertRuntimeGraphIsLightweight(
-    installedPackageRoot,
-    path.join(installedPackageRoot, "dist", "oxlint-anti-slop.mjs"),
+
+  await assertInstalledJsPluginResolvesFromConsumer(
+    consumerRoot,
+    "@e18e/eslint-plugin",
+    "e18e",
   );
 
   const recommendedRun = await execa(
@@ -118,6 +103,7 @@ try {
       "--config",
       "oxlint.recommended.config.ts",
       "src/valid.ts",
+      "src/types.d.ts",
     ],
     {
       all: true,
@@ -142,23 +128,7 @@ try {
   );
   assert.notEqual(factoryRun.exitCode, 0, "Expected Oxlint to report an error");
   assert.match(factoryRun.all, /no-debugger/u);
-
-  // Proves the vendored JS plugin resolves and loads from a real node_modules install.
-  const antiSlopRun = await execa(
-    "pnpm",
-    ["exec", "oxlint", "--config", "oxlint.anti-slop.config.ts", "src/slop.ts"],
-    {
-      all: true,
-      cwd: consumerRoot,
-      reject: false,
-    },
-  );
-  assert.notEqual(
-    antiSlopRun.exitCode,
-    0,
-    `Expected the packed anti-slop plugin to report an error:\n${antiSlopRun.all}`,
-  );
-  assert.match(antiSlopRun.all, /anti-slop\(no-reflect-get\)/u);
+  assert.match(factoryRun.all, /e18e\(prefer-date-now\)/u);
 
   process.stdout.write("Packed Oxlint consumer passed.\n");
 } finally {
@@ -212,7 +182,65 @@ async function assertRuntimeGraphIsLightweight(
   }
 }
 
+async function assertInstalledJsPluginResolvesFromConsumer(
+  consumerRoot: string,
+  packageName: string,
+  pluginName: string,
+): Promise<void> {
+  const inspectedConfig = await execa(
+    "node",
+    [
+      "--input-type=module",
+      "--eval",
+      `
+        import oxlint from "@nirtamir2/eslint-config/oxlint";
+
+        const config = oxlint({
+          e18e: true,
+          jsdoc: false,
+          jsx: false,
+          nextjs: false,
+          react: false,
+          regexp: false,
+          test: false,
+          typescript: false,
+          unicorn: false,
+          vue: false,
+        });
+        process.stdout.write(JSON.stringify(config.jsPlugins ?? []));
+      `,
+    ],
+    { cwd: consumerRoot },
+  );
+  const entries = JSON.parse(inspectedConfig.stdout) as Array<
+    string | { name: string; specifier: string }
+  >;
+  const entry = entries.find(
+    (candidate): candidate is { name: string; specifier: string } =>
+      typeof candidate !== "string" && candidate.name === pluginName,
+  );
+
+  assert.ok(entry, `The packed config did not export the ${pluginName} plugin`);
+  assert.equal(
+    entry.specifier.includes(packageName),
+    true,
+    `The ${pluginName} entry does not point at ${packageName}: ${entry.specifier}`,
+  );
+
+  const [realConsumerRoot, realPluginPath] = await Promise.all([
+    fs.realpath(consumerRoot),
+    fs.realpath(entry.specifier),
+  ]);
+  const relativePluginPath = path.relative(realConsumerRoot, realPluginPath);
+  assert.equal(
+    relativePluginPath.startsWith("..") || path.isAbsolute(relativePluginPath),
+    false,
+    `The packed ${pluginName} plugin resolved outside the consumer install: ${entry.specifier}`,
+  );
+}
+
 function isForbiddenRuntimeImport(specifier: string): boolean {
+  if (specifier === "eslint-config-flat-gitignore") return false;
   return (
     specifier === "@oxlint/migrate" ||
     specifier.startsWith("@oxlint/migrate/") ||
@@ -223,7 +251,6 @@ function isForbiddenRuntimeImport(specifier: string): boolean {
 async function readInstalledPackageVersion(
   packageName: string,
 ): Promise<string> {
-  // SAFETY: only `version` is read, and the guard below rejects a non-string value.
   const manifest = JSON.parse(
     await fs.readFile(
       path.join(repoRoot, "node_modules", packageName, "package.json"),

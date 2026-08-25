@@ -147,8 +147,6 @@ export async function typescript(
     };
   }
 
-  // SAFETY: the literal below is a flat-config array; the assertion only pins the
-  // rule-name unions that TypeScript widens to `string` inside object literals.
   return [
     {
       // Install the plugins without globs, so they can be configured separately.

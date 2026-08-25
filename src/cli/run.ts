@@ -31,12 +31,9 @@ export interface CliRunOptions {
 
 export async function run(options: CliRunOptions = {}) {
   const argumentSkipPrompt = Boolean(process.env.SKIP_PROMPT) || options.yes;
-  // SAFETY: `frameworks` is already typed as FrameworkOption values; trimming
-  // whitespace does not change which member of the union each entry is.
   const argumentTemplate = options.frameworks?.map((m) =>
     m.trim(),
   ) as Array<FrameworkOption>;
-  // SAFETY: as above, for the ExtraLibrariesOption union.
   const argumentExtra = options.extra?.map((m) =>
     m.trim(),
   ) as Array<ExtraLibrariesOption>;
@@ -57,7 +54,6 @@ export async function run(options: CliRunOptions = {}) {
   };
 
   if (!argumentSkipPrompt) {
-    // SAFETY: the prompt group below supplies every key of PromptResult.
     result = (await p.group(
       {
         uncommittedConfirmed: async () => {

@@ -27,8 +27,6 @@ import {
 import { StylisticConfigDefaults } from "./stylistic";
 
 function mergePrettierOptions<
-  // The constraint lets callers pass any Prettier option bag; T pins the real shape.
-  // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- third-party shape
   T extends Record<string, any> & { parser: string },
 >(options: VendoredPrettierOptions, overrides: T): VendoredPrettierOptions & T {
   return {
@@ -36,8 +34,7 @@ function mergePrettierOptions<
     ...overrides,
     plugins: [
       ...(overrides.plugins || []),
-      // SAFETY: dprint plugin entries are module specifiers.
-    ...((options.plugins as Array<string>) || []),
+      ...((options.plugins as Array<string>) || []),
     ],
   };
 }

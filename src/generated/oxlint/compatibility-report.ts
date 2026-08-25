@@ -13,40 +13,43 @@ export type OxlintSkippedRuleCategory =
   | "unsupported";
 
 export interface OxlintVariantCompatibility {
+  adaptations: Array<string>;
+  jsPlugins: boolean;
   migratedRuleCount: number;
   skippedRules: Record<OxlintSkippedRuleCategory, Array<string>>;
   sources: Array<string>;
   status: "partial" | "supported";
+  withNursery: boolean;
   warnings: Array<string>;
 }
 
 export interface OxlintCompatibilityReport {
   generation: {
-    jsPlugins: false;
+    jsPlugins: "per-variant";
     typeAware: "per-variant";
-    withNursery: false;
+    withNursery: true;
   };
   limitations: Array<{
     classification: OxlintLimitationClassification;
     description: string;
     id: string;
   }>;
-  schemaVersion: 1;
+  schemaVersion: 3;
   variants: Record<string, OxlintVariantCompatibility>;
   versions: { migrate: string; oxlint: string };
 }
 
 export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
   "generation": {
-    "jsPlugins": false,
+    "jsPlugins": "per-variant",
     "typeAware": "per-variant",
-    "withNursery": false
+    "withNursery": true
   },
   "limitations": [
     {
-      "classification": "intentional-v1",
-      "description": "Only rules implemented natively by Oxlint are emitted; JavaScript plugin fallbacks are withheld in v1.",
-      "id": "native-only-v1"
+      "classification": "runtime-requirement",
+      "description": "Compatible ESLint rules without native Oxlint implementations are emitted through Oxlint's JavaScript-plugin runtime and require their plugin packages.",
+      "id": "javascript-plugin-fallbacks"
     },
     {
       "classification": "upstream",
@@ -72,603 +75,373 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "classification": "runtime-requirement",
       "description": "Type-aware variants require oxlint-tsgolint at runtime and set options.typeAware.",
       "id": "type-aware-runtime"
+    },
+    {
+      "classification": "upstream",
+      "description": "JavaScript plugins cannot access TypeScript parser services in Oxlint. React therefore reuses its parser-service-independent fallback fragment when native TypeScript type-aware rules are enabled.",
+      "id": "javascript-plugin-parser-services"
+    },
+    {
+      "classification": "upstream",
+      "description": "Custom ESLint parsers and processors are not executable by Oxlint; JSONC, YAML, TOML, Markdown, framework templates, and formatter execution remain ESLint-only.",
+      "id": "custom-language-runtime"
     }
   ],
-  "schemaVersion": 1,
+  "schemaVersion": 3,
   "variants": {
+    "angular.typescript": {
+      "adaptations": [
+        "Angular HTML templates and the inline-template processor are omitted because Oxlint cannot execute the Angular template parser or processors; executable TypeScript rules are retained."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 13,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "angular.typescript"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
     "base.default": {
-      "migratedRuleCount": 114,
-      "skippedRules": {
-        "js-plugins": [
-          "@eslint-community/eslint-comments/no-aggregating-enable",
-          "@eslint-community/eslint-comments/no-duplicate-disable",
-          "@eslint-community/eslint-comments/no-unlimited-disable",
-          "@eslint-community/eslint-comments/no-unused-enable",
-          "antfu/import-dedupe",
-          "antfu/no-import-dist",
-          "antfu/no-import-node-modules-by-path",
-          "antfu/no-top-level-await",
-          "array-func/avoid-reverse",
-          "array-func/from-map",
-          "array-func/no-unnecessary-this-arg",
-          "array-func/prefer-array-from",
-          "clsx/forbid-array-expressions",
-          "clsx/forbid-false-inside-object-expressions",
-          "clsx/forbid-true-inside-object-expressions",
-          "clsx/no-redundant-clsx",
-          "clsx/no-spreading",
-          "clsx/prefer-merged-neighboring-elements",
-          "github/array-foreach",
-          "github/async-currenttarget",
-          "github/async-preventdefault",
-          "github/get-attribute",
-          "github/no-blur",
-          "github/no-dynamic-script-tag",
-          "github/no-implicit-buggy-globals",
-          "github/no-inner-html",
-          "github/no-innerText",
-          "github/no-useless-passive",
-          "github/prefer-observers",
-          "github/require-passive-events",
-          "github/unescaped-html-literal",
-          "no-use-extend-native/no-use-extend-native",
-          "optimize-regex/optimize-regex",
-          "sonarjs/anchor-precedence",
-          "sonarjs/argument-type",
-          "sonarjs/arguments-order",
-          "sonarjs/array-callback-without-return",
-          "sonarjs/assertions-in-test-cases",
-          "sonarjs/assertions-in-tests",
-          "sonarjs/async-test-assertions",
-          "sonarjs/aws-apigateway-public-api",
-          "sonarjs/aws-ec2-rds-dms-public",
-          "sonarjs/aws-ec2-unencrypted-ebs-volume",
-          "sonarjs/aws-efs-unencrypted",
-          "sonarjs/aws-iam-all-privileges",
-          "sonarjs/aws-iam-privilege-escalation",
-          "sonarjs/aws-iam-public-access",
-          "sonarjs/aws-opensearchservice-domain",
-          "sonarjs/aws-rds-unencrypted-databases",
-          "sonarjs/aws-restricted-ip-admin-access",
-          "sonarjs/aws-s3-bucket-granted-access",
-          "sonarjs/aws-s3-bucket-insecure-http",
-          "sonarjs/aws-s3-bucket-public-access",
-          "sonarjs/aws-s3-bucket-versioning",
-          "sonarjs/aws-sagemaker-unencrypted-notebook",
-          "sonarjs/aws-sns-unencrypted-topics",
-          "sonarjs/aws-sqs-unencrypted-queue",
-          "sonarjs/bitwise-operators",
-          "sonarjs/block-scoped-var",
-          "sonarjs/call-argument-line",
-          "sonarjs/chai-determinate-assertion",
-          "sonarjs/class-name",
-          "sonarjs/code-eval",
-          "sonarjs/cognitive-complexity",
-          "sonarjs/comma-or-logical-or-case",
-          "sonarjs/concise-regex",
-          "sonarjs/constructor-for-side-effects",
-          "sonarjs/content-length",
-          "sonarjs/content-security-policy",
-          "sonarjs/cookie-no-httponly",
-          "sonarjs/cors",
-          "sonarjs/csrf",
-          "sonarjs/deprecation",
-          "sonarjs/different-types-comparison",
-          "sonarjs/disabled-auto-escaping",
-          "sonarjs/disabled-resource-integrity",
-          "sonarjs/disabled-timeout",
-          "sonarjs/dompurify-unsafe-config",
-          "sonarjs/duplicates-in-character-class",
-          "sonarjs/dynamically-constructed-templates",
-          "sonarjs/empty-string-repetition",
-          "sonarjs/encryption-secure-mode",
-          "sonarjs/existing-groups",
-          "sonarjs/explicit-test-skip",
-          "sonarjs/file-permissions",
-          "sonarjs/file-uploads",
-          "sonarjs/fixme-tag",
-          "sonarjs/for-loop-increment-sign",
-          "sonarjs/function-inside-loop",
-          "sonarjs/function-return-type",
-          "sonarjs/future-reserved-words",
-          "sonarjs/generator-without-yield",
-          "sonarjs/hardcoded-secret-signatures",
-          "sonarjs/hashing",
-          "sonarjs/hooks-before-test-cases",
-          "sonarjs/in-operator-type-error",
-          "sonarjs/inconsistent-function-call",
-          "sonarjs/index-of-compare-to-positive-number",
-          "sonarjs/insecure-cookie",
-          "sonarjs/insecure-jwt-token",
-          "sonarjs/inverted-assertion-arguments",
-          "sonarjs/jsx-no-leaked-render",
-          "sonarjs/label-position",
-          "sonarjs/link-with-target-blank",
-          "sonarjs/max-switch-cases",
-          "sonarjs/memoize-cache-key",
-          "sonarjs/misplaced-loop-counter",
-          "sonarjs/new-operator-misuse",
-          "sonarjs/no-all-duplicated-branches",
-          "sonarjs/no-alphabetical-sort",
-          "sonarjs/no-angular-bypass-sanitization",
-          "sonarjs/no-array-delete",
-          "sonarjs/no-associative-arrays",
-          "sonarjs/no-async-constructor",
-          "sonarjs/no-case-label-in-switch",
-          "sonarjs/no-clear-text-protocols",
-          "sonarjs/no-code-after-done",
-          "sonarjs/no-collection-size-mischeck",
-          "sonarjs/no-control-regex",
-          "sonarjs/no-dead-store",
-          "sonarjs/no-debug-commands-in-ui-tests",
-          "sonarjs/no-default-utility-imports",
-          "sonarjs/no-delete-var",
-          "sonarjs/no-duplicate-in-composite",
-          "sonarjs/no-duplicate-test-title",
-          "sonarjs/no-duplicated-branches",
-          "sonarjs/no-element-overwrite",
-          "sonarjs/no-empty-after-reluctant",
-          "sonarjs/no-empty-alternatives",
-          "sonarjs/no-empty-character-class",
-          "sonarjs/no-empty-collection",
-          "sonarjs/no-empty-group",
-          "sonarjs/no-empty-test-file",
-          "sonarjs/no-empty-test-title",
-          "sonarjs/no-equals-in-for-termination",
-          "sonarjs/no-exclusive-tests",
-          "sonarjs/no-extra-arguments",
-          "sonarjs/no-fallthrough",
-          "sonarjs/no-fixed-wait-in-tests",
-          "sonarjs/no-floating-point-equality",
-          "sonarjs/no-forced-browser-interaction",
-          "sonarjs/no-global-this",
-          "sonarjs/no-globals-shadowing",
-          "sonarjs/no-gratuitous-expressions",
-          "sonarjs/no-hardcoded-ip",
-          "sonarjs/no-hardcoded-passwords",
-          "sonarjs/no-hardcoded-secrets",
-          "sonarjs/no-hook-setter-in-body",
-          "sonarjs/no-identical-conditions",
-          "sonarjs/no-identical-expressions",
-          "sonarjs/no-identical-functions",
-          "sonarjs/no-ignored-exceptions",
-          "sonarjs/no-ignored-return",
-          "sonarjs/no-implicit-global",
-          "sonarjs/no-in-misuse",
-          "sonarjs/no-incompatible-assertion-types",
-          "sonarjs/no-incomplete-assertions",
-          "sonarjs/no-internal-api-use",
-          "sonarjs/no-interpolation-in-inline-snapshots",
-          "sonarjs/no-invalid-regexp",
-          "sonarjs/no-invariant-returns",
-          "sonarjs/no-inverted-boolean-check",
-          "sonarjs/no-labels",
-          "sonarjs/no-literal-call",
-          "sonarjs/no-mime-sniff",
-          "sonarjs/no-misleading-array-reverse",
-          "sonarjs/no-misleading-character-class",
-          "sonarjs/no-mixed-completion-style",
-          "sonarjs/no-nested-assignment",
-          "sonarjs/no-nested-conditional",
-          "sonarjs/no-nested-functions",
-          "sonarjs/no-nested-template-literals",
-          "sonarjs/no-os-command-from-path",
-          "sonarjs/no-parameter-reassignment",
-          "sonarjs/no-primitive-wrappers",
-          "sonarjs/no-redundant-assignments",
-          "sonarjs/no-redundant-boolean",
-          "sonarjs/no-redundant-jump",
-          "sonarjs/no-redundant-optional",
-          "sonarjs/no-referrer-policy",
-          "sonarjs/no-regex-spaces",
-          "sonarjs/no-same-argument-assert",
-          "sonarjs/no-same-line-conditional",
-          "sonarjs/no-selector-parameter",
-          "sonarjs/no-session-cookies-on-static-assets",
-          "sonarjs/no-skipped-tests",
-          "sonarjs/no-small-switch",
-          "sonarjs/no-table-as-layout",
-          "sonarjs/no-trivial-assertions",
-          "sonarjs/no-try-promise",
-          "sonarjs/no-undefined-argument",
-          "sonarjs/no-unenclosed-multiline-block",
-          "sonarjs/no-uniq-key",
-          "sonarjs/no-unthrown-error",
-          "sonarjs/no-unused-collection",
-          "sonarjs/no-unused-vars",
-          "sonarjs/no-use-of-empty-return-value",
-          "sonarjs/no-useless-catch",
-          "sonarjs/no-useless-increment",
-          "sonarjs/no-useless-intersection",
-          "sonarjs/no-useless-react-setstate",
-          "sonarjs/no-weak-cipher",
-          "sonarjs/no-weak-keys",
-          "sonarjs/non-existent-operator",
-          "sonarjs/null-dereference",
-          "sonarjs/object-alt-content",
-          "sonarjs/parameterized-tests",
-          "sonarjs/post-message",
-          "sonarjs/prefer-default-last",
-          "sonarjs/prefer-native-lodash-alternative",
-          "sonarjs/prefer-promise-shorthand",
-          "sonarjs/prefer-read-only-props",
-          "sonarjs/prefer-regexp-exec",
-          "sonarjs/prefer-single-boolean-return",
-          "sonarjs/prefer-specific-assertions",
-          "sonarjs/prefer-type-guard",
-          "sonarjs/prefer-while",
-          "sonarjs/production-debug",
-          "sonarjs/pseudo-random",
-          "sonarjs/public-static-readonly",
-          "sonarjs/publicly-writable-directories",
-          "sonarjs/reduce-initial-value",
-          "sonarjs/redundant-type-aliases",
-          "sonarjs/regex-complexity",
-          "sonarjs/review-blockchain-mnemonic",
-          "sonarjs/session-regeneration",
-          "sonarjs/single-char-in-character-classes",
-          "sonarjs/single-character-alternation",
-          "sonarjs/slow-regex",
-          "sonarjs/sql-queries",
-          "sonarjs/stable-tests",
-          "sonarjs/stateful-regex",
-          "sonarjs/strict-transport-security",
-          "sonarjs/super-linear-regex",
-          "sonarjs/synchronous-suite-callback",
-          "sonarjs/table-header",
-          "sonarjs/table-header-reference",
-          "sonarjs/test-check-exception",
-          "sonarjs/todo-tag",
-          "sonarjs/unused-import",
-          "sonarjs/unused-named-groups",
-          "sonarjs/unverified-certificate",
-          "sonarjs/unverified-hostname",
-          "sonarjs/updated-const-var",
-          "sonarjs/updated-loop-counter",
-          "sonarjs/use-type-alias",
-          "sonarjs/void-use",
-          "sonarjs/weak-ssl",
-          "sonarjs/x-powered-by",
-          "sonarjs/xml-parser-xxe",
-          "unused-imports/no-unused-imports",
-          "unused-imports/no-unused-vars",
-          "workspaces/no-absolute-imports",
-          "workspaces/no-relative-imports",
-          "workspaces/require-dependency"
-        ],
-        "not-implemented": [
-          "n/no-deprecated-api",
-          "n/prefer-global/buffer",
-          "n/prefer-global/process",
-          "n/process-exit-as-throw",
-          "no-restricted-syntax"
-        ],
-        "nursery": [
-          "no-undef",
-          "no-unreachable-loop"
-        ],
-        "type-aware": [],
-        "unsupported": [
-          "no-dupe-args",
-          "no-octal",
-          "no-octal-escape",
-          "no-undef-init"
-        ]
-      },
-      "sources": [
-        "ignores",
-        "javascript",
-        "comments",
-        "node",
-        "imports"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ESLint import-sorting rules like `sort-imports` were not migrated because they conflict with Oxfmt's import sorting.\nUse Oxfmt's `sortImports` formatter option instead. It is based on `eslint-plugin-perfectionist/sort-imports`, is disabled by default, and will need to be enabled.\nhttps://oxc.rs/docs/guide/usage/formatter/sorting.html"
-      ]
-    },
-    "base.editor": {
-      "migratedRuleCount": 114,
-      "skippedRules": {
-        "js-plugins": [
-          "@eslint-community/eslint-comments/no-aggregating-enable",
-          "@eslint-community/eslint-comments/no-duplicate-disable",
-          "@eslint-community/eslint-comments/no-unlimited-disable",
-          "@eslint-community/eslint-comments/no-unused-enable",
-          "antfu/import-dedupe",
-          "antfu/no-import-dist",
-          "antfu/no-import-node-modules-by-path",
-          "antfu/no-top-level-await",
-          "array-func/avoid-reverse",
-          "array-func/from-map",
-          "array-func/no-unnecessary-this-arg",
-          "array-func/prefer-array-from",
-          "clsx/forbid-array-expressions",
-          "clsx/forbid-false-inside-object-expressions",
-          "clsx/forbid-true-inside-object-expressions",
-          "clsx/no-redundant-clsx",
-          "clsx/no-spreading",
-          "clsx/prefer-merged-neighboring-elements",
-          "github/array-foreach",
-          "github/async-currenttarget",
-          "github/async-preventdefault",
-          "github/get-attribute",
-          "github/no-blur",
-          "github/no-dynamic-script-tag",
-          "github/no-implicit-buggy-globals",
-          "github/no-inner-html",
-          "github/no-innerText",
-          "github/no-useless-passive",
-          "github/prefer-observers",
-          "github/require-passive-events",
-          "github/unescaped-html-literal",
-          "no-use-extend-native/no-use-extend-native",
-          "optimize-regex/optimize-regex",
-          "sonarjs/anchor-precedence",
-          "sonarjs/argument-type",
-          "sonarjs/arguments-order",
-          "sonarjs/array-callback-without-return",
-          "sonarjs/assertions-in-test-cases",
-          "sonarjs/assertions-in-tests",
-          "sonarjs/async-test-assertions",
-          "sonarjs/aws-apigateway-public-api",
-          "sonarjs/aws-ec2-rds-dms-public",
-          "sonarjs/aws-ec2-unencrypted-ebs-volume",
-          "sonarjs/aws-efs-unencrypted",
-          "sonarjs/aws-iam-all-privileges",
-          "sonarjs/aws-iam-privilege-escalation",
-          "sonarjs/aws-iam-public-access",
-          "sonarjs/aws-opensearchservice-domain",
-          "sonarjs/aws-rds-unencrypted-databases",
-          "sonarjs/aws-restricted-ip-admin-access",
-          "sonarjs/aws-s3-bucket-granted-access",
-          "sonarjs/aws-s3-bucket-insecure-http",
-          "sonarjs/aws-s3-bucket-public-access",
-          "sonarjs/aws-s3-bucket-versioning",
-          "sonarjs/aws-sagemaker-unencrypted-notebook",
-          "sonarjs/aws-sns-unencrypted-topics",
-          "sonarjs/aws-sqs-unencrypted-queue",
-          "sonarjs/bitwise-operators",
-          "sonarjs/block-scoped-var",
-          "sonarjs/call-argument-line",
-          "sonarjs/chai-determinate-assertion",
-          "sonarjs/class-name",
-          "sonarjs/code-eval",
-          "sonarjs/cognitive-complexity",
-          "sonarjs/comma-or-logical-or-case",
-          "sonarjs/concise-regex",
-          "sonarjs/constructor-for-side-effects",
-          "sonarjs/content-length",
-          "sonarjs/content-security-policy",
-          "sonarjs/cookie-no-httponly",
-          "sonarjs/cors",
-          "sonarjs/csrf",
-          "sonarjs/deprecation",
-          "sonarjs/different-types-comparison",
-          "sonarjs/disabled-auto-escaping",
-          "sonarjs/disabled-resource-integrity",
-          "sonarjs/disabled-timeout",
-          "sonarjs/dompurify-unsafe-config",
-          "sonarjs/duplicates-in-character-class",
-          "sonarjs/dynamically-constructed-templates",
-          "sonarjs/empty-string-repetition",
-          "sonarjs/encryption-secure-mode",
-          "sonarjs/existing-groups",
-          "sonarjs/explicit-test-skip",
-          "sonarjs/file-permissions",
-          "sonarjs/file-uploads",
-          "sonarjs/fixme-tag",
-          "sonarjs/for-loop-increment-sign",
-          "sonarjs/function-inside-loop",
-          "sonarjs/function-return-type",
-          "sonarjs/future-reserved-words",
-          "sonarjs/generator-without-yield",
-          "sonarjs/hardcoded-secret-signatures",
-          "sonarjs/hashing",
-          "sonarjs/hooks-before-test-cases",
-          "sonarjs/in-operator-type-error",
-          "sonarjs/inconsistent-function-call",
-          "sonarjs/index-of-compare-to-positive-number",
-          "sonarjs/insecure-cookie",
-          "sonarjs/insecure-jwt-token",
-          "sonarjs/inverted-assertion-arguments",
-          "sonarjs/jsx-no-leaked-render",
-          "sonarjs/label-position",
-          "sonarjs/link-with-target-blank",
-          "sonarjs/max-switch-cases",
-          "sonarjs/memoize-cache-key",
-          "sonarjs/misplaced-loop-counter",
-          "sonarjs/new-operator-misuse",
-          "sonarjs/no-all-duplicated-branches",
-          "sonarjs/no-alphabetical-sort",
-          "sonarjs/no-angular-bypass-sanitization",
-          "sonarjs/no-array-delete",
-          "sonarjs/no-associative-arrays",
-          "sonarjs/no-async-constructor",
-          "sonarjs/no-case-label-in-switch",
-          "sonarjs/no-clear-text-protocols",
-          "sonarjs/no-code-after-done",
-          "sonarjs/no-collection-size-mischeck",
-          "sonarjs/no-control-regex",
-          "sonarjs/no-dead-store",
-          "sonarjs/no-debug-commands-in-ui-tests",
-          "sonarjs/no-default-utility-imports",
-          "sonarjs/no-delete-var",
-          "sonarjs/no-duplicate-in-composite",
-          "sonarjs/no-duplicate-test-title",
-          "sonarjs/no-duplicated-branches",
-          "sonarjs/no-element-overwrite",
-          "sonarjs/no-empty-after-reluctant",
-          "sonarjs/no-empty-alternatives",
-          "sonarjs/no-empty-character-class",
-          "sonarjs/no-empty-collection",
-          "sonarjs/no-empty-group",
-          "sonarjs/no-empty-test-file",
-          "sonarjs/no-empty-test-title",
-          "sonarjs/no-equals-in-for-termination",
-          "sonarjs/no-exclusive-tests",
-          "sonarjs/no-extra-arguments",
-          "sonarjs/no-fallthrough",
-          "sonarjs/no-fixed-wait-in-tests",
-          "sonarjs/no-floating-point-equality",
-          "sonarjs/no-forced-browser-interaction",
-          "sonarjs/no-global-this",
-          "sonarjs/no-globals-shadowing",
-          "sonarjs/no-gratuitous-expressions",
-          "sonarjs/no-hardcoded-ip",
-          "sonarjs/no-hardcoded-passwords",
-          "sonarjs/no-hardcoded-secrets",
-          "sonarjs/no-hook-setter-in-body",
-          "sonarjs/no-identical-conditions",
-          "sonarjs/no-identical-expressions",
-          "sonarjs/no-identical-functions",
-          "sonarjs/no-ignored-exceptions",
-          "sonarjs/no-ignored-return",
-          "sonarjs/no-implicit-global",
-          "sonarjs/no-in-misuse",
-          "sonarjs/no-incompatible-assertion-types",
-          "sonarjs/no-incomplete-assertions",
-          "sonarjs/no-internal-api-use",
-          "sonarjs/no-interpolation-in-inline-snapshots",
-          "sonarjs/no-invalid-regexp",
-          "sonarjs/no-invariant-returns",
-          "sonarjs/no-inverted-boolean-check",
-          "sonarjs/no-labels",
-          "sonarjs/no-literal-call",
-          "sonarjs/no-mime-sniff",
-          "sonarjs/no-misleading-array-reverse",
-          "sonarjs/no-misleading-character-class",
-          "sonarjs/no-mixed-completion-style",
-          "sonarjs/no-nested-assignment",
-          "sonarjs/no-nested-conditional",
-          "sonarjs/no-nested-functions",
-          "sonarjs/no-nested-template-literals",
-          "sonarjs/no-os-command-from-path",
-          "sonarjs/no-parameter-reassignment",
-          "sonarjs/no-primitive-wrappers",
-          "sonarjs/no-redundant-assignments",
-          "sonarjs/no-redundant-boolean",
-          "sonarjs/no-redundant-jump",
-          "sonarjs/no-redundant-optional",
-          "sonarjs/no-referrer-policy",
-          "sonarjs/no-regex-spaces",
-          "sonarjs/no-same-argument-assert",
-          "sonarjs/no-same-line-conditional",
-          "sonarjs/no-selector-parameter",
-          "sonarjs/no-session-cookies-on-static-assets",
-          "sonarjs/no-skipped-tests",
-          "sonarjs/no-small-switch",
-          "sonarjs/no-table-as-layout",
-          "sonarjs/no-trivial-assertions",
-          "sonarjs/no-try-promise",
-          "sonarjs/no-undefined-argument",
-          "sonarjs/no-unenclosed-multiline-block",
-          "sonarjs/no-uniq-key",
-          "sonarjs/no-unthrown-error",
-          "sonarjs/no-unused-collection",
-          "sonarjs/no-unused-vars",
-          "sonarjs/no-use-of-empty-return-value",
-          "sonarjs/no-useless-catch",
-          "sonarjs/no-useless-increment",
-          "sonarjs/no-useless-intersection",
-          "sonarjs/no-useless-react-setstate",
-          "sonarjs/no-weak-cipher",
-          "sonarjs/no-weak-keys",
-          "sonarjs/non-existent-operator",
-          "sonarjs/null-dereference",
-          "sonarjs/object-alt-content",
-          "sonarjs/parameterized-tests",
-          "sonarjs/post-message",
-          "sonarjs/prefer-default-last",
-          "sonarjs/prefer-native-lodash-alternative",
-          "sonarjs/prefer-promise-shorthand",
-          "sonarjs/prefer-read-only-props",
-          "sonarjs/prefer-regexp-exec",
-          "sonarjs/prefer-single-boolean-return",
-          "sonarjs/prefer-specific-assertions",
-          "sonarjs/prefer-type-guard",
-          "sonarjs/prefer-while",
-          "sonarjs/production-debug",
-          "sonarjs/pseudo-random",
-          "sonarjs/public-static-readonly",
-          "sonarjs/publicly-writable-directories",
-          "sonarjs/reduce-initial-value",
-          "sonarjs/redundant-type-aliases",
-          "sonarjs/regex-complexity",
-          "sonarjs/review-blockchain-mnemonic",
-          "sonarjs/session-regeneration",
-          "sonarjs/single-char-in-character-classes",
-          "sonarjs/single-character-alternation",
-          "sonarjs/slow-regex",
-          "sonarjs/sql-queries",
-          "sonarjs/stable-tests",
-          "sonarjs/stateful-regex",
-          "sonarjs/strict-transport-security",
-          "sonarjs/super-linear-regex",
-          "sonarjs/synchronous-suite-callback",
-          "sonarjs/table-header",
-          "sonarjs/table-header-reference",
-          "sonarjs/test-check-exception",
-          "sonarjs/todo-tag",
-          "sonarjs/unused-import",
-          "sonarjs/unused-named-groups",
-          "sonarjs/unverified-certificate",
-          "sonarjs/unverified-hostname",
-          "sonarjs/updated-const-var",
-          "sonarjs/updated-loop-counter",
-          "sonarjs/use-type-alias",
-          "sonarjs/void-use",
-          "sonarjs/weak-ssl",
-          "sonarjs/x-powered-by",
-          "sonarjs/xml-parser-xxe",
-          "unused-imports/no-unused-imports",
-          "unused-imports/no-unused-vars",
-          "workspaces/no-absolute-imports",
-          "workspaces/no-relative-imports",
-          "workspaces/require-dependency"
-        ],
-        "not-implemented": [
-          "n/no-deprecated-api",
-          "n/prefer-global/buffer",
-          "n/prefer-global/process",
-          "n/process-exit-as-throw",
-          "no-restricted-syntax"
-        ],
-        "nursery": [
-          "no-undef",
-          "no-unreachable-loop"
-        ],
-        "type-aware": [],
-        "unsupported": [
-          "no-dupe-args",
-          "no-octal",
-          "no-octal-escape",
-          "no-undef-init"
-        ]
-      },
-      "sources": [
-        "ignores",
-        "javascript",
-        "comments",
-        "node",
-        "imports"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ESLint import-sorting rules like `sort-imports` were not migrated because they conflict with Oxfmt's import sorting.\nUse Oxfmt's `sortImports` formatter option instead. It is based on `eslint-plugin-perfectionist/sort-imports`, is disabled by default, and will need to be enabled.\nhttps://oxc.rs/docs/guide/usage/formatter/sorting.html"
-      ]
-    },
-    "jsdoc": {
-      "migratedRuleCount": 10,
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 443,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
-          "jsdoc/check-param-names",
-          "jsdoc/check-types",
-          "jsdoc/no-multi-asterisks",
-          "jsdoc/require-returns-check",
-          "jsdoc/require-yields-check"
+          "no-restricted-syntax"
         ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "dot-notation",
+          "import-x/order",
+          "no-dupe-args",
+          "no-octal",
+          "no-octal-escape",
+          "no-undef-init"
+        ]
+      },
+      "sources": [
+        "ignores",
+        "javascript",
+        "comments",
+        "node",
+        "imports"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ESLint import-sorting rules like `sort-imports` were not migrated because they conflict with Oxfmt's import sorting.\nUse Oxfmt's `sortImports` formatter option instead. It is based on `eslint-plugin-perfectionist/sort-imports`, is disabled by default, and will need to be enabled.\nhttps://oxc.rs/docs/guide/usage/formatter/sorting.html"
+      ],
+      "withNursery": true
+    },
+    "base.editor": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 443,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "dot-notation",
+          "import-x/order",
+          "no-dupe-args",
+          "no-octal",
+          "no-octal-escape",
+          "no-undef-init"
+        ]
+      },
+      "sources": [
+        "ignores",
+        "javascript",
+        "comments",
+        "node",
+        "imports"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ESLint import-sorting rules like `sort-imports` were not migrated because they conflict with Oxfmt's import sorting.\nUse Oxfmt's `sortImports` formatter option instead. It is based on `eslint-plugin-perfectionist/sort-imports`, is disabled by default, and will need to be enabled.\nhttps://oxc.rs/docs/guide/usage/formatter/sorting.html"
+      ],
+      "withNursery": true
+    },
+    "base.suffix": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 322,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "dot-notation",
+          "import-x/order"
+        ]
+      },
+      "sources": [
+        "javascript.suffix",
+        "comments",
+        "node",
+        "imports"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "command": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "command"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.app.default": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 17,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.app.editor": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 17,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.base.app": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 7,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.base"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.base.lib": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 6,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.base"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.lib.default": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 17,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.lib.editor": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 18,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.modernization": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 5,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.modernization"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.moduleReplacements": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.moduleReplacements"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.performanceImprovements.app": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 5,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.performanceImprovements"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "e18e.performanceImprovements.lib": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 6,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "e18e.performanceImprovements"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "i18n.javascript": {
+      "adaptations": [
+        "Locale JSON validation, translation-key path validation, and prefix checks are omitted because they require unsupported JSON parsing or legacy plugin behavior; the executable i18next JavaScript/JSX rule is retained."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "i18n.javascript"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "imports.stylistic": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "imports"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "jsdoc.standard": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 16,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
@@ -676,34 +449,55 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "sources": [
         "jsdoc"
       ],
-      "status": "partial",
-      "warnings": []
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
-    "jsx": {
-      "migratedRuleCount": 33,
+    "jsdoc.stylistic": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 18,
       "skippedRules": {
-        "js-plugins": [
-          "@stylistic/jsx-quotes",
-          "@stylistic/jsx-self-closing-comp"
-        ],
+        "js-plugins": [],
         "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
       },
       "sources": [
+        "jsdoc"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "jsx": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 35,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "jsx-a11y/label-has-for"
+        ]
+      },
+      "sources": [
         "jsx"
       ],
       "status": "partial",
-      "warnings": []
+      "warnings": [],
+      "withNursery": true
     },
     "nextjs": {
-      "migratedRuleCount": 23,
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 24,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "@next/next/no-location-assign-relative-destination"
-        ],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
@@ -714,590 +508,1483 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "status": "partial",
       "warnings": [
         "Settings found under a 'files' pattern — oxlint does not support settings in overrides and they will be skipped:\n`react`"
-      ]
+      ],
+      "withNursery": true
+    },
+    "perfectionist": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 3,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "perfectionist"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ESLint import-sorting rules like `sort-imports` were not migrated because they conflict with Oxfmt's import sorting.\nUse Oxfmt's `sortImports` formatter option instead. It is based on `eslint-plugin-perfectionist/sort-imports`, is disabled by default, and will need to be enabled.\nhttps://oxc.rs/docs/guide/usage/formatter/sorting.html"
+      ],
+      "withNursery": true
+    },
+    "query": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 7,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "query"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
     "react.standard": {
-      "migratedRuleCount": 40,
+      "adaptations": [
+        "eslint-plugin-ssr-friendly is omitted because it uses ESLint APIs that Oxlint's JavaScript-plugin runtime does not implement."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 124,
       "skippedRules": {
-        "js-plugins": [
-          "@eslint-react/dom-no-dangerously-set-innerhtml",
-          "@eslint-react/dom-no-dangerously-set-innerhtml-with-children",
-          "@eslint-react/dom-no-find-dom-node",
-          "@eslint-react/dom-no-flush-sync",
-          "@eslint-react/dom-no-hydrate",
-          "@eslint-react/dom-no-missing-button-type",
-          "@eslint-react/dom-no-missing-iframe-sandbox",
-          "@eslint-react/dom-no-render",
-          "@eslint-react/dom-no-render-return-value",
-          "@eslint-react/dom-no-script-url",
-          "@eslint-react/dom-no-unsafe-iframe-sandbox",
-          "@eslint-react/dom-no-unsafe-target-blank",
-          "@eslint-react/dom-no-use-form-state",
-          "@eslint-react/dom-no-void-elements-with-children",
-          "@eslint-react/error-boundaries",
-          "@eslint-react/exhaustive-deps",
-          "@eslint-react/jsx-no-children-prop",
-          "@eslint-react/jsx-no-children-prop-with-children",
-          "@eslint-react/jsx-no-comment-textnodes",
-          "@eslint-react/jsx-no-key-after-spread",
-          "@eslint-react/jsx-no-leaked-dollar",
-          "@eslint-react/jsx-no-leaked-semicolon",
-          "@eslint-react/jsx-no-namespace",
-          "@eslint-react/jsx-no-useless-fragment",
-          "@eslint-react/naming-convention-context-name",
-          "@eslint-react/naming-convention-id-name",
-          "@eslint-react/naming-convention-ref-name",
-          "@eslint-react/no-access-state-in-setstate",
-          "@eslint-react/no-array-index-key",
-          "@eslint-react/no-children-count",
-          "@eslint-react/no-children-for-each",
-          "@eslint-react/no-children-map",
-          "@eslint-react/no-children-only",
-          "@eslint-react/no-children-to-array",
-          "@eslint-react/no-class-component",
-          "@eslint-react/no-clone-element",
-          "@eslint-react/no-component-will-mount",
-          "@eslint-react/no-component-will-receive-props",
-          "@eslint-react/no-component-will-update",
-          "@eslint-react/no-context-provider",
-          "@eslint-react/no-create-ref",
-          "@eslint-react/no-direct-mutation-state",
-          "@eslint-react/no-forward-ref",
-          "@eslint-react/no-missing-key",
-          "@eslint-react/no-misused-capture-owner-stack",
-          "@eslint-react/no-nested-component-definitions",
-          "@eslint-react/no-nested-lazy-component-declarations",
-          "@eslint-react/no-set-state-in-component-did-mount",
-          "@eslint-react/no-set-state-in-component-did-update",
-          "@eslint-react/no-set-state-in-component-will-update",
-          "@eslint-react/no-unnecessary-use-prefix",
-          "@eslint-react/no-unsafe-component-will-mount",
-          "@eslint-react/no-unsafe-component-will-receive-props",
-          "@eslint-react/no-unsafe-component-will-update",
-          "@eslint-react/no-unstable-context-value",
-          "@eslint-react/no-unstable-default-props",
-          "@eslint-react/no-unused-class-component-members",
-          "@eslint-react/no-use-context",
-          "@eslint-react/purity",
-          "@eslint-react/rsc-function-definition",
-          "@eslint-react/rules-of-hooks",
-          "@eslint-react/set-state-in-effect",
-          "@eslint-react/set-state-in-render",
-          "@eslint-react/static-components",
-          "@eslint-react/unsupported-syntax",
-          "@eslint-react/use-memo",
-          "@eslint-react/use-state",
-          "@eslint-react/web-api-no-leaked-event-listener",
-          "@eslint-react/web-api-no-leaked-fetch",
-          "@eslint-react/web-api-no-leaked-intersection-observer",
-          "@eslint-react/web-api-no-leaked-interval",
-          "@eslint-react/web-api-no-leaked-resize-observer",
-          "@eslint-react/web-api-no-leaked-timeout",
-          "react-you-might-not-need-an-effect/no-adjust-state-on-prop-change",
-          "react-you-might-not-need-an-effect/no-chain-state-updates",
-          "react-you-might-not-need-an-effect/no-derived-state",
-          "react-you-might-not-need-an-effect/no-event-handler",
-          "react-you-might-not-need-an-effect/no-external-store-subscription",
-          "react-you-might-not-need-an-effect/no-initialize-state",
-          "react-you-might-not-need-an-effect/no-pass-data-to-parent",
-          "react-you-might-not-need-an-effect/no-pass-live-state-to-parent",
-          "react-you-might-not-need-an-effect/no-reset-all-state-on-prop-change",
-          "ssr-friendly/no-dom-globals-in-constructor",
-          "ssr-friendly/no-dom-globals-in-module-scope",
-          "ssr-friendly/no-dom-globals-in-react-cc-render",
-          "ssr-friendly/no-dom-globals-in-react-fc",
-          "style/jsx-curly-brace-presence",
-          "style/jsx-pascal-case"
-        ],
+        "js-plugins": [],
         "not-implemented": [],
         "nursery": [],
         "type-aware": [],
-        "unsupported": []
+        "unsupported": [
+          "jsx-a11y/label-has-for"
+        ]
       },
       "sources": [
         "react"
       ],
       "status": "partial",
       "warnings": [
-        "react.version \"detect\" is not supported. Specify an explicit version (e.g., \"18.2.0\") in your oxlint config.",
-        "Settings not migrated (not supported by oxlint):\n`react-x`"
-      ]
+        "react.version \"detect\" is not supported. Specify an explicit version (e.g., \"18.2.0\") in your oxlint config."
+      ],
+      "withNursery": true
     },
     "react.typeAware": {
-      "migratedRuleCount": 40,
+      "adaptations": [
+        "eslint-plugin-ssr-friendly is omitted because it uses ESLint APIs that Oxlint's JavaScript-plugin runtime does not implement.",
+        "Type-aware React JavaScript-plugin rules, including classname-components, are omitted because Oxlint does not expose TypeScript parser services to JavaScript plugins."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 124,
       "skippedRules": {
-        "js-plugins": [
-          "@eslint-react/dom-no-dangerously-set-innerhtml",
-          "@eslint-react/dom-no-dangerously-set-innerhtml-with-children",
-          "@eslint-react/dom-no-find-dom-node",
-          "@eslint-react/dom-no-flush-sync",
-          "@eslint-react/dom-no-hydrate",
-          "@eslint-react/dom-no-missing-button-type",
-          "@eslint-react/dom-no-missing-iframe-sandbox",
-          "@eslint-react/dom-no-render",
-          "@eslint-react/dom-no-render-return-value",
-          "@eslint-react/dom-no-script-url",
-          "@eslint-react/dom-no-unsafe-iframe-sandbox",
-          "@eslint-react/dom-no-unsafe-target-blank",
-          "@eslint-react/dom-no-use-form-state",
-          "@eslint-react/dom-no-void-elements-with-children",
-          "@eslint-react/error-boundaries",
-          "@eslint-react/exhaustive-deps",
-          "@eslint-react/jsx-no-children-prop",
-          "@eslint-react/jsx-no-children-prop-with-children",
-          "@eslint-react/jsx-no-comment-textnodes",
-          "@eslint-react/jsx-no-key-after-spread",
-          "@eslint-react/jsx-no-leaked-dollar",
-          "@eslint-react/jsx-no-leaked-semicolon",
-          "@eslint-react/jsx-no-namespace",
-          "@eslint-react/jsx-no-useless-fragment",
-          "@eslint-react/naming-convention-context-name",
-          "@eslint-react/naming-convention-id-name",
-          "@eslint-react/naming-convention-ref-name",
-          "@eslint-react/no-access-state-in-setstate",
-          "@eslint-react/no-array-index-key",
-          "@eslint-react/no-children-count",
-          "@eslint-react/no-children-for-each",
-          "@eslint-react/no-children-map",
-          "@eslint-react/no-children-only",
-          "@eslint-react/no-children-to-array",
-          "@eslint-react/no-class-component",
-          "@eslint-react/no-clone-element",
-          "@eslint-react/no-component-will-mount",
-          "@eslint-react/no-component-will-receive-props",
-          "@eslint-react/no-component-will-update",
-          "@eslint-react/no-context-provider",
-          "@eslint-react/no-create-ref",
-          "@eslint-react/no-direct-mutation-state",
-          "@eslint-react/no-forward-ref",
-          "@eslint-react/no-leaked-conditional-rendering",
-          "@eslint-react/no-missing-key",
-          "@eslint-react/no-misused-capture-owner-stack",
-          "@eslint-react/no-nested-component-definitions",
-          "@eslint-react/no-nested-lazy-component-declarations",
-          "@eslint-react/no-set-state-in-component-did-mount",
-          "@eslint-react/no-set-state-in-component-did-update",
-          "@eslint-react/no-set-state-in-component-will-update",
-          "@eslint-react/no-unnecessary-use-prefix",
-          "@eslint-react/no-unsafe-component-will-mount",
-          "@eslint-react/no-unsafe-component-will-receive-props",
-          "@eslint-react/no-unsafe-component-will-update",
-          "@eslint-react/no-unstable-context-value",
-          "@eslint-react/no-unstable-default-props",
-          "@eslint-react/no-unused-class-component-members",
-          "@eslint-react/no-unused-props",
-          "@eslint-react/no-use-context",
-          "@eslint-react/purity",
-          "@eslint-react/rsc-function-definition",
-          "@eslint-react/rules-of-hooks",
-          "@eslint-react/set-state-in-effect",
-          "@eslint-react/set-state-in-render",
-          "@eslint-react/static-components",
-          "@eslint-react/unsupported-syntax",
-          "@eslint-react/use-memo",
-          "@eslint-react/use-state",
-          "@eslint-react/web-api-no-leaked-event-listener",
-          "@eslint-react/web-api-no-leaked-fetch",
-          "@eslint-react/web-api-no-leaked-intersection-observer",
-          "@eslint-react/web-api-no-leaked-interval",
-          "@eslint-react/web-api-no-leaked-resize-observer",
-          "@eslint-react/web-api-no-leaked-timeout",
-          "eslint-plugin-classname-components/no-classname-prop-in-styled-components",
-          "eslint-plugin-classname-components/no-classname-prop-merge-in-styled-components",
-          "eslint-plugin-classname-components/prefer-plain-props-parameter",
-          "eslint-plugin-classname-components/prefer-static-classname-in-styled-components",
-          "react-you-might-not-need-an-effect/no-adjust-state-on-prop-change",
-          "react-you-might-not-need-an-effect/no-chain-state-updates",
-          "react-you-might-not-need-an-effect/no-derived-state",
-          "react-you-might-not-need-an-effect/no-event-handler",
-          "react-you-might-not-need-an-effect/no-external-store-subscription",
-          "react-you-might-not-need-an-effect/no-initialize-state",
-          "react-you-might-not-need-an-effect/no-pass-data-to-parent",
-          "react-you-might-not-need-an-effect/no-pass-live-state-to-parent",
-          "react-you-might-not-need-an-effect/no-reset-all-state-on-prop-change",
-          "ssr-friendly/no-dom-globals-in-constructor",
-          "ssr-friendly/no-dom-globals-in-module-scope",
-          "ssr-friendly/no-dom-globals-in-react-cc-render",
-          "ssr-friendly/no-dom-globals-in-react-fc",
-          "style/jsx-curly-brace-presence",
-          "style/jsx-pascal-case"
-        ],
+        "js-plugins": [],
         "not-implemented": [],
         "nursery": [],
         "type-aware": [],
-        "unsupported": []
+        "unsupported": [
+          "jsx-a11y/label-has-for"
+        ]
       },
       "sources": [
         "react"
       ],
       "status": "partial",
       "warnings": [
-        "ignore list inside overrides is not supported",
-        "react.version \"detect\" is not supported. Specify an explicit version (e.g., \"18.2.0\") in your oxlint config.",
-        "Settings not migrated (not supported by oxlint):\n`react-x`"
-      ]
+        "react.version \"detect\" is not supported. Specify an explicit version (e.g., \"18.2.0\") in your oxlint config."
+      ],
+      "withNursery": true
     },
-    "test.default": {
-      "migratedRuleCount": 7,
+    "regexp.error": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 67,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "vitest/no-only-tests"
-        ],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
       },
       "sources": [
-        "test"
+        "regexp"
       ],
-      "status": "partial",
-      "warnings": []
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
-    "test.editor": {
-      "migratedRuleCount": 7,
+    "regexp.warn": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 67,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "vitest/no-only-tests"
-        ],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
       },
       "sources": [
-        "test"
+        "regexp"
       ],
-      "status": "partial",
-      "warnings": []
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
-    "typescript.app.standard": {
-      "migratedRuleCount": 85,
-      "skippedRules": {
-        "js-plugins": [
-          "erasable-syntax-only/enums",
-          "erasable-syntax-only/export-aliases",
-          "erasable-syntax-only/import-aliases",
-          "erasable-syntax-only/namespaces",
-          "erasable-syntax-only/parameter-properties"
-        ],
-        "not-implemented": [
-          "@typescript-eslint/member-ordering"
-        ],
-        "nursery": [],
-        "type-aware": [],
-        "unsupported": [
-          "@typescript-eslint/no-invalid-this"
-        ]
-      },
-      "sources": [
-        "typescript"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ignore list inside overrides is not supported"
-      ]
-    },
-    "typescript.app.typeAware": {
-      "migratedRuleCount": 166,
-      "skippedRules": {
-        "js-plugins": [
-          "erasable-syntax-only/enums",
-          "erasable-syntax-only/export-aliases",
-          "erasable-syntax-only/import-aliases",
-          "erasable-syntax-only/namespaces",
-          "erasable-syntax-only/parameter-properties",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-destructure-keys-by-type",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-jsx-attributes-by-type",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-object-properties-by-type",
-          "expect-type/expect"
-        ],
-        "not-implemented": [
-          "@typescript-eslint/member-ordering"
-        ],
-        "nursery": [
-          "@typescript-eslint/no-unnecessary-condition",
-          "@typescript-eslint/prefer-optional-chain"
-        ],
-        "type-aware": [],
-        "unsupported": [
-          "@typescript-eslint/no-invalid-this"
-        ]
-      },
-      "sources": [
-        "typescript"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ignore list inside overrides is not supported"
-      ]
-    },
-    "typescript.lib.standard": {
-      "migratedRuleCount": 86,
-      "skippedRules": {
-        "js-plugins": [
-          "erasable-syntax-only/enums",
-          "erasable-syntax-only/export-aliases",
-          "erasable-syntax-only/import-aliases",
-          "erasable-syntax-only/namespaces",
-          "erasable-syntax-only/parameter-properties"
-        ],
-        "not-implemented": [
-          "@typescript-eslint/member-ordering"
-        ],
-        "nursery": [],
-        "type-aware": [],
-        "unsupported": [
-          "@typescript-eslint/no-invalid-this"
-        ]
-      },
-      "sources": [
-        "typescript"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ignore list inside overrides is not supported"
-      ]
-    },
-    "typescript.lib.typeAware": {
-      "migratedRuleCount": 167,
-      "skippedRules": {
-        "js-plugins": [
-          "erasable-syntax-only/enums",
-          "erasable-syntax-only/export-aliases",
-          "erasable-syntax-only/import-aliases",
-          "erasable-syntax-only/namespaces",
-          "erasable-syntax-only/parameter-properties",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-destructure-keys-by-type",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-jsx-attributes-by-type",
-          "eslint-plugin-sort-destructure-keys-typescript/sort-object-properties-by-type",
-          "expect-type/expect"
-        ],
-        "not-implemented": [
-          "@typescript-eslint/member-ordering"
-        ],
-        "nursery": [
-          "@typescript-eslint/no-unnecessary-condition",
-          "@typescript-eslint/prefer-optional-chain"
-        ],
-        "type-aware": [],
-        "unsupported": [
-          "@typescript-eslint/no-invalid-this"
-        ]
-      },
-      "sources": [
-        "typescript"
-      ],
-      "status": "partial",
-      "warnings": [
-        "ignore list inside overrides is not supported"
-      ]
-    },
-    "unicorn.allRecommended": {
-      "migratedRuleCount": 135,
+    "security": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 14,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "unicorn/better-dom-traversing",
-          "unicorn/class-reference-in-static-methods",
-          "unicorn/consistent-boolean-name",
-          "unicorn/consistent-compound-words",
-          "unicorn/consistent-conditional-object-spread",
-          "unicorn/consistent-destructuring",
-          "unicorn/consistent-export-decorator-position",
-          "unicorn/consistent-json-file-read",
-          "unicorn/consistent-optional-chaining",
-          "unicorn/consistent-tuple-labels",
-          "unicorn/default-export-style",
-          "unicorn/dom-node-dataset",
-          "unicorn/expiring-todo-comments",
-          "unicorn/isolated-functions",
-          "unicorn/logical-assignment-operators",
-          "unicorn/name-replacements",
-          "unicorn/no-array-concat-in-loop",
-          "unicorn/no-array-from-fill",
-          "unicorn/no-array-sort-for-min-max",
-          "unicorn/no-array-splice",
-          "unicorn/no-async-promise-finally",
-          "unicorn/no-blob-to-file",
-          "unicorn/no-break-in-nested-loop",
-          "unicorn/no-canvas-to-image",
-          "unicorn/no-computed-property-existence-check",
-          "unicorn/no-confusing-array-splice",
-          "unicorn/no-declarations-before-early-exit",
-          "unicorn/no-duplicate-if-branches",
-          "unicorn/no-duplicate-logical-operands",
-          "unicorn/no-duplicate-loops",
-          "unicorn/no-duplicate-set-values",
-          "unicorn/no-error-property-assignment",
-          "unicorn/no-exports-in-scripts",
-          "unicorn/no-for-each",
-          "unicorn/no-global-object-property-assignment",
-          "unicorn/no-impossible-length-comparison",
-          "unicorn/no-incorrect-query-selector",
-          "unicorn/no-incorrect-template-string-interpolation",
-          "unicorn/no-invalid-well-known-symbol-methods",
-          "unicorn/no-late-current-target-access",
-          "unicorn/no-late-event-control",
-          "unicorn/no-loop-iterable-mutation",
-          "unicorn/no-mismatched-map-key",
-          "unicorn/no-multiple-promise-resolver-calls",
-          "unicorn/no-negated-array-predicate",
-          "unicorn/no-negated-comparison",
-          "unicorn/no-object-methods-with-collections",
-          "unicorn/no-optional-chaining-on-undeclared-variable",
-          "unicorn/no-redundant-comparison",
-          "unicorn/no-return-array-push",
-          "unicorn/no-selector-as-dom-name",
-          "unicorn/no-subtraction-comparison",
-          "unicorn/no-this-outside-of-class",
-          "unicorn/no-top-level-assignment-in-function",
-          "unicorn/no-top-level-side-effects",
-          "unicorn/no-uncalled-method",
-          "unicorn/no-unnecessary-array-flat-map",
-          "unicorn/no-unnecessary-fetch-options",
-          "unicorn/no-unnecessary-global-this",
-          "unicorn/no-unnecessary-nested-ternary",
-          "unicorn/no-unnecessary-polyfills",
-          "unicorn/no-unnecessary-splice",
-          "unicorn/no-unnecessary-string-trim",
-          "unicorn/no-unreadable-for-of-expression",
-          "unicorn/no-unreadable-object-destructuring",
-          "unicorn/no-unsafe-buffer-conversion",
-          "unicorn/no-unsafe-property-key",
-          "unicorn/no-unsafe-sqlite-interpolation",
-          "unicorn/no-unsafe-string-replacement",
-          "unicorn/no-unused-array-method-return",
-          "unicorn/no-useless-boolean-cast",
-          "unicorn/no-useless-compound-assignment",
-          "unicorn/no-useless-continue",
-          "unicorn/no-useless-delete-check",
-          "unicorn/no-useless-else",
-          "unicorn/no-useless-logical-operand",
-          "unicorn/no-useless-override",
-          "unicorn/no-useless-re-export",
-          "unicorn/no-useless-recursion",
-          "unicorn/no-xor-as-exponentiation",
-          "unicorn/operator-assignment",
-          "unicorn/prefer-abort-signal-any",
-          "unicorn/prefer-abort-signal-timeout",
-          "unicorn/prefer-add-event-listener-options",
-          "unicorn/prefer-aggregate-error",
-          "unicorn/prefer-array-from-async",
-          "unicorn/prefer-array-from-map",
-          "unicorn/prefer-array-from-range",
-          "unicorn/prefer-array-iterable-methods",
-          "unicorn/prefer-array-last-methods",
-          "unicorn/prefer-array-slice",
-          "unicorn/prefer-await",
-          "unicorn/prefer-block-statement-over-iife",
-          "unicorn/prefer-boolean-return",
-          "unicorn/prefer-continue",
-          "unicorn/prefer-direct-iteration",
-          "unicorn/prefer-dom-node-html-methods",
-          "unicorn/prefer-dom-node-replace-children",
-          "unicorn/prefer-early-return",
-          "unicorn/prefer-else-if",
-          "unicorn/prefer-flat-math-min-max",
-          "unicorn/prefer-get-or-insert-computed",
-          "unicorn/prefer-global-number-constants",
-          "unicorn/prefer-group-by",
-          "unicorn/prefer-has-check",
-          "unicorn/prefer-hoisting-branch-code",
-          "unicorn/prefer-https",
-          "unicorn/prefer-identifier-import-export-specifiers",
-          "unicorn/prefer-includes-over-repeated-comparisons",
-          "unicorn/prefer-iterable-in-constructor",
-          "unicorn/prefer-iterator-helpers",
-          "unicorn/prefer-iterator-to-array",
-          "unicorn/prefer-iterator-to-array-at-end",
-          "unicorn/prefer-location-assign",
-          "unicorn/prefer-map-from-entries",
-          "unicorn/prefer-math-abs",
-          "unicorn/prefer-minimal-ternary",
-          "unicorn/prefer-number-is-safe-integer",
-          "unicorn/prefer-object-define-properties",
-          "unicorn/prefer-object-destructuring-defaults",
-          "unicorn/prefer-object-iterable-methods",
-          "unicorn/prefer-observer-apis",
-          "unicorn/prefer-path2d",
-          "unicorn/prefer-private-class-fields",
-          "unicorn/prefer-promise-try",
-          "unicorn/prefer-promise-with-resolvers",
-          "unicorn/prefer-queue-microtask",
-          "unicorn/prefer-scoped-selector",
-          "unicorn/prefer-set-methods",
-          "unicorn/prefer-simple-condition-first",
-          "unicorn/prefer-simple-sort-comparator",
-          "unicorn/prefer-simplified-conditions",
-          "unicorn/prefer-single-array-predicate",
-          "unicorn/prefer-single-object-destructuring",
-          "unicorn/prefer-single-replace",
-          "unicorn/prefer-smaller-scope",
-          "unicorn/prefer-split-limit",
-          "unicorn/prefer-string-match-all",
-          "unicorn/prefer-string-pad-start-end",
-          "unicorn/prefer-string-repeat",
-          "unicorn/prefer-switch",
-          "unicorn/prefer-then-catch",
-          "unicorn/prefer-toggle-attribute",
-          "unicorn/prefer-type-literal-last",
-          "unicorn/prefer-unary-minus",
-          "unicorn/prefer-unicode-code-point-escapes",
-          "unicorn/prefer-url-can-parse",
-          "unicorn/prefer-url-href",
-          "unicorn/prefer-url-search-parameters",
-          "unicorn/prefer-while-loop-condition",
-          "unicorn/require-css-escape",
-          "unicorn/require-passive-events",
-          "unicorn/single-line-block-comment-style"
-        ],
-        "nursery": [
-          "unicorn/no-useless-iterator-to-array"
-        ],
+        "not-implemented": [],
+        "nursery": [],
         "type-aware": [],
-        "unsupported": [
-          "unicorn/consistent-class-member-order",
-          "unicorn/no-accidental-bitwise-operator",
-          "unicorn/no-boolean-sort-comparator",
-          "unicorn/no-chained-comparison",
-          "unicorn/no-collection-bracket-access",
-          "unicorn/no-constant-zero-expression",
-          "unicorn/no-double-comparison",
-          "unicorn/no-for-loop",
-          "unicorn/no-invalid-argument-count",
-          "unicorn/no-invalid-character-comparison",
-          "unicorn/no-misrefactored-assignment",
-          "unicorn/no-named-default",
-          "unicorn/no-non-function-verb-prefix",
-          "unicorn/no-nonstandard-builtin-properties",
-          "unicorn/no-shorthand-property-overrides",
-          "unicorn/no-transition-all",
-          "unicorn/no-undeclared-class-members",
-          "unicorn/no-unnecessary-boolean-comparison",
-          "unicorn/no-unsafe-promise-all-settled-values",
-          "unicorn/no-useless-coercion",
-          "unicorn/no-useless-concat",
-          "unicorn/no-useless-template-literals",
-          "unicorn/prefer-math-constants",
-          "unicorn/require-array-sort-compare",
-          "unicorn/require-proxy-trap-boolean-return",
-          "unicorn/template-indent"
-        ]
+        "unsupported": []
       },
       "sources": [
-        "unicorn"
+        "security"
       ],
-      "status": "partial",
-      "warnings": []
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
-    "unicorn.selected": {
+    "solid.javascript": {
+      "adaptations": [
+        "Embedded React, JSX-a11y, and eslint-plugin-ssr-friendly presets are omitted; executable Solid rules and Solid-specific disables are retained, except obsolete SonarJS rule IDs absent from the installed plugin."
+      ],
+      "jsPlugins": true,
       "migratedRuleCount": 18,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "unicorn/consistent-destructuring"
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "solid"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "solid.reactDisables": {
+      "adaptations": [
+        "The obsolete @eslint-react/prefer-destructuring-assignment disable is omitted because the installed plugin no longer defines that rule."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 4,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "solid.reactDisables"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "solid.typescript": {
+      "adaptations": [
+        "Embedded React, JSX-a11y, and eslint-plugin-ssr-friendly presets are omitted; executable Solid rules and Solid-specific disables are retained, except obsolete SonarJS rule IDs absent from the installed plugin."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 18,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "solid"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "storybook": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 32,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "storybook"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 70,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.braceStyle.1tbs": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.braceStyle.1tbs"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.braceStyle.allman": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.braceStyle.allman"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.experimental": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 14,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.experimental"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.indent.numberTemplate": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 3,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.indent.numberTemplate"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.indent.tab": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 4,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.indent.tab"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.lessOpinionated": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 68,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.lessOpinionated.noJsx": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 54,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.noJsx": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 56,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.quotes.backtick": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.quotes.backtick"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.quotes.single": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.quotes.single"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "stylistic.semi.false": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 2,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "stylistic.semi.false"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "tail": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 25,
+      "skippedRules": {
+        "js-plugins": [
+          "@babel/object-curly-spacing",
+          "@babel/semi",
+          "@stylistic/array-bracket-newline",
+          "@stylistic/array-bracket-spacing",
+          "@stylistic/array-element-newline",
+          "@stylistic/arrow-parens",
+          "@stylistic/arrow-spacing",
+          "@stylistic/block-spacing",
+          "@stylistic/brace-style",
+          "@stylistic/comma-dangle",
+          "@stylistic/comma-spacing",
+          "@stylistic/comma-style",
+          "@stylistic/computed-property-spacing",
+          "@stylistic/dot-location",
+          "@stylistic/eol-last",
+          "@stylistic/func-call-spacing",
+          "@stylistic/function-call-argument-newline",
+          "@stylistic/function-call-spacing",
+          "@stylistic/function-paren-newline",
+          "@stylistic/generator-star-spacing",
+          "@stylistic/implicit-arrow-linebreak",
+          "@stylistic/indent",
+          "@stylistic/indent-binary-ops",
+          "@stylistic/js/array-bracket-newline",
+          "@stylistic/js/array-bracket-spacing",
+          "@stylistic/js/array-element-newline",
+          "@stylistic/js/arrow-parens",
+          "@stylistic/js/arrow-spacing",
+          "@stylistic/js/block-spacing",
+          "@stylistic/js/brace-style",
+          "@stylistic/js/comma-dangle",
+          "@stylistic/js/comma-spacing",
+          "@stylistic/js/comma-style",
+          "@stylistic/js/computed-property-spacing",
+          "@stylistic/js/dot-location",
+          "@stylistic/js/eol-last",
+          "@stylistic/js/func-call-spacing",
+          "@stylistic/js/function-call-argument-newline",
+          "@stylistic/js/function-call-spacing",
+          "@stylistic/js/function-paren-newline",
+          "@stylistic/js/generator-star-spacing",
+          "@stylistic/js/implicit-arrow-linebreak",
+          "@stylistic/js/indent",
+          "@stylistic/js/jsx-quotes",
+          "@stylistic/js/key-spacing",
+          "@stylistic/js/keyword-spacing",
+          "@stylistic/js/linebreak-style",
+          "@stylistic/js/lines-around-comment",
+          "@stylistic/js/max-len",
+          "@stylistic/js/max-statements-per-line",
+          "@stylistic/js/multiline-ternary",
+          "@stylistic/js/new-parens",
+          "@stylistic/js/newline-per-chained-call",
+          "@stylistic/js/no-confusing-arrow",
+          "@stylistic/js/no-extra-parens",
+          "@stylistic/js/no-extra-semi",
+          "@stylistic/js/no-floating-decimal",
+          "@stylistic/js/no-mixed-operators",
+          "@stylistic/js/no-mixed-spaces-and-tabs",
+          "@stylistic/js/no-multi-spaces",
+          "@stylistic/js/no-multiple-empty-lines",
+          "@stylistic/js/no-tabs",
+          "@stylistic/js/no-trailing-spaces",
+          "@stylistic/js/no-whitespace-before-property",
+          "@stylistic/js/nonblock-statement-body-position",
+          "@stylistic/js/object-curly-newline",
+          "@stylistic/js/object-curly-spacing",
+          "@stylistic/js/object-property-newline",
+          "@stylistic/js/one-var-declaration-per-line",
+          "@stylistic/js/operator-linebreak",
+          "@stylistic/js/padded-blocks",
+          "@stylistic/js/quote-props",
+          "@stylistic/js/quotes",
+          "@stylistic/js/rest-spread-spacing",
+          "@stylistic/js/semi",
+          "@stylistic/js/semi-spacing",
+          "@stylistic/js/semi-style",
+          "@stylistic/js/space-before-blocks",
+          "@stylistic/js/space-before-function-paren",
+          "@stylistic/js/space-in-parens",
+          "@stylistic/js/space-infix-ops",
+          "@stylistic/js/space-unary-ops",
+          "@stylistic/js/switch-colon-spacing",
+          "@stylistic/js/template-curly-spacing",
+          "@stylistic/js/template-tag-spacing",
+          "@stylistic/js/wrap-iife",
+          "@stylistic/js/wrap-regex",
+          "@stylistic/js/yield-star-spacing",
+          "@stylistic/jsx-child-element-spacing",
+          "@stylistic/jsx-closing-bracket-location",
+          "@stylistic/jsx-closing-tag-location",
+          "@stylistic/jsx-curly-newline",
+          "@stylistic/jsx-curly-spacing",
+          "@stylistic/jsx-equals-spacing",
+          "@stylistic/jsx-first-prop-new-line",
+          "@stylistic/jsx-indent",
+          "@stylistic/jsx-indent-props",
+          "@stylistic/jsx-max-props-per-line",
+          "@stylistic/jsx-newline",
+          "@stylistic/jsx-one-expression-per-line",
+          "@stylistic/jsx-props-no-multi-spaces",
+          "@stylistic/jsx-quotes",
+          "@stylistic/jsx-tag-spacing",
+          "@stylistic/jsx-wrap-multilines",
+          "@stylistic/jsx/jsx-child-element-spacing",
+          "@stylistic/jsx/jsx-closing-bracket-location",
+          "@stylistic/jsx/jsx-closing-tag-location",
+          "@stylistic/jsx/jsx-curly-newline",
+          "@stylistic/jsx/jsx-curly-spacing",
+          "@stylistic/jsx/jsx-equals-spacing",
+          "@stylistic/jsx/jsx-first-prop-new-line",
+          "@stylistic/jsx/jsx-indent",
+          "@stylistic/jsx/jsx-indent-props",
+          "@stylistic/jsx/jsx-max-props-per-line",
+          "@stylistic/key-spacing",
+          "@stylistic/keyword-spacing",
+          "@stylistic/linebreak-style",
+          "@stylistic/lines-around-comment",
+          "@stylistic/max-len",
+          "@stylistic/max-statements-per-line",
+          "@stylistic/member-delimiter-style",
+          "@stylistic/multiline-ternary",
+          "@stylistic/new-parens",
+          "@stylistic/newline-per-chained-call",
+          "@stylistic/no-confusing-arrow",
+          "@stylistic/no-extra-parens",
+          "@stylistic/no-extra-semi",
+          "@stylistic/no-floating-decimal",
+          "@stylistic/no-mixed-operators",
+          "@stylistic/no-mixed-spaces-and-tabs",
+          "@stylistic/no-multi-spaces",
+          "@stylistic/no-multiple-empty-lines",
+          "@stylistic/no-tabs",
+          "@stylistic/no-trailing-spaces",
+          "@stylistic/no-whitespace-before-property",
+          "@stylistic/nonblock-statement-body-position",
+          "@stylistic/object-curly-newline",
+          "@stylistic/object-curly-spacing",
+          "@stylistic/object-property-newline",
+          "@stylistic/one-var-declaration-per-line",
+          "@stylistic/operator-linebreak",
+          "@stylistic/padded-blocks",
+          "@stylistic/quote-props",
+          "@stylistic/quotes",
+          "@stylistic/rest-spread-spacing",
+          "@stylistic/semi",
+          "@stylistic/semi-spacing",
+          "@stylistic/semi-style",
+          "@stylistic/space-before-blocks",
+          "@stylistic/space-before-function-paren",
+          "@stylistic/space-in-parens",
+          "@stylistic/space-infix-ops",
+          "@stylistic/space-unary-ops",
+          "@stylistic/switch-colon-spacing",
+          "@stylistic/template-curly-spacing",
+          "@stylistic/template-tag-spacing",
+          "@stylistic/ts/block-spacing",
+          "@stylistic/ts/brace-style",
+          "@stylistic/ts/comma-dangle",
+          "@stylistic/ts/comma-spacing",
+          "@stylistic/ts/func-call-spacing",
+          "@stylistic/ts/function-call-spacing",
+          "@stylistic/ts/indent",
+          "@stylistic/ts/key-spacing",
+          "@stylistic/ts/keyword-spacing",
+          "@stylistic/ts/lines-around-comment",
+          "@stylistic/ts/member-delimiter-style",
+          "@stylistic/ts/no-extra-parens",
+          "@stylistic/ts/no-extra-semi",
+          "@stylistic/ts/object-curly-spacing",
+          "@stylistic/ts/quotes",
+          "@stylistic/ts/semi",
+          "@stylistic/ts/space-before-blocks",
+          "@stylistic/ts/space-before-function-paren",
+          "@stylistic/ts/space-infix-ops",
+          "@stylistic/ts/type-annotation-spacing",
+          "@stylistic/type-annotation-spacing",
+          "@stylistic/type-generic-spacing",
+          "@stylistic/type-named-tuple-spacing",
+          "@stylistic/wrap-iife",
+          "@stylistic/wrap-regex",
+          "@stylistic/yield-star-spacing",
+          "babel/object-curly-spacing",
+          "babel/quotes",
+          "babel/semi",
+          "flowtype/boolean-style",
+          "flowtype/delimiter-dangle",
+          "flowtype/generic-spacing",
+          "flowtype/object-type-curly-spacing",
+          "flowtype/object-type-delimiter",
+          "flowtype/quotes",
+          "flowtype/semi",
+          "flowtype/space-after-type-colon",
+          "flowtype/space-before-generic-bracket",
+          "flowtype/space-before-type-colon",
+          "flowtype/union-intersection-spacing",
+          "standard/array-bracket-even-spacing",
+          "standard/computed-property-even-spacing",
+          "standard/object-curly-even-spacing"
         ],
+        "not-implemented": [
+          "@typescript-eslint/block-spacing",
+          "@typescript-eslint/brace-style",
+          "@typescript-eslint/comma-dangle",
+          "@typescript-eslint/comma-spacing",
+          "@typescript-eslint/func-call-spacing",
+          "@typescript-eslint/indent",
+          "@typescript-eslint/key-spacing",
+          "@typescript-eslint/keyword-spacing",
+          "@typescript-eslint/lines-around-comment",
+          "@typescript-eslint/member-delimiter-style",
+          "@typescript-eslint/no-extra-parens",
+          "@typescript-eslint/no-extra-semi",
+          "@typescript-eslint/object-curly-spacing",
+          "@typescript-eslint/quotes",
+          "@typescript-eslint/semi",
+          "@typescript-eslint/space-before-blocks",
+          "@typescript-eslint/space-before-function-paren",
+          "@typescript-eslint/space-infix-ops",
+          "@typescript-eslint/type-annotation-spacing",
+          "generator-star",
+          "no-arrow-condition",
+          "no-comma-dangle",
+          "no-reserved-keys",
+          "no-restricted-syntax",
+          "no-space-before-semi",
+          "no-wrap-func",
+          "space-after-function-name",
+          "space-after-keywords",
+          "space-before-function-parentheses",
+          "space-before-keywords",
+          "space-in-brackets",
+          "space-return-throw-case",
+          "space-unary-word-ops",
+          "vue/script-indent"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "array-bracket-newline",
+          "array-bracket-spacing",
+          "array-element-newline",
+          "arrow-parens",
+          "arrow-spacing",
+          "block-spacing",
+          "brace-style",
+          "comma-dangle",
+          "comma-spacing",
+          "comma-style",
+          "computed-property-spacing",
+          "dot-location",
+          "eol-last",
+          "func-call-spacing",
+          "function-call-argument-newline",
+          "function-paren-newline",
+          "generator-star-spacing",
+          "implicit-arrow-linebreak",
+          "indent",
+          "indent-legacy",
+          "jsx-quotes",
+          "key-spacing",
+          "keyword-spacing",
+          "linebreak-style",
+          "lines-around-comment",
+          "max-len",
+          "max-statements-per-line",
+          "multiline-ternary",
+          "new-parens",
+          "newline-per-chained-call",
+          "no-confusing-arrow",
+          "no-extra-parens",
+          "no-extra-semi",
+          "no-floating-decimal",
+          "no-mixed-operators",
+          "no-mixed-spaces-and-tabs",
+          "no-multi-spaces",
+          "no-multiple-empty-lines",
+          "no-spaced-func",
+          "no-tabs",
+          "no-trailing-spaces",
+          "no-whitespace-before-property",
+          "nonblock-statement-body-position",
+          "object-curly-newline",
+          "object-curly-spacing",
+          "object-property-newline",
+          "one-var-declaration-per-line",
+          "operator-linebreak",
+          "padded-blocks",
+          "quote-props",
+          "quotes",
+          "react/jsx-child-element-spacing",
+          "react/jsx-closing-bracket-location",
+          "react/jsx-closing-tag-location",
+          "react/jsx-curly-newline",
+          "react/jsx-curly-spacing",
+          "react/jsx-equals-spacing",
+          "react/jsx-first-prop-new-line",
+          "react/jsx-indent",
+          "react/jsx-indent-props",
+          "react/jsx-max-props-per-line",
+          "react/jsx-newline",
+          "react/jsx-one-expression-per-line",
+          "react/jsx-props-no-multi-spaces",
+          "react/jsx-space-before-closing",
+          "react/jsx-tag-spacing",
+          "react/jsx-wrap-multilines",
+          "rest-spread-spacing",
+          "semi",
+          "semi-spacing",
+          "semi-style",
+          "space-before-blocks",
+          "space-before-function-paren",
+          "space-in-parens",
+          "space-infix-ops",
+          "space-unary-ops",
+          "switch-colon-spacing",
+          "template-curly-spacing",
+          "template-tag-spacing",
+          "vue/array-bracket-newline",
+          "vue/array-bracket-spacing",
+          "vue/array-element-newline",
+          "vue/arrow-spacing",
+          "vue/block-spacing",
+          "vue/block-tag-newline",
+          "vue/brace-style",
+          "vue/comma-dangle",
+          "vue/comma-spacing",
+          "vue/comma-style",
+          "vue/dot-location",
+          "vue/func-call-spacing",
+          "vue/html-closing-bracket-newline",
+          "vue/html-closing-bracket-spacing",
+          "vue/html-end-tags",
+          "vue/html-indent",
+          "vue/html-quotes",
+          "vue/html-self-closing",
+          "vue/key-spacing",
+          "vue/keyword-spacing",
+          "vue/max-attributes-per-line",
+          "vue/max-len",
+          "vue/multiline-html-element-content-newline",
+          "vue/multiline-ternary",
+          "vue/mustache-interpolation-spacing",
+          "vue/no-extra-parens",
+          "vue/no-multi-spaces",
+          "vue/no-spaces-around-equal-signs-in-attribute",
+          "vue/object-curly-newline",
+          "vue/object-curly-spacing",
+          "vue/object-property-newline",
+          "vue/operator-linebreak",
+          "vue/quote-props",
+          "vue/singleline-html-element-content-newline",
+          "vue/space-in-parens",
+          "vue/space-infix-ops",
+          "vue/space-unary-ops",
+          "vue/template-curly-spacing",
+          "wrap-iife",
+          "wrap-regex",
+          "yield-star-spacing"
+        ]
+      },
+      "sources": [
+        "default-import-name",
+        "prettier",
+        "disables"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "tailwindcss": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 9,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "tailwindcss"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "test.default": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 10,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "test"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "test.editor": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 10,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "test"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "tsdoc": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "tsdoc"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "typescript.app.standard": {
+      "adaptations": [
+        "eslint-plugin-expect-type is omitted because it depends on unsupported TypeScript parser services."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 97,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [
+          "@typescript-eslint/await-thenable",
+          "@typescript-eslint/consistent-return",
+          "@typescript-eslint/consistent-type-exports",
+          "@typescript-eslint/dot-notation",
+          "@typescript-eslint/no-array-delete",
+          "@typescript-eslint/no-base-to-string",
+          "@typescript-eslint/no-confusing-void-expression",
+          "@typescript-eslint/no-deprecated",
+          "@typescript-eslint/no-duplicate-type-constituents",
+          "@typescript-eslint/no-floating-promises",
+          "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-implied-eval",
+          "@typescript-eslint/no-meaningless-void-operator",
+          "@typescript-eslint/no-misused-promises",
+          "@typescript-eslint/no-misused-spread",
+          "@typescript-eslint/no-mixed-enums",
+          "@typescript-eslint/no-redundant-type-constituents",
+          "@typescript-eslint/no-unnecessary-boolean-literal-compare",
+          "@typescript-eslint/no-unnecessary-condition",
+          "@typescript-eslint/no-unnecessary-qualifier",
+          "@typescript-eslint/no-unnecessary-template-expression",
+          "@typescript-eslint/no-unnecessary-type-arguments",
+          "@typescript-eslint/no-unnecessary-type-assertion",
+          "@typescript-eslint/no-unnecessary-type-conversion",
+          "@typescript-eslint/no-unnecessary-type-parameters",
+          "@typescript-eslint/no-unsafe-argument",
+          "@typescript-eslint/no-unsafe-assignment",
+          "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-comparison",
+          "@typescript-eslint/no-unsafe-member-access",
+          "@typescript-eslint/no-unsafe-return",
+          "@typescript-eslint/no-unsafe-type-assertion",
+          "@typescript-eslint/no-unsafe-unary-minus",
+          "@typescript-eslint/no-useless-default-assignment",
+          "@typescript-eslint/non-nullable-type-assertion-style",
+          "@typescript-eslint/only-throw-error",
+          "@typescript-eslint/prefer-find",
+          "@typescript-eslint/prefer-includes",
+          "@typescript-eslint/prefer-nullish-coalescing",
+          "@typescript-eslint/prefer-optional-chain",
+          "@typescript-eslint/prefer-promise-reject-errors",
+          "@typescript-eslint/prefer-readonly",
+          "@typescript-eslint/prefer-readonly-parameter-types",
+          "@typescript-eslint/prefer-reduce-type-parameter",
+          "@typescript-eslint/prefer-regexp-exec",
+          "@typescript-eslint/prefer-return-this-type",
+          "@typescript-eslint/prefer-string-starts-ends-with",
+          "@typescript-eslint/promise-function-async",
+          "@typescript-eslint/related-getter-setter-pairs",
+          "@typescript-eslint/require-array-sort-compare",
+          "@typescript-eslint/require-await",
+          "@typescript-eslint/restrict-plus-operands",
+          "@typescript-eslint/restrict-template-expressions",
+          "@typescript-eslint/return-await",
+          "@typescript-eslint/strict-boolean-expressions",
+          "@typescript-eslint/strict-void-return",
+          "@typescript-eslint/switch-exhaustiveness-check",
+          "@typescript-eslint/unbound-method",
+          "@typescript-eslint/use-unknown-in-catch-callback-variable"
+        ],
+        "unsupported": [
+          "dot-notation",
+          "no-invalid-this"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.app.standard.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type is omitted because it depends on unsupported TypeScript parser services."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 92,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [
+          "@typescript-eslint/await-thenable",
+          "@typescript-eslint/consistent-return",
+          "@typescript-eslint/consistent-type-exports",
+          "@typescript-eslint/dot-notation",
+          "@typescript-eslint/no-array-delete",
+          "@typescript-eslint/no-base-to-string",
+          "@typescript-eslint/no-confusing-void-expression",
+          "@typescript-eslint/no-deprecated",
+          "@typescript-eslint/no-duplicate-type-constituents",
+          "@typescript-eslint/no-floating-promises",
+          "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-implied-eval",
+          "@typescript-eslint/no-meaningless-void-operator",
+          "@typescript-eslint/no-misused-promises",
+          "@typescript-eslint/no-misused-spread",
+          "@typescript-eslint/no-mixed-enums",
+          "@typescript-eslint/no-redundant-type-constituents",
+          "@typescript-eslint/no-unnecessary-boolean-literal-compare",
+          "@typescript-eslint/no-unnecessary-condition",
+          "@typescript-eslint/no-unnecessary-qualifier",
+          "@typescript-eslint/no-unnecessary-template-expression",
+          "@typescript-eslint/no-unnecessary-type-arguments",
+          "@typescript-eslint/no-unnecessary-type-assertion",
+          "@typescript-eslint/no-unnecessary-type-conversion",
+          "@typescript-eslint/no-unnecessary-type-parameters",
+          "@typescript-eslint/no-unsafe-argument",
+          "@typescript-eslint/no-unsafe-assignment",
+          "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-comparison",
+          "@typescript-eslint/no-unsafe-member-access",
+          "@typescript-eslint/no-unsafe-return",
+          "@typescript-eslint/no-unsafe-type-assertion",
+          "@typescript-eslint/no-unsafe-unary-minus",
+          "@typescript-eslint/no-useless-default-assignment",
+          "@typescript-eslint/non-nullable-type-assertion-style",
+          "@typescript-eslint/only-throw-error",
+          "@typescript-eslint/prefer-find",
+          "@typescript-eslint/prefer-includes",
+          "@typescript-eslint/prefer-nullish-coalescing",
+          "@typescript-eslint/prefer-optional-chain",
+          "@typescript-eslint/prefer-promise-reject-errors",
+          "@typescript-eslint/prefer-readonly",
+          "@typescript-eslint/prefer-readonly-parameter-types",
+          "@typescript-eslint/prefer-reduce-type-parameter",
+          "@typescript-eslint/prefer-regexp-exec",
+          "@typescript-eslint/prefer-return-this-type",
+          "@typescript-eslint/prefer-string-starts-ends-with",
+          "@typescript-eslint/promise-function-async",
+          "@typescript-eslint/related-getter-setter-pairs",
+          "@typescript-eslint/require-array-sort-compare",
+          "@typescript-eslint/require-await",
+          "@typescript-eslint/restrict-plus-operands",
+          "@typescript-eslint/restrict-template-expressions",
+          "@typescript-eslint/return-await",
+          "@typescript-eslint/strict-boolean-expressions",
+          "@typescript-eslint/strict-void-return",
+          "@typescript-eslint/switch-exhaustiveness-check",
+          "@typescript-eslint/unbound-method",
+          "@typescript-eslint/use-unknown-in-catch-callback-variable"
+        ],
+        "unsupported": [
+          "dot-notation",
+          "no-invalid-this"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.app.typeAware": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 179,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.app.typeAware.customScope": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 179,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript.typeAwareCustomScope"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.app.typeAware.customScope.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 174,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript.typeAwareCustomScope"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.app.typeAware.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 174,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.standard": {
+      "adaptations": [
+        "eslint-plugin-expect-type is omitted because it depends on unsupported TypeScript parser services."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 98,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [
+          "@typescript-eslint/await-thenable",
+          "@typescript-eslint/consistent-return",
+          "@typescript-eslint/consistent-type-exports",
+          "@typescript-eslint/dot-notation",
+          "@typescript-eslint/no-array-delete",
+          "@typescript-eslint/no-base-to-string",
+          "@typescript-eslint/no-confusing-void-expression",
+          "@typescript-eslint/no-deprecated",
+          "@typescript-eslint/no-duplicate-type-constituents",
+          "@typescript-eslint/no-floating-promises",
+          "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-implied-eval",
+          "@typescript-eslint/no-meaningless-void-operator",
+          "@typescript-eslint/no-misused-promises",
+          "@typescript-eslint/no-misused-spread",
+          "@typescript-eslint/no-mixed-enums",
+          "@typescript-eslint/no-redundant-type-constituents",
+          "@typescript-eslint/no-unnecessary-boolean-literal-compare",
+          "@typescript-eslint/no-unnecessary-condition",
+          "@typescript-eslint/no-unnecessary-qualifier",
+          "@typescript-eslint/no-unnecessary-template-expression",
+          "@typescript-eslint/no-unnecessary-type-arguments",
+          "@typescript-eslint/no-unnecessary-type-assertion",
+          "@typescript-eslint/no-unnecessary-type-conversion",
+          "@typescript-eslint/no-unnecessary-type-parameters",
+          "@typescript-eslint/no-unsafe-argument",
+          "@typescript-eslint/no-unsafe-assignment",
+          "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-comparison",
+          "@typescript-eslint/no-unsafe-member-access",
+          "@typescript-eslint/no-unsafe-return",
+          "@typescript-eslint/no-unsafe-type-assertion",
+          "@typescript-eslint/no-unsafe-unary-minus",
+          "@typescript-eslint/no-useless-default-assignment",
+          "@typescript-eslint/non-nullable-type-assertion-style",
+          "@typescript-eslint/only-throw-error",
+          "@typescript-eslint/prefer-find",
+          "@typescript-eslint/prefer-includes",
+          "@typescript-eslint/prefer-nullish-coalescing",
+          "@typescript-eslint/prefer-optional-chain",
+          "@typescript-eslint/prefer-promise-reject-errors",
+          "@typescript-eslint/prefer-readonly",
+          "@typescript-eslint/prefer-readonly-parameter-types",
+          "@typescript-eslint/prefer-reduce-type-parameter",
+          "@typescript-eslint/prefer-regexp-exec",
+          "@typescript-eslint/prefer-return-this-type",
+          "@typescript-eslint/prefer-string-starts-ends-with",
+          "@typescript-eslint/promise-function-async",
+          "@typescript-eslint/related-getter-setter-pairs",
+          "@typescript-eslint/require-array-sort-compare",
+          "@typescript-eslint/require-await",
+          "@typescript-eslint/restrict-plus-operands",
+          "@typescript-eslint/restrict-template-expressions",
+          "@typescript-eslint/return-await",
+          "@typescript-eslint/strict-boolean-expressions",
+          "@typescript-eslint/strict-void-return",
+          "@typescript-eslint/switch-exhaustiveness-check",
+          "@typescript-eslint/unbound-method",
+          "@typescript-eslint/use-unknown-in-catch-callback-variable"
+        ],
+        "unsupported": [
+          "dot-notation",
+          "no-invalid-this"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.standard.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type is omitted because it depends on unsupported TypeScript parser services."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 93,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [
+          "@typescript-eslint/await-thenable",
+          "@typescript-eslint/consistent-return",
+          "@typescript-eslint/consistent-type-exports",
+          "@typescript-eslint/dot-notation",
+          "@typescript-eslint/no-array-delete",
+          "@typescript-eslint/no-base-to-string",
+          "@typescript-eslint/no-confusing-void-expression",
+          "@typescript-eslint/no-deprecated",
+          "@typescript-eslint/no-duplicate-type-constituents",
+          "@typescript-eslint/no-floating-promises",
+          "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-implied-eval",
+          "@typescript-eslint/no-meaningless-void-operator",
+          "@typescript-eslint/no-misused-promises",
+          "@typescript-eslint/no-misused-spread",
+          "@typescript-eslint/no-mixed-enums",
+          "@typescript-eslint/no-redundant-type-constituents",
+          "@typescript-eslint/no-unnecessary-boolean-literal-compare",
+          "@typescript-eslint/no-unnecessary-condition",
+          "@typescript-eslint/no-unnecessary-qualifier",
+          "@typescript-eslint/no-unnecessary-template-expression",
+          "@typescript-eslint/no-unnecessary-type-arguments",
+          "@typescript-eslint/no-unnecessary-type-assertion",
+          "@typescript-eslint/no-unnecessary-type-conversion",
+          "@typescript-eslint/no-unnecessary-type-parameters",
+          "@typescript-eslint/no-unsafe-argument",
+          "@typescript-eslint/no-unsafe-assignment",
+          "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-comparison",
+          "@typescript-eslint/no-unsafe-member-access",
+          "@typescript-eslint/no-unsafe-return",
+          "@typescript-eslint/no-unsafe-type-assertion",
+          "@typescript-eslint/no-unsafe-unary-minus",
+          "@typescript-eslint/no-useless-default-assignment",
+          "@typescript-eslint/non-nullable-type-assertion-style",
+          "@typescript-eslint/only-throw-error",
+          "@typescript-eslint/prefer-find",
+          "@typescript-eslint/prefer-includes",
+          "@typescript-eslint/prefer-nullish-coalescing",
+          "@typescript-eslint/prefer-optional-chain",
+          "@typescript-eslint/prefer-promise-reject-errors",
+          "@typescript-eslint/prefer-readonly",
+          "@typescript-eslint/prefer-readonly-parameter-types",
+          "@typescript-eslint/prefer-reduce-type-parameter",
+          "@typescript-eslint/prefer-regexp-exec",
+          "@typescript-eslint/prefer-return-this-type",
+          "@typescript-eslint/prefer-string-starts-ends-with",
+          "@typescript-eslint/promise-function-async",
+          "@typescript-eslint/related-getter-setter-pairs",
+          "@typescript-eslint/require-array-sort-compare",
+          "@typescript-eslint/require-await",
+          "@typescript-eslint/restrict-plus-operands",
+          "@typescript-eslint/restrict-template-expressions",
+          "@typescript-eslint/return-await",
+          "@typescript-eslint/strict-boolean-expressions",
+          "@typescript-eslint/strict-void-return",
+          "@typescript-eslint/switch-exhaustiveness-check",
+          "@typescript-eslint/unbound-method",
+          "@typescript-eslint/use-unknown-in-catch-callback-variable"
+        ],
+        "unsupported": [
+          "dot-notation",
+          "no-invalid-this"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.typeAware": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 180,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.typeAware.customScope": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 180,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript.typeAwareCustomScope"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.typeAware.customScope.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 175,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript.typeAwareCustomScope"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "typescript.lib.typeAware.nonErasable": {
+      "adaptations": [
+        "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 175,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [
+          "no-restricted-syntax"
+        ],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-invalid-this",
+          "no-return-await"
+        ]
+      },
+      "sources": [
+        "typescript"
+      ],
+      "status": "partial",
+      "warnings": [
+        "ignore list inside overrides is not supported"
+      ],
+      "withNursery": true
+    },
+    "unicorn.allRecommended": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 342,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "no-process-exit"
+        ]
+      },
+      "sources": [
+        "unicorn"
+      ],
+      "status": "partial",
+      "warnings": [],
+      "withNursery": true
+    },
+    "unicorn.selected": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 20,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": []
@@ -1305,26 +1992,91 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "sources": [
         "unicorn"
       ],
-      "status": "partial",
-      "warnings": []
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "unocss.attributify": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 2,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "unocss"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "unocss.attributifyStrict": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 3,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "unocss"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "unocss.base": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "unocss"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
+    },
+    "unocss.strict": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 2,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "unocss"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     },
     "vue.javascript": {
-      "migratedRuleCount": 37,
+      "adaptations": [
+        "Vue template, accessibility, custom-block, and SFC-block configs are omitted because Oxlint only exposes the script AST."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 52,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "vue/component-options-name-casing",
-          "vue/jsx-uses-vars",
-          "vue/no-deprecated-dollar-listeners-api",
-          "vue/no-deprecated-dollar-scopedslots-api",
-          "vue/no-irregular-whitespace",
-          "vue/no-mutating-props",
-          "vue/no-ref-as-operand",
-          "vue/no-use-computed-property-like-method",
-          "vue/one-component-per-file",
-          "vue/order-in-components",
-          "vue/require-valid-default-prop"
-        ],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": [
@@ -1345,6 +2097,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "vue/html-indent",
           "vue/html-quotes",
           "vue/html-self-closing",
+          "vue/max-attributes-per-line",
           "vue/multiline-html-element-content-newline",
           "vue/mustache-interpolation-spacing",
           "vue/no-child-content",
@@ -1381,6 +2134,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "vue/no-useless-template-attributes",
           "vue/no-useless-v-bind",
           "vue/no-v-for-template-key-on-child",
+          "vue/no-v-html",
           "vue/no-v-text-v-html-on-component",
           "vue/object-shorthand",
           "vue/prefer-separate-static-class",
@@ -1425,25 +2179,120 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "warnings": [
         "Added 14 globals to the root config. This may happen when your ESLint config uses a different version of the `globals` package than @oxlint/migrate. Try updating `globals` and rerun the migration to get a simpler config.",
         "special parser detected: vue-eslint-parser"
-      ]
+      ],
+      "withNursery": true
+    },
+    "vue.javascript.v2": {
+      "adaptations": [
+        "Vue template, accessibility, custom-block, and SFC-block configs are omitted because Oxlint only exposes the script AST."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 37,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "vue/attribute-hyphenation",
+          "vue/attributes-order",
+          "vue/block-order",
+          "vue/comment-directive",
+          "vue/component-name-in-template-casing",
+          "vue/custom-event-name-casing",
+          "vue/define-macros-order",
+          "vue/dot-location",
+          "vue/dot-notation",
+          "vue/eqeqeq",
+          "vue/first-attribute-linebreak",
+          "vue/html-closing-bracket-newline",
+          "vue/html-closing-bracket-spacing",
+          "vue/html-end-tags",
+          "vue/html-indent",
+          "vue/html-quotes",
+          "vue/html-self-closing",
+          "vue/max-attributes-per-line",
+          "vue/multiline-html-element-content-newline",
+          "vue/mustache-interpolation-spacing",
+          "vue/no-child-content",
+          "vue/no-custom-modifiers-on-v-model",
+          "vue/no-dupe-v-else-if",
+          "vue/no-duplicate-attributes",
+          "vue/no-empty-pattern",
+          "vue/no-lone-template",
+          "vue/no-loss-of-precision",
+          "vue/no-multi-spaces",
+          "vue/no-multiple-template-root",
+          "vue/no-parsing-error",
+          "vue/no-restricted-syntax",
+          "vue/no-restricted-v-bind",
+          "vue/no-spaces-around-equal-signs-in-attribute",
+          "vue/no-sparse-arrays",
+          "vue/no-template-key",
+          "vue/no-template-shadow",
+          "vue/no-textarea-mustache",
+          "vue/no-unused-components",
+          "vue/no-unused-refs",
+          "vue/no-unused-vars",
+          "vue/no-use-v-if-with-v-for",
+          "vue/no-useless-template-attributes",
+          "vue/no-useless-v-bind",
+          "vue/no-v-for-template-key",
+          "vue/no-v-html",
+          "vue/no-v-model-argument",
+          "vue/no-v-text-v-html-on-component",
+          "vue/object-shorthand",
+          "vue/prefer-separate-static-class",
+          "vue/prefer-template",
+          "vue/require-component-is",
+          "vue/require-v-for-key",
+          "vue/singleline-html-element-content-newline",
+          "vue/space-infix-ops",
+          "vue/space-unary-ops",
+          "vue/this-in-template",
+          "vue/use-v-on-exact",
+          "vue/v-bind-style",
+          "vue/v-on-style",
+          "vue/v-slot-style",
+          "vue/valid-attribute-name",
+          "vue/valid-model-definition",
+          "vue/valid-template-root",
+          "vue/valid-v-bind",
+          "vue/valid-v-bind-sync",
+          "vue/valid-v-cloak",
+          "vue/valid-v-else",
+          "vue/valid-v-else-if",
+          "vue/valid-v-for",
+          "vue/valid-v-html",
+          "vue/valid-v-if",
+          "vue/valid-v-model",
+          "vue/valid-v-on",
+          "vue/valid-v-once",
+          "vue/valid-v-pre",
+          "vue/valid-v-show",
+          "vue/valid-v-slot",
+          "vue/valid-v-text"
+        ]
+      },
+      "sources": [
+        "vue"
+      ],
+      "status": "partial",
+      "warnings": [
+        "Added 14 globals to the root config. This may happen when your ESLint config uses a different version of the `globals` package than @oxlint/migrate. Try updating `globals` and rerun the migration to get a simpler config.",
+        "special parser detected: vue-eslint-parser"
+      ],
+      "withNursery": true
     },
     "vue.typescript": {
-      "migratedRuleCount": 37,
+      "adaptations": [
+        "Vue template, accessibility, custom-block, and SFC-block configs are omitted because Oxlint only exposes the script AST."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 52,
       "skippedRules": {
         "js-plugins": [],
-        "not-implemented": [
-          "vue/component-options-name-casing",
-          "vue/jsx-uses-vars",
-          "vue/no-deprecated-dollar-listeners-api",
-          "vue/no-deprecated-dollar-scopedslots-api",
-          "vue/no-irregular-whitespace",
-          "vue/no-mutating-props",
-          "vue/no-ref-as-operand",
-          "vue/no-use-computed-property-like-method",
-          "vue/one-component-per-file",
-          "vue/order-in-components",
-          "vue/require-valid-default-prop"
-        ],
+        "not-implemented": [],
         "nursery": [],
         "type-aware": [],
         "unsupported": [
@@ -1464,6 +2313,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "vue/html-indent",
           "vue/html-quotes",
           "vue/html-self-closing",
+          "vue/max-attributes-per-line",
           "vue/multiline-html-element-content-newline",
           "vue/mustache-interpolation-spacing",
           "vue/no-child-content",
@@ -1500,6 +2350,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "vue/no-useless-template-attributes",
           "vue/no-useless-v-bind",
           "vue/no-v-for-template-key-on-child",
+          "vue/no-v-html",
           "vue/no-v-text-v-html-on-component",
           "vue/object-shorthand",
           "vue/prefer-separate-static-class",
@@ -1544,7 +2395,128 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
       "warnings": [
         "Added 14 globals to the root config. This may happen when your ESLint config uses a different version of the `globals` package than @oxlint/migrate. Try updating `globals` and rerun the migration to get a simpler config.",
         "special parser detected: vue-eslint-parser"
-      ]
+      ],
+      "withNursery": true
+    },
+    "vue.typescript.v2": {
+      "adaptations": [
+        "Vue template, accessibility, custom-block, and SFC-block configs are omitted because Oxlint only exposes the script AST."
+      ],
+      "jsPlugins": true,
+      "migratedRuleCount": 37,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": [
+          "vue/attribute-hyphenation",
+          "vue/attributes-order",
+          "vue/block-order",
+          "vue/comment-directive",
+          "vue/component-name-in-template-casing",
+          "vue/custom-event-name-casing",
+          "vue/define-macros-order",
+          "vue/dot-location",
+          "vue/dot-notation",
+          "vue/eqeqeq",
+          "vue/first-attribute-linebreak",
+          "vue/html-closing-bracket-newline",
+          "vue/html-closing-bracket-spacing",
+          "vue/html-end-tags",
+          "vue/html-indent",
+          "vue/html-quotes",
+          "vue/html-self-closing",
+          "vue/max-attributes-per-line",
+          "vue/multiline-html-element-content-newline",
+          "vue/mustache-interpolation-spacing",
+          "vue/no-child-content",
+          "vue/no-custom-modifiers-on-v-model",
+          "vue/no-dupe-v-else-if",
+          "vue/no-duplicate-attributes",
+          "vue/no-empty-pattern",
+          "vue/no-lone-template",
+          "vue/no-loss-of-precision",
+          "vue/no-multi-spaces",
+          "vue/no-multiple-template-root",
+          "vue/no-parsing-error",
+          "vue/no-restricted-syntax",
+          "vue/no-restricted-v-bind",
+          "vue/no-spaces-around-equal-signs-in-attribute",
+          "vue/no-sparse-arrays",
+          "vue/no-template-key",
+          "vue/no-template-shadow",
+          "vue/no-textarea-mustache",
+          "vue/no-unused-components",
+          "vue/no-unused-refs",
+          "vue/no-unused-vars",
+          "vue/no-use-v-if-with-v-for",
+          "vue/no-useless-template-attributes",
+          "vue/no-useless-v-bind",
+          "vue/no-v-for-template-key",
+          "vue/no-v-html",
+          "vue/no-v-model-argument",
+          "vue/no-v-text-v-html-on-component",
+          "vue/object-shorthand",
+          "vue/prefer-separate-static-class",
+          "vue/prefer-template",
+          "vue/require-component-is",
+          "vue/require-v-for-key",
+          "vue/singleline-html-element-content-newline",
+          "vue/space-infix-ops",
+          "vue/space-unary-ops",
+          "vue/this-in-template",
+          "vue/use-v-on-exact",
+          "vue/v-bind-style",
+          "vue/v-on-style",
+          "vue/v-slot-style",
+          "vue/valid-attribute-name",
+          "vue/valid-model-definition",
+          "vue/valid-template-root",
+          "vue/valid-v-bind",
+          "vue/valid-v-bind-sync",
+          "vue/valid-v-cloak",
+          "vue/valid-v-else",
+          "vue/valid-v-else-if",
+          "vue/valid-v-for",
+          "vue/valid-v-html",
+          "vue/valid-v-if",
+          "vue/valid-v-model",
+          "vue/valid-v-on",
+          "vue/valid-v-once",
+          "vue/valid-v-pre",
+          "vue/valid-v-show",
+          "vue/valid-v-slot",
+          "vue/valid-v-text"
+        ]
+      },
+      "sources": [
+        "vue"
+      ],
+      "status": "partial",
+      "warnings": [
+        "Added 14 globals to the root config. This may happen when your ESLint config uses a different version of the `globals` package than @oxlint/migrate. Try updating `globals` and rerun the migration to get a simpler config.",
+        "special parser detected: vue-eslint-parser"
+      ],
+      "withNursery": true
+    },
+    "zod": {
+      "adaptations": [],
+      "jsPlugins": true,
+      "migratedRuleCount": 1,
+      "skippedRules": {
+        "js-plugins": [],
+        "not-implemented": [],
+        "nursery": [],
+        "type-aware": [],
+        "unsupported": []
+      },
+      "sources": [
+        "zod"
+      ],
+      "status": "supported",
+      "warnings": [],
+      "withNursery": true
     }
   },
   "versions": {

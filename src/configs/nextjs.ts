@@ -7,8 +7,8 @@ import { GLOB_SRC } from "../globs";
 import { ensurePackages, interopDefault } from "../utils";
 
 function normalizeRules(
-  rules: NonNullable<TypedFlatConfigItem["rules"]>,
-): NonNullable<TypedFlatConfigItem["rules"]> {
+  rules: Record<string, unknown>,
+): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(rules).map(([key, value]) => [
       key,
