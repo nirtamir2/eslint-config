@@ -22,6 +22,9 @@ const RemixPackages = [
 
 export async function react(
   options: OptionsTypeScriptWithTypes & OptionsOverrides & OptionsFiles = {},
+  environment: { hasPackage: (name: string) => boolean } = {
+    hasPackage: isPackageExists,
+  },
 ): Promise<Array<TypedFlatConfigItem>> {
   const { overrides = {}, files = [GLOB_SRC] } = options;
   const tsconfigPath = options.tsconfigPath
@@ -51,14 +54,15 @@ export async function react(
     interopDefault(import("@stylistic/eslint-plugin")),
     isTypeAware
       ? interopDefault(import("eslint-plugin-classname-components/config"))
-      : Promise.resolve(undefined),
+      : Promise.resolve(),
   ] as const);
 
-  const isUsingNext = isPackageExists("next");
-  const isAllowConstantExport = ReactRefreshAllowConstantExportPackages.some(
-    (i) => isPackageExists(i),
-  ) && !isUsingNext;
-  const isUsingRemix = RemixPackages.some((i) => isPackageExists(i));
+  const isUsingNext = environment.hasPackage("next");
+  const isAllowConstantExport =
+    ReactRefreshAllowConstantExportPackages.some((index) =>
+      environment.hasPackage(index),
+    ) && !isUsingNext;
+  const isUsingRemix = RemixPackages.some((index) => environment.hasPackage(index));
   const eslintReactConfig = isTypeAware
     ? pluginReact.configs["strict-type-checked"]
     : pluginReact.configs["strict-typescript"];
@@ -78,7 +82,7 @@ export async function react(
           pluginReactYouMightNotNeedAnEffect,
       },
       settings: {
-        ...(eslintReactConfig.settings ?? {}),
+        ...eslintReactConfig.settings,
         react: { version: "detect" },
       },
     },
@@ -158,7 +162,7 @@ export async function react(
         rules: {
           "ssr-friendly/no-dom-globals-in-react-cc-render": "off", // I don't use class components
         },
-      }) as never,
+      }),
     ),
     ...a11y(),
   ];

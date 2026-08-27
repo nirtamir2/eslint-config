@@ -30,11 +30,11 @@ export interface CliRunOptions {
 }
 
 export async function run(options: CliRunOptions = {}) {
-  const argSkipPrompt = Boolean(process.env.SKIP_PROMPT) || options.yes;
-  const argTemplate = options.frameworks?.map((m) =>
+  const argumentSkipPrompt = Boolean(process.env.SKIP_PROMPT) || options.yes;
+  const argumentTemplate = options.frameworks?.map((m) =>
     m.trim(),
   ) as Array<FrameworkOption>;
-  const argExtra = options.extra?.map((m) =>
+  const argumentExtra = options.extra?.map((m) =>
     m.trim(),
   ) as Array<ExtraLibrariesOption>;
 
@@ -48,16 +48,16 @@ export async function run(options: CliRunOptions = {}) {
   // Set default value for promptResult if `argSkipPrompt` is enabled
   let result: PromptResult = {
     uncommittedConfirmed: false,
-    frameworks: argTemplate ?? [],
-    extra: argExtra ?? [],
+    frameworks: argumentTemplate ?? [],
+    extra: argumentExtra ?? [],
     updateVscodeSettings: true,
   };
 
-  if (!argSkipPrompt) {
+  if (!argumentSkipPrompt) {
     result = (await p.group(
       {
         uncommittedConfirmed: async () => {
-          if (argSkipPrompt || isGitClean()) return true;
+          if (argumentSkipPrompt || isGitClean()) return true;
 
           return await p.confirm({
             initialValue: false,
@@ -66,15 +66,15 @@ export async function run(options: CliRunOptions = {}) {
           });
         },
         frameworks: async ({ results }) => {
-          const isArgTemplateValid =
-            typeof argTemplate === "string" &&
-            frameworks.includes(argTemplate as FrameworkOption);
+          const isArgumentTemplateValid =
+            typeof argumentTemplate === "string" &&
+            frameworks.includes(argumentTemplate);
 
-          if (!results.uncommittedConfirmed || isArgTemplateValid) return;
+          if (!results.uncommittedConfirmed || isArgumentTemplateValid) return;
 
           const message =
-            !isArgTemplateValid && argTemplate
-              ? `"${argTemplate}" isn't a valid template. Please choose from below: `
+            !isArgumentTemplateValid && argumentTemplate
+              ? `"${argumentTemplate}" isn't a valid template. Please choose from below: `
               : "Select a framework:";
 
           return await p.multiselect<FrameworkOption>({
@@ -84,15 +84,15 @@ export async function run(options: CliRunOptions = {}) {
           });
         },
         extra: async ({ results }) => {
-          const isArgExtraValid =
-            argExtra.length > 0 &&
-            argExtra.filter((element) => !extra.includes(element)).length === 0;
+          const isArgumentExtraValid =
+            argumentExtra.length > 0 &&
+            argumentExtra.every((element) => extra.includes(element));
 
-          if (!results.uncommittedConfirmed || isArgExtraValid) return;
+          if (!results.uncommittedConfirmed || isArgumentExtraValid) return;
 
           const message =
-            !isArgExtraValid && argExtra
-              ? `"${argExtra}" isn't a valid extra util. Please choose from below: `
+            !isArgumentExtraValid && argumentExtra
+              ? `"${argumentExtra}" isn't a valid extra util. Please choose from below: `
               : "Select a extra utils:";
 
           return await p.multiselect<ExtraLibrariesOption>({

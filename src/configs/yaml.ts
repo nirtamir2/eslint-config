@@ -45,8 +45,7 @@ export async function yaml(
 
         "yml/vue-custom-block/no-parsing-error": "error",
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "yml/block-mapping-question-indicator-newline": "error",
               "yml/block-sequence-hyphen-indicator-newline": "error",
               "yml/flow-mapping-curly-newline": "error",
@@ -64,8 +63,7 @@ export async function yaml(
                 },
               ],
               "yml/spaced-comment": "error",
-            }
-          : {}),
+            }),
 
         ...overrides,
       },

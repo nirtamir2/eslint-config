@@ -41,8 +41,7 @@ export async function pnpm(
         pnpm: pluginPnpm,
       },
       rules: {
-        ...(catalogs
-          ? {
+        ...(catalogs && {
               "pnpm/json-enforce-catalog": [
                 "error",
                 {
@@ -50,8 +49,7 @@ export async function pnpm(
                   ignores: ["@types/vscode"],
                 },
               ],
-            }
-          : {}),
+            }),
         "pnpm/json-prefer-workspace-settings": [
           "error",
           { autofix: !isInEditor },

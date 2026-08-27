@@ -50,9 +50,10 @@ import type {
   OptionsConfig,
   TypedFlatConfigItem,
 } from "./types";
-import { findUpSync, interopDefault, isInEditorEnv } from "./utils";
+import { resolveSharedFeaturePlan } from "./feature-plan";
+import { findUpSync, interopDefault, isInEditorEnv as isInEditorEnvironment } from "./utils";
 
-const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
+const flatConfigProperties: Array<keyof TypedFlatConfigItem> = [
   "name",
   "files",
   "ignores",
@@ -63,8 +64,6 @@ const flatConfigProps: Array<keyof TypedFlatConfigItem> = [
   "rules",
   "settings",
 ];
-
-const VuePackages = ["vue", "nuxt", "vitepress", "@slidev/cli"];
 
 const TanstackQueryPackages = [
   "@tanstack/react-query",
@@ -103,36 +102,44 @@ export function nirtamir2(
     >
   >
 ): FlatConfigComposer<TypedFlatConfigItem, ConfigNames> {
+  const sharedPlan = resolveSharedFeaturePlan(options, {
+    hasPackage: isPackageExists,
+    isInEditor: options.isInEditor ?? isInEditorEnvironment(),
+  });
+
   const {
     angular: enableAngular = false,
     astro: enableAstro = false,
     // autoRenamePlugins = true,
-    componentExts = [],
+    componentExts: componentExtensions = [],
     e18e: enableE18e = true,
     gitignore: enableGitignore = true,
     ignores: userIgnores = [],
-    isInEditor = isInEditorEnv(),
-    jsx: enableJsx = true,
-    nextjs: enableNextjs = isPackageExists("next"),
     pnpm: enablePnpm = Boolean(findUpSync("pnpm-workspace.yaml")),
     perfectionist: enablePerfectionist = false,
-    react: enableReact = false,
     regexp: enableRegexp = true,
     solid: enableSolid = false,
     svelte: enableSvelte = false,
-    type: appType = "app",
     zod: enableZod = isPackageExists("zod") && isPackageExists("next"),
     tailwindcss: enableTailwindCSS = isPackageExists("tailwindcss"),
-    typescript: enableTypeScript = isPackageExists("typescript"),
     unocss: enableUnoCSS = false,
-    vue: enableVue = VuePackages.some((i) => isPackageExists(i)),
-    storybook: enableStorybook = StorybookPackages.some((i) =>
-      isPackageExists(i),
+    storybook: enableStorybook = StorybookPackages.some((index) =>
+      isPackageExists(index),
     ),
-    query: enableQuery = TanstackQueryPackages.some((i) => isPackageExists(i)),
+    query: enableQuery = TanstackQueryPackages.some((index) => isPackageExists(index)),
     i18n: enableI18n = false,
     security: enableSecurity = false,
   } = options;
+  const {
+    jsdoc: enableJsdoc,
+    jsx: enableJsx,
+    nextjs: enableNextjs,
+    react: enableReact,
+    test: enableTest,
+    typescript: enableTypeScript,
+    vue: enableVue,
+  } = sharedPlan.enabled;
+  const { isInEditor, type: appType } = sharedPlan;
 
   const stylisticOptions =
     options.stylistic === false || options.stylistic == null
@@ -191,11 +198,15 @@ export function nirtamir2(
   );
 
   if (enablePerfectionist) {
-    configs.push(perfectionist());
+    configs.push(
+      perfectionist({
+        overrides: getOverrides(options, "perfectionist"),
+      }),
+    );
   }
 
   if (enableVue) {
-    componentExts.push("vue");
+    componentExtensions.push("vue");
   }
 
   if (enableJsx) {
@@ -206,7 +217,7 @@ export function nirtamir2(
     configs.push(
       typescript({
         ...typescriptOptions,
-        componentExts,
+        componentExts: componentExtensions,
         overrides: getOverrides(options, "typescript"),
         type: appType,
       }),
@@ -216,7 +227,7 @@ export function nirtamir2(
   if (enableE18e) {
     configs.push(
       e18e({
-        ...(typeof enableE18e === "boolean" ? {} : enableE18e),
+        ...(typeof enableE18e !== "boolean" && enableE18e),
         isInEditor,
         type: appType,
       }),
@@ -237,7 +248,7 @@ export function nirtamir2(
     configs.push(regexp(typeof enableRegexp === "boolean" ? {} : enableRegexp));
   }
 
-  if (options.test ?? true) {
+  if (enableTest) {
     configs.push(
       test({
         isInEditor,
@@ -252,7 +263,7 @@ export function nirtamir2(
         ...resolveSubOptions(options, "vue"),
         overrides: getOverrides(options, "vue"),
         stylistic: stylisticOptions,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -283,7 +294,7 @@ export function nirtamir2(
       solid({
         overrides: getOverrides(options, "solid"),
         tsconfigPath,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -293,7 +304,7 @@ export function nirtamir2(
       svelte({
         overrides: getOverrides(options, "svelte"),
         stylistic: stylisticOptions,
-        typescript: Boolean(enableTypeScript),
+        typescript: enableTypeScript,
       }),
     );
   }
@@ -361,14 +372,14 @@ export function nirtamir2(
         isInEditor,
         json: options.jsonc !== false,
         yaml: options.yaml !== false,
-        ...(typeof enablePnpm === "boolean" ? {} : enablePnpm),
+        ...(typeof enablePnpm !== "boolean" && enablePnpm),
       }),
     );
   }
 
   configs.push(defaultImportName());
 
-  if (options.jsdoc ?? false) {
+  if (enableJsdoc) {
     configs.push(
       jsdoc({
         stylistic: stylisticOptions,
@@ -406,7 +417,7 @@ export function nirtamir2(
   if (options.markdown ?? true) {
     configs.push(
       markdown({
-        componentExts,
+        componentExts: componentExtensions,
         overrides: getOverrides(options, "markdown"),
       }),
     );
@@ -434,10 +445,10 @@ export function nirtamir2(
 
   // User can optionally pass a flat config item to the first argument
   // We pick the known keys as ESLint would do schema validation
-  const fusedConfig = flatConfigProps.reduce<TypedFlatConfigItem>(
-    (acc, key) => {
-      if (key in options) acc[key] = options[key] as never;
-      return acc;
+  const fusedConfig = flatConfigProperties.reduce<TypedFlatConfigItem>(
+    (accumulator, key) => {
+      if (key in options) accumulator[key] = options[key] as never;
+      return accumulator;
     },
     {},
   );
@@ -488,6 +499,6 @@ export function getOverrides<K extends keyof OptionsConfig>(
   const sub = resolveSubOptions(options, key);
   return {
     ...(options.overrides as any)?.[key],
-    ...("overrides" in sub ? sub.overrides : {}),
+    ...(("overrides" in sub) && sub.overrides),
   };
 }

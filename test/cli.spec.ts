@@ -6,25 +6,25 @@ import fs from "fs-extra";
 import { afterAll, beforeEach, expect, it } from "vitest";
 
 const CLI_PATH = fileURLToPath(new URL("../src/cli/index.ts", import.meta.url));
-const genPath = fileURLToPath(new URL(`../.temp/${randomStr()}`, import.meta.url));
+const genPath = fileURLToPath(new URL(`../.temp/${randomString()}`, import.meta.url));
 
-function randomStr() {
+function randomString() {
   // eslint-disable-next-line sonarjs/pseudo-random
   return Math.random().toString(36).slice(2);
 }
 
 async function run(
-  params: Array<string> = [],
-  env = {
+  parameters: Array<string> = [],
+  environment = {
     SKIP_PROMPT: "1",
     NO_COLOR: "1",
   },
 ) {
-  return await execa("pnpm", ["exec", "tsx", CLI_PATH, ...params], {
+  return await execa("pnpm", ["exec", "tsx", CLI_PATH, ...parameters], {
     cwd: genPath,
     env: {
       ...process.env,
-      ...env,
+      ...environment,
     },
   });
 }
@@ -52,21 +52,21 @@ afterAll(async () => {
 it("package.json updated", async () => {
   const { stdout } = await run();
 
-  const pkgContent: Record<string, any> = await fs.readJSON(
+  const packageContent: Record<string, any> = await fs.readJSON(
     join(genPath, "package.json"),
   );
 
-  expect(JSON.stringify(pkgContent.devDependencies)).toContain(
+  expect(JSON.stringify(packageContent.devDependencies)).toContain(
     "@nirtamir2/eslint-config",
   );
   expect(stdout).toContain("Changes wrote to package.json");
 });
 
 it("esm eslint.config.js", async () => {
-  const pkgContent = await fs.readFile(join(genPath, "package.json"), "utf8");
+  const packageContent = await fs.readFile(join(genPath, "package.json"), "utf8");
   await fs.writeFile(
     join(genPath, "package.json"),
-    JSON.stringify({ ...JSON.parse(pkgContent), type: "module" }, null, 2),
+    JSON.stringify({ ...JSON.parse(packageContent), type: "module" }, null, 2),
   );
 
   const { stdout } = await run();

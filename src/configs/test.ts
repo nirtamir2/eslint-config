@@ -21,7 +21,7 @@ export async function test(
     interopDefault(import("eslint-plugin-no-only-tests")),
   ] as const);
 
-  _pluginTest = _pluginTest || {
+  _pluginTest ||= {
     ...pluginVitest,
     rules: {
       ...pluginVitest.rules,

@@ -11,7 +11,7 @@ import globals from "globals";
 import { compat } from "../compat";
 import { GLOB_SRC, GLOB_SRC_EXT } from "../globs";
 import {
-  arrayFunc,
+  arrayFunc as arrayFunction,
   eslintPluginNoUseExtendNative,
   pluginAntfu,
   pluginUnusedImports,
@@ -314,7 +314,7 @@ export async function javascript(
         "dot-notation": "off", // Collide with TypeScript TS4111
       },
     },
-    arrayFunc.configs.recommended,
+    arrayFunction.configs.recommended,
     {
       name: "nirtamir2/javascript/arrayFunc/overrides",
       rules: {

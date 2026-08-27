@@ -36,7 +36,7 @@ function mergePrettierOptions<
       ...(overrides.plugins || []),
       ...((options.plugins as Array<string>) || []),
     ],
-  } as VendoredPrettierOptions & T;
+  };
 }
 
 export async function formatters(
@@ -77,7 +77,7 @@ export async function formatters(
       "`slidev` option only works when `markdown` is enabled with `prettier`",
     );
 
-  const { semi, indent, quotes } = {
+  const { indent, quotes, semi } = {
     ...StylisticConfigDefaults,
     ...stylistic,
   };
@@ -104,7 +104,7 @@ export async function formatters(
     indentWidth: typeof indent === "number" ? indent : 2,
     quoteStyle: quotes === "single" ? "preferSingle" : "preferDouble",
     useTabs: indent === "tab",
-    ...(typeof options.dprintOptions === "object" ? options.dprintOptions : {}),
+    ...((typeof options.dprintOptions === "object") && options.dprintOptions),
   };
 
   const pluginFormat = await interopDefault(import("eslint-plugin-format"));

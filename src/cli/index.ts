@@ -3,13 +3,13 @@ import * as p from "@clack/prompts";
 import c from "picocolors";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { pkgJson } from "./constants";
+import { pkgJson as packageJson } from "./constants";
 import { run } from "./run";
 
 function header() {
   console.log("\n");
   p.intro(
-    `${c.green(`@nirtamir2/eslint-config `)}${c.dim(`v${pkgJson.version}`)}`,
+    `${c.green(`@nirtamir2/eslint-config `)}${c.dim(`v${packageJson.version}`)}`,
   );
 }
 
@@ -19,8 +19,8 @@ const instance = yargs(hideBin(process.argv))
   .command(
     "*",
     "Run the initialization or migration",
-    (args) =>
-      args
+    (arguments_) =>
+      arguments_
         .option("yes", {
           alias: "y",
           description: "Skip prompts and use default values",
@@ -40,10 +40,10 @@ const instance = yargs(hideBin(process.argv))
           type: "string",
         })
         .help(),
-    async (args) => {
+    async (arguments_) => {
       header();
       try {
-        await run(args);
+        await run(arguments_);
       } catch (error) {
         p.log.error(c.inverse(c.red(" Failed to migrate ")));
         p.log.error(c.red(`✘ ${String(error)}`));
@@ -53,7 +53,7 @@ const instance = yargs(hideBin(process.argv))
   )
   .showHelpOnFail(false)
   .alias("h", "help")
-  .version("version", pkgJson.version)
+  .version("version", packageJson.version)
   .alias("v", "version");
 
 void instance.help().argv;

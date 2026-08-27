@@ -11,6 +11,7 @@ export const StylisticConfigDefaults: StylisticConfig = {
   quotes: "double",
   jsx: true,
   semi: true,
+  braceStyle: "stroustrup",
   experimental: false,
 };
 
@@ -27,6 +28,7 @@ export async function stylistic(
     quotes,
     jsx,
     semi,
+    braceStyle,
     experimental,
     overrides = {},
   } = {
@@ -39,6 +41,7 @@ export async function stylistic(
   );
 
   const config = pluginStylistic.configs.customize({
+    braceStyle,
     experimental,
     indent,
     jsx,
@@ -57,7 +60,7 @@ export async function stylistic(
       rules: {
         ...config.rules,
 
-        ...(experimental ? {} : { "antfu/consistent-list-newline": "error" }),
+        ...(!experimental && { "antfu/consistent-list-newline": "error" }),
 
         "antfu/consistent-chaining": "error",
 

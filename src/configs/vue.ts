@@ -27,7 +27,8 @@ export async function vue(
 
   const sfcBlocks = options.sfcBlocks === true ? {} : (options.sfcBlocks ?? {});
 
-  const { indent = 2 } = typeof stylistic === "boolean" ? {} : stylistic;
+  const { indent = 2, braceStyle = "stroustrup" } =
+    typeof stylistic === "boolean" ? {} : stylistic;
 
   if (a11y) {
     await ensurePackages(["eslint-plugin-vuejs-accessibility"]);
@@ -68,7 +69,7 @@ export async function vue(
       name: "antfu/vue/setup",
       plugins: {
         vue: pluginVue,
-        ...(a11y ? { "vue-a11y": pluginVueA11y } : {}),
+        ...(a11y && { "vue-a11y": pluginVueA11y }),
       },
     },
     {
@@ -114,13 +115,13 @@ export async function vue(
           : {
               ...(pluginVue.configs["flat/essential"]
                 .map((c) => c.rules)
-                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
+                .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),
               ...(pluginVue.configs["flat/strongly-recommended"]
                 .map((c) => c.rules)
-                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
+                .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),
               ...(pluginVue.configs["flat/recommended"]
                 .map((c) => c.rules)
-                .reduce((acc, c) => ({ ...acc, ...c }), {}) as any),
+                .reduce((accumulator, c) => ({ ...accumulator, ...c }), {}) as any),
             }),
 
         "antfu/no-top-level-await": "off",
@@ -189,8 +190,7 @@ export async function vue(
         "vue/space-infix-ops": "error",
         "vue/space-unary-ops": ["error", { nonwords: false, words: true }],
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "vue/array-bracket-spacing": ["error", "never"],
               "vue/arrow-spacing": ["error", { after: true, before: true }],
               "vue/block-spacing": ["error", "always"],
@@ -203,7 +203,7 @@ export async function vue(
               ],
               "vue/brace-style": [
                 "error",
-                "stroustrup",
+                braceStyle,
                 { allowSingleLine: true },
               ],
               "vue/comma-dangle": ["error", "always-multiline"],
@@ -232,11 +232,9 @@ export async function vue(
               "vue/quote-props": ["error", "consistent-as-needed"],
               "vue/space-in-parens": ["error", "never"],
               "vue/template-curly-spacing": "error",
-            }
-          : {}),
+            }),
 
-        ...(a11y
-          ? {
+        ...(a11y && {
               "vue-a11y/alt-text": "error",
               "vue-a11y/anchor-has-content": "error",
               "vue-a11y/aria-props": "error",
@@ -259,8 +257,7 @@ export async function vue(
               "vue-a11y/no-static-element-interactions": "error",
               "vue-a11y/role-has-required-aria-props": "error",
               "vue-a11y/tabindex-no-positive": "warn",
-            }
-          : {}),
+            }),
 
         ...overrides,
       },

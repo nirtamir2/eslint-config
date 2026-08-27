@@ -1,0 +1,5 @@
+async function loadValue(): Promise<number> {
+  return 1;
+}
+
+loadValue();

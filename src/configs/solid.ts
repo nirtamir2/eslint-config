@@ -49,7 +49,7 @@ export async function solid(
           ecmaFeatures: {
             jsx: true,
           },
-          ...(isTypeAware ? { project: tsconfigPath } : {}),
+          ...(isTypeAware && { project: tsconfigPath }),
         },
         sourceType: "module",
       },
@@ -83,12 +83,10 @@ export async function solid(
         "solid/reactivity": "warn",
         "solid/self-closing-comp": "error",
         "solid/style-prop": ["error", { styleProps: ["style", "css"] }],
-        ...(typescript
-          ? {
+        ...(typescript && {
               "solid/jsx-no-undef": ["error", { typescriptEnabled: true }],
               "solid/no-unknown-namespaces": "off",
-            }
-          : {}),
+            }),
         // overrides
         ...overrides,
       },

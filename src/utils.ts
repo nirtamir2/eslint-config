@@ -91,8 +91,8 @@ export function renamePluginInConfigs(
   configs: Array<TypedFlatConfigItem>,
   map: Record<string, string>,
 ): Array<TypedFlatConfigItem> {
-  return configs.map((i) => {
-    const clone = { ...i };
+  return configs.map((index) => {
+    const clone = { ...index };
     if (clone.rules) clone.rules = renameRules(clone.rules, map);
     if (clone.plugins) {
       clone.plugins = Object.fromEntries(
@@ -160,19 +160,11 @@ export function isPackageInScope(name: string): boolean {
   return isPackageExists(name, { paths: [scopeUrl] });
 }
 
-export function isInGitHooksOrLintStaged(): boolean {
-  return Boolean(
-    process.env.GIT_PARAMS ||
-    process.env.VSCODE_GIT_COMMAND ||
-    process.env.npm_lifecycle_script?.startsWith("lint-staged"),
-  );
-}
-
 export async function ensurePackages(packages: Array<string | undefined>) {
   if (process.env.CI || !process.stdout.isTTY || !isCwdInScope) return;
 
   const nonExistingPackages = packages.filter(
-    (i) => i && !isPackageInScope(i),
+    (index) => index && !isPackageInScope(index),
   ) as Array<string>;
   if (nonExistingPackages.length === 0) return;
 
@@ -185,20 +177,12 @@ export async function ensurePackages(packages: Array<string | undefined>) {
     )}. Do you want to install them?`,
   });
   if (result)
-    await import("@antfu/install-pkg").then((i) =>
-      i.installPackage(nonExistingPackages, { dev: true }),
+    await import("@antfu/install-pkg").then((index) =>
+      index.installPackage(nonExistingPackages, { dev: true }),
     );
 }
 
-export function isInEditorEnv(): boolean {
-  if (process.env.CI) return false;
-  if (isInGitHooksOrLintStaged()) return false;
-  return Boolean(
-    process.env.VSCODE_PID ||
-    process.env.VSCODE_CWD ||
-    process.env.JETBRAINS_IDE ||
-    process.env.VIM ||
-    process.env.NVIM ||
-    (process.env.ZED_ENVIRONMENT && !process.env.ZED_TERM),
-  );
-}
+export {
+  isInEditorEnv,
+  isInGitHooksOrLintStaged,
+} from "./editor-environment";

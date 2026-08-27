@@ -26,7 +26,7 @@ export async function astro(
       config: TypedFlatConfigItem,
     ) => ({
       ...rules,
-      ...(config.rules ?? {}),
+      ...config.rules,
     }),
     {},
   );
@@ -57,15 +57,13 @@ export async function astro(
         "astro/no-set-html-directive": "off",
         "astro/semi": "off",
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "@stylistic/indent": "off",
               "@stylistic/jsx-closing-tag-location": "off",
               "@stylistic/jsx-indent": "off",
               "@stylistic/jsx-one-expression-per-line": "off",
               "@stylistic/no-multiple-empty-lines": "off",
-            }
-          : {}),
+            }),
 
         ...overrides,
       },

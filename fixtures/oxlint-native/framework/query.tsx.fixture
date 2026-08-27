@@ -1,0 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
+
+export function Example() {
+  const { data, ...query } = useQuery({
+    queryFn: async () => "value",
+    queryKey: ["example"],
+  });
+
+  return <div>{data ?? query.status}</div>;
+}

@@ -1,5 +1,5 @@
 import type {
-  OptionsComponentExts,
+  OptionsComponentExts as OptionsComponentExtensions,
   OptionsFiles,
   OptionsOverrides,
   TypedFlatConfigItem,
@@ -13,11 +13,11 @@ import {
 import { interopDefault, parserPlain } from "../utils";
 
 export async function markdown(
-  options: OptionsFiles & OptionsComponentExts & OptionsOverrides = {},
+  options: OptionsFiles & OptionsComponentExtensions & OptionsOverrides = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   const {
     files = [GLOB_MARKDOWN],
-    componentExts = [],
+    componentExts: componentExtensions = [],
     overrides = {},
   } = options;
 
@@ -52,7 +52,7 @@ export async function markdown(
     {
       files: [
         GLOB_MARKDOWN_CODE,
-        ...componentExts.map((ext) => `${GLOB_MARKDOWN}/**/*.${ext}`),
+        ...componentExtensions.map((extension) => `${GLOB_MARKDOWN}/**/*.${extension}`),
       ],
       languageOptions: {
         parserOptions: {

@@ -1,0 +1,7 @@
+<script setup>
+const message = "Oxlint";
+</script>
+
+<template>
+  <main>{{ message }}</main>
+</template>

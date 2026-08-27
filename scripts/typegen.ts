@@ -48,7 +48,7 @@ const configs = await combine(
     {
       plugins: {
         "": {
-          rules: Object.fromEntries(builtinRules.entries()),
+          rules: Object.fromEntries(builtinRules),
         },
       },
     },
@@ -94,16 +94,16 @@ const configs = await combine(
 );
 
 const configNames = configs
-  .map((i) => i?.name)
+  .map((index) => index?.name)
   .filter(Boolean) as Array<string>;
 
-let dts = await flatConfigsToRulesDTS(configs as any, {
+let dts = await flatConfigsToRulesDTS(configs, {
   includeAugmentation: false,
 });
 
 dts += `
 // Names of all the configs
-export type ConfigNames = ${configNames.map((i) => `'${i}'`).join(" | ")}
+export type ConfigNames = ${configNames.map((index) => `'${index}'`).join(" | ")}
 `;
 
 await fs.writeFile("src/typegen.d.ts", dts);

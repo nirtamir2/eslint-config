@@ -31,11 +31,9 @@ export async function imports(
         "import-x/no-webpack-loader-syntax": "error",
         "import-x/order": "off", // use prettier for it
 
-        ...(stylistic
-          ? {
+        ...(stylistic && {
               "import-x/newline-after-import": ["error", { count: 1 }],
-            }
-          : {}),
+            }),
       },
     },
     {

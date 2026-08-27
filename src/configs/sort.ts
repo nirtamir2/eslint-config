@@ -55,6 +55,7 @@ export async function sortPackageJson(): Promise<Array<TypedFlatConfigItem>> {
               "activationEvents",
               "contributes",
               "scripts",
+              "scripts-info",
               "peerDependencies",
               "peerDependenciesMeta",
               "dependencies",
@@ -139,14 +140,18 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
           },
           {
             order: [
-              /* Projects */
+              /*
+              Projects
+              */
               "incremental",
               "composite",
               "tsBuildInfoFile",
               "disableSourceOfProjectReferenceRedirect",
               "disableSolutionSearching",
               "disableReferencedProjectLoad",
-              /* Language and Environment */
+              /*
+              Language and Environment
+              */
               "target",
               "jsx",
               "jsxFactory",
@@ -160,7 +165,9 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
               "emitDecoratorMetadata",
               "experimentalDecorators",
               "libReplacement",
-              /* Modules */
+              /*
+              Modules
+              */
               "baseUrl",
               "rootDir",
               "rootDirs",
@@ -178,11 +185,15 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
               "allowArbitraryExtensions",
               "allowImportingTsExtensions",
               "allowUmdGlobalAccess",
-              /* JavaScript Support */
+              /*
+              JavaScript Support
+              */
               "allowJs",
               "checkJs",
               "maxNodeModuleJsDepth",
-              /* Type Checking */
+              /*
+              Type Checking
+              */
               "strict",
               "strictBindCallApply",
               "strictFunctionTypes",
@@ -202,7 +213,9 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
               "noUnusedLocals",
               "noUnusedParameters",
               "useUnknownInCatchVariables",
-              /* Emit */
+              /*
+              Emit
+              */
               "declaration",
               "declarationDir",
               "declarationMap",
@@ -226,7 +239,9 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
               "sourceMap",
               "sourceRoot",
               "stripInternal",
-              /* Interop Constraints */
+              /*
+              Interop Constraints
+              */
               "allowSyntheticDefaultImports",
               "esModuleInterop",
               "forceConsistentCasingInFileNames",
@@ -235,7 +250,9 @@ export function sortTsconfig(): Array<TypedFlatConfigItem> {
               "preserveSymlinks",
               "verbatimModuleSyntax",
               "erasableSyntaxOnly",
-              /* Completeness */
+              /*
+              Completeness
+              */
               "skipDefaultLibCheck",
               "skipLibCheck",
             ],

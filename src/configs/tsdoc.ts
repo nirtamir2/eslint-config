@@ -1,5 +1,5 @@
 import type {
-  OptionsComponentExts,
+  OptionsComponentExts as OptionsComponentExtensions,
   OptionsFiles,
   OptionsOverrides,
   TypedFlatConfigItem,
@@ -7,7 +7,7 @@ import type {
 import { compat } from "../compat";
 
 export async function tsdoc(
-  options: OptionsFiles & OptionsComponentExts & OptionsOverrides = {},
+  options: OptionsFiles & OptionsComponentExtensions & OptionsOverrides = {},
 ): Promise<Array<TypedFlatConfigItem>> {
   return [
     ...compat.config({

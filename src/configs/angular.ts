@@ -23,7 +23,7 @@ export async function angular(
   const angularTsRules: Rules = {};
   const angularTemplateRules: Rules = {};
 
-  Object.entries(overrides).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(overrides)) {
     if (key.startsWith("@angular-eslint/")) {
       angularTsRules[key] = value;
     }
@@ -31,7 +31,18 @@ export async function angular(
     if (key.startsWith("@angular-eslint/template/")) {
       angularTemplateRules[key] = value;
     }
-  });
+  }
+
+  const angularRecommendedRules = Object.fromEntries(
+    Object.entries(pluginAngular.rules)
+      .filter(([, rule]) => rule.meta.docs?.recommended === "recommended")
+      .map(([name]) => [`@angular-eslint/${name}`, "error"]),
+  );
+  const angularTemplateRecommendedRules = Object.fromEntries(
+    Object.entries(pluginAngularTemplate.rules)
+      .filter(([, rule]) => rule.meta.docs?.recommended === "recommended")
+      .map(([name]) => [`@angular-eslint/template/${name}`, "error"]),
+  );
 
   return [
     {
@@ -48,7 +59,7 @@ export async function angular(
         "extract-inline-html"
       ] as TypedFlatConfigItem["processor"],
       rules: {
-        ...(pluginAngular.configs.recommended.rules as Rules),
+        ...angularRecommendedRules,
         "@angular-eslint/prefer-inject": "error",
         "@angular-eslint/prefer-standalone": "error",
         "@angular-eslint/use-lifecycle-interface": "error",
@@ -62,7 +73,7 @@ export async function angular(
       },
       name: "antfu/angular/rules/template",
       rules: {
-        ...(pluginAngularTemplate.configs.recommended.rules as Rules),
+        ...angularTemplateRecommendedRules,
         "@stylistic/indent": "off",
         "@stylistic/no-multiple-empty-lines": ["error", { max: 1 }],
         "@stylistic/no-trailing-spaces": "off",

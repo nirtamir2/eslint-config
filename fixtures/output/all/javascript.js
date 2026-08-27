@@ -55,7 +55,7 @@ try {
 }
 
 // Use a ternary conditional operator
-const isEven = (num) => num % 2 === 0;
+const isEven = (number_) => number_ % 2 === 0;
 const number = 7;
 log(`${number} is ${isEven(number) ? "even" : "odd"}.`);
 

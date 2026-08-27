@@ -107,11 +107,11 @@ function serializeConfigs(
   });
 }
 
-suites.forEach(({ name, configs }) => {
+for (const { name, configs } of suites) {
   it.concurrent(`factory ${name}`, async ({ expect }) => {
     const resolved = await nirtamir2(configs);
     await expect(serializeConfigs(resolved)).toMatchFileSnapshot(
       `./__snapshots__/factory/${name}.snap.js`,
     );
   });
-});
+}

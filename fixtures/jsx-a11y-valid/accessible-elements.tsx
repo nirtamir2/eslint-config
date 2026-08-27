@@ -1,4 +1,4 @@
-function App() {
+export default function App() {
   return (
     <div>
       <img src="test.jpg" alt="A decorative element" />
@@ -13,5 +13,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
