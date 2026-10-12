@@ -3,6 +3,7 @@ import { angular } from "../src/configs/angular";
 import { defaultImportName } from "../src/configs/default-import-name";
 import { nextjs } from "../src/configs/nextjs";
 import { react } from "../src/configs/react";
+import { solid } from "../src/configs/solid";
 import { svelte } from "../src/configs/svelte";
 import { zod } from "../src/configs/zod";
 
@@ -92,6 +93,10 @@ describe("custom config blocks", () => {
     expect(withTypesConfig?.plugins).toHaveProperty(
       "eslint-plugin-classname-components",
     );
+    expect(withTypesConfig?.languageOptions?.parser).toBeDefined();
+    expect(withTypesConfig?.languageOptions?.parserOptions).toMatchObject({
+      project: ["tsconfig.json"],
+    });
     expect(withTypesConfig?.rules).toMatchObject({
       "eslint-plugin-classname-components/no-classname-prop-in-styled-components":
         "error",
@@ -102,5 +107,100 @@ describe("custom config blocks", () => {
       "eslint-plugin-classname-components/prefer-static-classname-in-styled-components":
         "error",
     });
+  });
+
+  it("applies the Solid 2.0 preset and type-aware classname-components", async () => {
+    const withoutTypes = await solid({ typescript: true });
+    const withoutTypesSetup = withoutTypes.find(
+      (config) => config.name === "antfu/solid/setup",
+    );
+    const withoutTypesRules = withoutTypes.find(
+      (config) => config.name === "antfu/solid/rules",
+    );
+    const withoutTypesClassname = withoutTypes.find(
+      (config) => config.name === "nirtamir2/solid/classname-components",
+    );
+
+    expect(withoutTypesSetup?.settings).toMatchObject({
+      solid: { version: 2 },
+    });
+    expect(withoutTypesRules?.rules).toMatchObject({
+      "solid/no-accessor-as-prop": 2,
+      "solid/no-browser-globals-in-server-function": 2,
+      "solid/no-invalid-server-capture": 2,
+      "solid/no-react-deps": 0,
+      "solid/no-single-arg-create-effect": 2,
+      "solid/prefer-classlist": 0,
+      "solid/prefer-structured-class": 1,
+      "solid/removed-api": 2,
+      "solid/require-async-server-function": 2,
+      "solid/valid-use-server": 2,
+    });
+    expect(withoutTypesClassname).toBeUndefined();
+    expect(
+      withoutTypes.find((config) => config.name === "nirtamir2/solid/jsx-style")
+        ?.rules,
+    ).toMatchObject({
+      "@stylistic/jsx-curly-brace-presence": [
+        "error",
+        { props: "never", children: "never" },
+      ],
+    });
+    expect(
+      withoutTypes.find(
+        (config) => config.name === "nirtamir2/solid/typescript-disables",
+      )?.files,
+    ).toEqual(["**/*.?([cm])jsx", "**/*.?([cm])tsx"]);
+
+    const withTypes = await solid({
+      tsconfigPath: "tsconfig.json",
+      typescript: true,
+    });
+    const withTypesClassname = withTypes.find(
+      (config) => config.name === "nirtamir2/solid/classname-components",
+    );
+
+    expect(withTypesClassname).toBeDefined();
+    expect(withTypesClassname?.plugins).toHaveProperty(
+      "eslint-plugin-classname-components",
+    );
+    expect(withTypesClassname?.languageOptions?.parser).toBeDefined();
+    expect(withTypesClassname?.languageOptions?.parserOptions).toMatchObject({
+      project: ["tsconfig.json"],
+    });
+    expect(withTypesClassname?.rules).toMatchObject({
+      "eslint-plugin-classname-components/no-classname-prop-in-styled-components":
+        "error",
+      "eslint-plugin-classname-components/no-classname-prop-merge-in-styled-components":
+        "error",
+      "eslint-plugin-classname-components/prefer-plain-props-parameter":
+        "error",
+      "eslint-plugin-classname-components/prefer-static-classname-in-styled-components":
+        "error",
+    });
+
+    expect(
+      withoutTypes.some((config) => config.plugins?.["@eslint-react"]),
+    ).toBe(false);
+    expect(
+      withoutTypes.some(
+        (config) => config.name === "nirtamir2/solid/react-rules-off",
+      ),
+    ).toBe(false);
+
+    const withReact = await solid({ react: true, typescript: true });
+    const reactDisables = withReact.find(
+      (config) => config.name === "nirtamir2/solid/react-rules-off",
+    );
+    expect(
+      withReact.some((config) => config.name === "nirtamir2/solid/jsx-style"),
+    ).toBe(false);
+    expect(reactDisables?.rules).toMatchObject({
+      "@eslint-react/no-unstable-context-value": "off",
+      "react-refresh/only-export-components": "off",
+      "react/jsx-no-constructed-context-values": "off",
+      "react/no-unknown-property": "off",
+    });
+    expect(reactDisables?.files).toEqual(["**/*.?([cm])jsx", "**/*.?([cm])tsx"]);
   });
 });

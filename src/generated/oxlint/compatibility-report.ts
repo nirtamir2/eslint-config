@@ -654,10 +654,11 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     },
     "solid.javascript": {
       "adaptations": [
-        "Embedded React, JSX-a11y, and eslint-plugin-ssr-friendly presets are omitted; executable Solid rules and Solid-specific disables are retained, except obsolete SonarJS rule IDs absent from the installed plugin."
+        "JSX-a11y is covered by the JSX integration; eslint-plugin-ssr-friendly is omitted because it uses ESLint APIs that Oxlint's JavaScript-plugin runtime does not implement.",
+        "Type-aware classname-components rules are omitted because Oxlint JS plugins cannot use TypeScript parser services (https://oxc.rs/docs/guide/usage/linter/js-plugins.html)."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 18,
+      "migratedRuleCount": 36,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -674,6 +675,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     },
     "solid.reactDisables": {
       "adaptations": [
+        "React-specific rules that conflict with Solid are turned off on JSX/TSX files when React is also enabled.",
         "The obsolete @eslint-react/prefer-destructuring-assignment disable is omitted because the installed plugin no longer defines that rule."
       ],
       "jsPlugins": true,
@@ -694,10 +696,11 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     },
     "solid.typescript": {
       "adaptations": [
-        "Embedded React, JSX-a11y, and eslint-plugin-ssr-friendly presets are omitted; executable Solid rules and Solid-specific disables are retained, except obsolete SonarJS rule IDs absent from the installed plugin."
+        "JSX-a11y is covered by the JSX integration; eslint-plugin-ssr-friendly is omitted because it uses ESLint APIs that Oxlint's JavaScript-plugin runtime does not implement.",
+        "Type-aware classname-components rules are omitted because Oxlint JS plugins cannot use TypeScript parser services (https://oxc.rs/docs/guide/usage/linter/js-plugins.html)."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 18,
+      "migratedRuleCount": 36,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],

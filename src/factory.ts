@@ -293,6 +293,7 @@ export function nirtamir2(
     configs.push(
       solid({
         overrides: getOverrides(options, "solid"),
+        react: enableReact,
         tsconfigPath,
         typescript: enableTypeScript,
       }),

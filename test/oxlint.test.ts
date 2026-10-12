@@ -401,6 +401,14 @@ describe("oxlint config factory", () => {
     expect(solidRules).not.toHaveProperty(
       "sonarjs/jsx-no-constructed-context-values",
     );
+    expect(jsPluginNames(config)).not.toContain("classname-components");
+    expect(config.settings).toMatchObject({
+      solid: { version: 2 },
+    });
+    expect(solidRules).toMatchObject({
+      "solid/no-single-arg-create-effect": "error",
+      "solid/removed-api": "error",
+    });
   });
 
   it("inserts feature overrides before later producer-internal disables", () => {

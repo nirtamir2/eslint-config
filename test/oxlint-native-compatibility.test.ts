@@ -586,6 +586,12 @@ const diagnosticCases = [
     rule: "jsx-no-script-url",
   },
   {
+    file: "framework/solid-v2-effect.tsx",
+    name: "Solid 2.0 JavaScript plugin",
+    options: { solid: true, typescript: true },
+    rule: "no-single-arg-create-effect",
+  },
+  {
     file: "framework/example.stories.tsx",
     name: "Storybook JavaScript plugin",
     options: { storybook: true },

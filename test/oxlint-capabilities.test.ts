@@ -127,8 +127,11 @@ describe("oxlint capability manifest", () => {
     );
     expect(oxlintCapabilities.solid).toMatchObject({
       support: "js-plugin",
-      runtimePackages: ["@eslint-react/eslint-plugin", "eslint-plugin-solid"],
+      runtimePackages: ["@stylistic/eslint-plugin", "eslint-plugin-solid"],
     });
+    expect(oxlintCapabilities.solid.runtimePackages).not.toContain(
+      "eslint-plugin-classname-components",
+    );
     expect(oxlintCapabilities.command).toMatchObject({
       support: "js-plugin",
       runtimePackages: ["eslint-plugin-command"],

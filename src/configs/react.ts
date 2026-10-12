@@ -7,9 +7,10 @@ import type {
 import { fixupConfigRules } from "@eslint/compat";
 import { isPackageExists } from "local-pkg";
 import { compat } from "../compat";
-import { GLOB_JS, GLOB_JSX, GLOB_SRC, GLOB_TS } from "../globs";
+import { GLOB_SRC } from "../globs";
 import { ensurePackages, interopDefault, toArray } from "../utils";
 import { a11y } from "./a11y";
+import { classnameComponents } from "./classname-components";
 
 // react refresh
 const ReactRefreshAllowConstantExportPackages = ["vite"];
@@ -34,7 +35,6 @@ export async function react(
 
   await ensurePackages([
     "@eslint-react/eslint-plugin",
-    isTypeAware ? "eslint-plugin-classname-components" : undefined,
     "eslint-plugin-react-you-might-not-need-an-effect",
     "eslint-plugin-react-refresh",
   ]);
@@ -45,16 +45,12 @@ export async function react(
     parserTs,
     pluginReactYouMightNotNeedAnEffect,
     pluginStylistic,
-    classnameComponentsConfig,
   ] = await Promise.all([
     interopDefault(import("@eslint-react/eslint-plugin")),
     interopDefault(import("eslint-plugin-react-refresh")),
     interopDefault(import("@typescript-eslint/parser")),
     interopDefault(import("eslint-plugin-react-you-might-not-need-an-effect")),
     interopDefault(import("@stylistic/eslint-plugin")),
-    isTypeAware
-      ? interopDefault(import("eslint-plugin-classname-components/config"))
-      : Promise.resolve(),
   ] as const);
 
   const isUsingNext = environment.hasPackage("next");
@@ -66,9 +62,6 @@ export async function react(
   const eslintReactConfig = isTypeAware
     ? pluginReact.configs["strict-type-checked"]
     : pluginReact.configs["strict-typescript"];
-  const classnameComponentsTypeAwareConfig = classnameComponentsConfig?.({
-    strict: true,
-  });
 
   return [
     {
@@ -146,16 +139,11 @@ export async function react(
       },
     },
     pluginReactYouMightNotNeedAnEffect.configs.recommended,
-    ...(classnameComponentsTypeAwareConfig
-      ? [
-          {
-            ...classnameComponentsTypeAwareConfig,
-            files,
-            ignores: [GLOB_JS, GLOB_JSX, GLOB_TS],
-            name: "nirtamir2/react/classname-components",
-          },
-        ]
-      : []),
+    ...(await classnameComponents({
+      files,
+      name: "nirtamir2/react/classname-components",
+      tsconfigPath: options.tsconfigPath,
+    })),
     ...fixupConfigRules(
       compat.config({
         extends: ["plugin:ssr-friendly/recommended"],

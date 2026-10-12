@@ -524,8 +524,14 @@ export interface OptionsConfig
   /**
    * Enable solid rules.
    *
+   * Applies eslint-plugin-solid's Solid 2.0 (`v2`) preset, JSX a11y/SSR,
+   * and type-aware classname-components when `typescript.tsconfigPath` is set.
+   * React-specific rules are not included; enable `react` as well to lint a
+   * mixed React/Solid repo, which turns conflicting React rules off on JSX/TSX.
+   *
    * Requires installing:
    * - `eslint-plugin-solid`
+   * - `eslint-plugin-classname-components` (when type-aware)
    *
    * @default false
    */

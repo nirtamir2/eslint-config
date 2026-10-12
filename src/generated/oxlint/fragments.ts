@@ -2467,6 +2467,10 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                 "solid/jsx-no-script-url": "error",
                 "solid/jsx-no-undef": "error",
                 "solid/jsx-uses-vars": "error",
+                "solid/no-accessor-as-prop": "error",
+                "solid/no-array-handlers": "off",
+                "solid/no-boolean-enumerated-attribute": "error",
+                "solid/no-browser-globals-in-server-function": "error",
                 "solid/no-destructure": "error",
                 "solid/no-innerhtml": [
                   "error",
@@ -2474,11 +2478,22 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                     "allowStatic": true
                   }
                 ],
-                "solid/no-react-deps": "error",
+                "solid/no-invalid-server-capture": "error",
+                "solid/no-proxy-apis": "off",
+                "solid/no-react-deps": "off",
                 "solid/no-react-specific-props": "error",
+                "solid/no-single-arg-create-effect": "error",
+                "solid/no-store-mutation-outside-setter": "error",
                 "solid/no-unknown-namespaces": "error",
+                "solid/no-unused-signal": "warn",
+                "solid/no-write-in-pure-computation": "error",
+                "solid/prefer-classlist": "off",
                 "solid/prefer-for": "error",
+                "solid/prefer-show": "off",
+                "solid/prefer-structured-class": "warn",
                 "solid/reactivity": "warn",
+                "solid/removed-api": "error",
+                "solid/require-async-server-function": "error",
                 "solid/self-closing-comp": "error",
                 "solid/style-prop": [
                   "error",
@@ -2487,6 +2502,32 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                       "style",
                       "css"
                     ]
+                  }
+                ],
+                "solid/valid-use-server": "error"
+              }
+            },
+            {
+              "files": [
+                "**/*.{jsx,mjsx,cjsx}",
+                "**/*.{tsx,mtsx,ctsx}"
+              ],
+              "jsPlugins": [
+                "@stylistic/eslint-plugin"
+              ],
+              "rules": {
+                "@stylistic/jsx-curly-brace-presence": [
+                  "error",
+                  {
+                    "children": "never",
+                    "props": "never"
+                  }
+                ],
+                "@stylistic/jsx-pascal-case": [
+                  "error",
+                  {
+                    "allowLeadingUnderscore": true,
+                    "allowNamespace": true
                   }
                 ]
               }
@@ -2504,7 +2545,12 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                 "typescript/no-non-null-assertion": "off"
               }
             }
-          ]
+          ],
+          "settings": {
+            "solid": {
+              "version": 2
+            }
+          }
         },
         "overrideTarget": {
           "files": [
@@ -2573,6 +2619,10 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                   }
                 ],
                 "solid/jsx-uses-vars": "error",
+                "solid/no-accessor-as-prop": "error",
+                "solid/no-array-handlers": "off",
+                "solid/no-boolean-enumerated-attribute": "error",
+                "solid/no-browser-globals-in-server-function": "error",
                 "solid/no-destructure": "error",
                 "solid/no-innerhtml": [
                   "error",
@@ -2580,11 +2630,22 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                     "allowStatic": true
                   }
                 ],
-                "solid/no-react-deps": "error",
+                "solid/no-invalid-server-capture": "error",
+                "solid/no-proxy-apis": "off",
+                "solid/no-react-deps": "off",
                 "solid/no-react-specific-props": "error",
+                "solid/no-single-arg-create-effect": "error",
+                "solid/no-store-mutation-outside-setter": "error",
                 "solid/no-unknown-namespaces": "off",
+                "solid/no-unused-signal": "warn",
+                "solid/no-write-in-pure-computation": "error",
+                "solid/prefer-classlist": "off",
                 "solid/prefer-for": "error",
+                "solid/prefer-show": "off",
+                "solid/prefer-structured-class": "warn",
                 "solid/reactivity": "warn",
+                "solid/removed-api": "error",
+                "solid/require-async-server-function": "error",
                 "solid/self-closing-comp": "error",
                 "solid/style-prop": [
                   "error",
@@ -2593,6 +2654,32 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                       "style",
                       "css"
                     ]
+                  }
+                ],
+                "solid/valid-use-server": "error"
+              }
+            },
+            {
+              "files": [
+                "**/*.{jsx,mjsx,cjsx}",
+                "**/*.{tsx,mtsx,ctsx}"
+              ],
+              "jsPlugins": [
+                "@stylistic/eslint-plugin"
+              ],
+              "rules": {
+                "@stylistic/jsx-curly-brace-presence": [
+                  "error",
+                  {
+                    "children": "never",
+                    "props": "never"
+                  }
+                ],
+                "@stylistic/jsx-pascal-case": [
+                  "error",
+                  {
+                    "allowLeadingUnderscore": true,
+                    "allowNamespace": true
                   }
                 ]
               }
@@ -2610,7 +2697,12 @@ export const generatedOxlintFragments: GeneratedOxlintFragments = {
                 "typescript/no-non-null-assertion": "off"
               }
             }
-          ]
+          ],
+          "settings": {
+            "solid": {
+              "version": 2
+            }
+          }
         },
         "overrideTarget": {
           "files": [

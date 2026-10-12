@@ -279,9 +279,11 @@ export const oxlintCapabilities = {
     support: "js-plugin",
     eslintDefault: "disabled",
     detection: none,
-    runtimePackages: ["@eslint-react/eslint-plugin", "eslint-plugin-solid"],
+    runtimePackages: ["@stylistic/eslint-plugin", "eslint-plugin-solid"],
     limitations: [
-      "Solid's own rules and Solid-specific TypeScript disables are exported; React-specific disables are added only when React is enabled, while embedded React, JSX-a11y, and SSR presets are excluded and JavaScript-plugin rules cannot use TypeScript parser services.",
+      "Solid 2.0 rules run as a JavaScript plugin with settings.solid.version = 2; JSX stylistic rules and Solid-specific TypeScript disables are exported; React-specific disables are added only when React is enabled.",
+      "JSX-a11y is covered by the JSX integration; eslint-plugin-ssr-friendly is omitted because it uses ESLint APIs that Oxlint's JavaScript-plugin runtime does not implement.",
+      "Type-aware eslint-plugin-classname-components is omitted because Oxlint JS plugins cannot use TypeScript parser services (https://oxc.rs/docs/guide/usage/linter/js-plugins.html).",
       "The @eslint-react package is loaded only for the React-disable fragment when React is also enabled.",
     ],
   },

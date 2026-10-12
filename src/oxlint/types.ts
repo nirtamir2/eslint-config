@@ -188,7 +188,7 @@ export interface OxlintOptions {
   */
   security?: boolean | OxlintOverridesOptions;
   /**
-  Enable Solid rules for JSX and TSX files.
+  Enable Solid 2.0 rules for JSX and TSX files.
   */
   solid?: boolean | OxlintOverridesOptions;
   /**

@@ -176,7 +176,7 @@ The factory accepts these public options:
 | `perfectionist`   | Disabled; accepts `overrides`.                                                                                                                                  |
 | `query`           | Detected from TanStack React Query or Solid Query; accepts `overrides`.                                                                                         |
 | `security`        | Disabled; accepts `overrides`.                                                                                                                                  |
-| `solid`           | Disabled; accepts `overrides`.                                                                                                                                  |
+| `solid`           | Disabled; Solid 2.0 (`v2`) rules; requires `eslint-plugin-solid >=0.18.1`; accepts `overrides`.                                                                                                           |
 | `storybook`       | Detected from Storybook packages; boolean only.                                                                                                                 |
 | `stylistic`       | Disabled; accepts `braceStyle`, `experimental`, numeric-or-tab `indent`, `jsx`, `quotes`, `semi`, and `overrides`. This is rule coverage, not formatter parity. |
 | `tailwindcss`     | Detected from `tailwindcss`; accepts `entryPoint` and `overrides`.                                                                                              |
@@ -228,7 +228,7 @@ features use optional peers; install the matching peer before enabling them:
 | `perfectionist` | `eslint-plugin-perfectionist`                                                                                   |
 | `query`         | `@tanstack/eslint-plugin-query`                                                                                 |
 | `security`      | `eslint-plugin-security`                                                                                        |
-| `solid`         | `eslint-plugin-solid` (`@eslint-react/eslint-plugin` is already required when Solid and React are both enabled) |
+| `solid`         | `eslint-plugin-solid` (`@eslint-react/eslint-plugin` is required only when Solid and React are both enabled) |
 | `storybook`     | `eslint-plugin-storybook`                                                                                       |
 | `tailwindcss`   | `eslint-plugin-better-tailwindcss`                                                                              |
 | `unocss`        | `@unocss/eslint-plugin`                                                                                         |
@@ -556,6 +556,8 @@ export default nirtamir2({
   },
 });
 ```
+
+That `tsconfigPath` also turns on type-aware `eslint-plugin-classname-components` for React and Solid TSX, using `@typescript-eslint/parser` with `parserOptions.project`. Oxlint cannot run those rules: its JavaScript-plugin runtime does not expose TypeScript parser services.
 
 ### Editor Specific Disables
 
