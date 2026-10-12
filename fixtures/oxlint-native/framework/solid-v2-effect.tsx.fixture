@@ -1,0 +1,8 @@
+import { createEffect } from "solid-js";
+
+export function Tick() {
+  createEffect(() => {
+    console.log("tick");
+  });
+  return <div />;
+}
