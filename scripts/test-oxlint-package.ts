@@ -29,7 +29,7 @@ try {
     stdio: "inherit",
   });
 
-  const packageJson: typeof import("../package.json") = JSON.parse(
+  const packageJson: { peerDependencies: Record<string, string> } = JSON.parse(
     await fs.readFile(path.join(repoRoot, "package.json"), "utf8"),
   );
   const solidMinimum = /^>=(\d+\.\d+\.\d+)$/u.exec(
