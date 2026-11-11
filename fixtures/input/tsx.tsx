@@ -3,7 +3,7 @@ export function Component1() {
 }
 
 export function jsx2() {
-  const props = { a: 1, b: 2 };
+  var props = { a: 1, b: 2 };
   return (
     <a foo="bar" bar={`foo`}>
       <div {...props} a={1} b="2">

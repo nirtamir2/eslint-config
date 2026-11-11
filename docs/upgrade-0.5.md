@@ -51,6 +51,19 @@ enabled on feature override blocks so test overrides load without requiring a
 consumer workaround. Type-aware JS-plugin rules that Oxlint cannot execute remain
 listed in the compatibility report; the upgrade does not claim full ESLint parity.
 
+## TSX fixture coverage
+
+The old TSX expected output differed from its input only by the Unicorn
+`props` → `properties` rename. Disabling `unicorn/name-replacements` removes
+that fix. The former fixture harness deleted expected files when the output
+matched the input; it did not mean ESLint deleted the TSX source.
+
+The harness now retains snapshots for every fixture, verifies ESLint's exit
+status and zero fatal parse errors, and requires the TSX anchor accessibility
+diagnostic. The TSX input uses `var props`, with `const props` in the 24-line
+expected output, so the test also proves that autofix actually runs. A deliberate
+TSX syntax error was verified to fail the harness before snapshot comparison.
+
 ## Minimal consumer setup
 
 Install `@nirtamir2/eslint-config@^0.5.0`, `eslint@^10.14.0`, and
