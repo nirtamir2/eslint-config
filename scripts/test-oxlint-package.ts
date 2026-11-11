@@ -5,6 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
+import { generatedOxlintFragments } from "../src/generated/oxlint";
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url));
 const fixtureRoot = path.join(repoRoot, "fixtures", "oxlint-consumer");
@@ -28,6 +29,14 @@ try {
     stdio: "inherit",
   });
 
+  const packageJson: typeof import("../package.json") = JSON.parse(
+    await fs.readFile(path.join(repoRoot, "package.json"), "utf8"),
+  );
+  const solidMinimum = /^>=(\d+\.\d+\.\d+)$/u.exec(
+    packageJson.peerDependencies["eslint-plugin-solid"],
+  )?.[1];
+  assert.ok(solidMinimum, "Expected an explicit Solid minimum peer version");
+
   await fs.cp(fixtureRoot, consumerRoot, { recursive: true });
   await fs.rename(
     path.join(consumerRoot, "src", "invalid.ts.fixture"),
@@ -44,6 +53,7 @@ try {
         devDependencies: {
           "@nirtamir2/eslint-config": `file:${tarballPath}`,
           eslint: eslintVersion,
+          "eslint-plugin-solid": solidMinimum,
           oxlint: oxlintVersion,
           typescript: typescriptVersion,
         },
@@ -101,6 +111,8 @@ try {
     "e18e",
   );
 
+  await assertSolidRulesExistAtPeerMinimum(consumerRoot, solidMinimum);
+
   const recommendedRun = await execa(
     "pnpm",
     [
@@ -139,6 +151,44 @@ try {
   process.stdout.write("Packed Oxlint consumer passed.\n");
 } finally {
   await fs.rm(temporaryRoot, { force: true, recursive: true });
+}
+
+async function assertSolidRulesExistAtPeerMinimum(
+  consumerRoot: string,
+  minimum: string,
+): Promise<void> {
+  const ruleNames = [
+    ...new Set(
+      Object.values(generatedOxlintFragments.integrations.solid)
+        .flatMap(({ config }) => [
+          config.rules,
+          ...(config.overrides ?? []).map((override) => override.rules),
+        ])
+        .flatMap((rules) => Object.keys(rules ?? {}))
+        .filter((rule) => rule.startsWith("solid/")),
+    ),
+  ];
+  await execa(
+    "node",
+    [
+      "--input-type=module",
+      "--eval",
+      `
+    import assert from "node:assert/strict";
+    import { createRequire } from "node:module";
+    import solid from "eslint-plugin-solid";
+    const require = createRequire(import.meta.url);
+    const installed = require("eslint-plugin-solid/package.json").version;
+    assert.equal(installed, process.argv[2]);
+    const ruleNames = JSON.parse(process.argv[1]);
+    const missing = ruleNames.filter((rule) => !Object.hasOwn(solid.rules, rule.slice("solid/".length)));
+    assert.deepEqual(missing, [], "Generated Solid rules unavailable at declared peer minimum " + installed);
+  `,
+      JSON.stringify(ruleNames),
+      minimum,
+    ],
+    { cwd: consumerRoot, stdio: "inherit" },
+  );
 }
 
 function collectModuleSpecifiers(source: string): Array<string> {

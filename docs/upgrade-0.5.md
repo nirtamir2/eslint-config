@@ -7,6 +7,19 @@ stylistic defaults remain in place. Unicorn's renamed `name-replacements` rule
 stays disabled, matching the previous `prevent-abbreviations` customization.
 Unicorn's new documentation-comment rule stays disabled to preserve JSDoc/TSDoc.
 
+## Version 0.5.1 Solid peer correction
+
+Version 0.5.1 raises the optional `eslint-plugin-solid` peer minimum from
+`>=0.18.1` to `>=0.19.0`. The generated Solid config uses
+`solid/no-unassigned-vars` and `solid/validate-jsx-nesting`, introduced in 0.19.0.
+Version 0.18.1 lacks both rules and causes Oxlint to fail during config loading.
+Consumers using Solid must upgrade that plugin; other integrations are unchanged.
+
+The packed-consumer check installs the exact declared Solid minimum and verifies
+all generated Solid rule names against that installed plugin. It fails with the
+old minimum. The other 31 peer floors match the repository's tested installed
+versions; Solid was the only stale floor and the only unbounded `>=` peer range.
+
 ## Upstream review
 
 Compared `antfu/eslint-config` snapshot
