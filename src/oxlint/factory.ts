@@ -221,11 +221,7 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
     throw new TypeError(
       'Oxlint option "ignores" must be an array of strings or transformer function',
     );
-  if (
-    options.type !== undefined &&
-    options.type !== "app" &&
-    options.type !== "lib"
-  )
+  if (!optionalValues("app", "lib").includes(options.type))
     throw new TypeError('Oxlint option "type" must be "app" or "lib"');
 
   assertRules(options.rules, "rules");
@@ -294,10 +290,9 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
   }
   if (isRecord(options.stylistic)) {
     if (
-      options.stylistic.braceStyle !== undefined &&
-      options.stylistic.braceStyle !== "1tbs" &&
-      options.stylistic.braceStyle !== "allman" &&
-      options.stylistic.braceStyle !== "stroustrup"
+      !optionalValues("1tbs", "allman", "stroustrup").includes(
+        options.stylistic.braceStyle,
+      )
     )
       throw new TypeError(
         'Oxlint option "stylistic.braceStyle" must be "1tbs", "allman", or "stroustrup"',
@@ -315,10 +310,9 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
       );
     assertBoolean(options.stylistic.jsx, "stylistic.jsx");
     if (
-      options.stylistic.quotes !== undefined &&
-      options.stylistic.quotes !== "backtick" &&
-      options.stylistic.quotes !== "double" &&
-      options.stylistic.quotes !== "single"
+      !optionalValues("backtick", "double", "single").includes(
+        options.stylistic.quotes,
+      )
     )
       throw new TypeError(
         'Oxlint option "stylistic.quotes" must be "backtick", "double", or "single"',
@@ -359,10 +353,16 @@ function validateOptions(options: unknown): asserts options is OxlintOptions {
     throw new TypeError(
       'Oxlint option "tailwindcss.entryPoint" must be a string',
     );
-  if (isRecord(options.unocss)) {
-    assertBoolean(options.unocss.attributify, "unocss.attributify");
-    assertBoolean(options.unocss.strict, "unocss.strict");
+  if (!isRecord(options.unocss)) {
+    return;
   }
+
+  assertBoolean(options.unocss.attributify, "unocss.attributify");
+  assertBoolean(options.unocss.strict, "unocss.strict");
+}
+
+function optionalValues(...values: Array<string>): ReadonlyArray<unknown> {
+  return [undefined, ...values];
 }
 
 function subOptions<T>(value: boolean | T | undefined): T {
@@ -453,6 +453,13 @@ function addFragment(
           excludeFiles: [...fragment.overrideTarget.excludeFiles],
         }),
         files: [...fragment.overrideTarget.files],
+        plugins: [
+          ...new Set(
+            fragment.config.overrides?.flatMap(
+              (override) => override.plugins ?? [],
+            ),
+          ),
+        ],
         rules: { ...overrides },
       },
     ],

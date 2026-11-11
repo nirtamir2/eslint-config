@@ -1,9 +1,9 @@
-import type { OptionsConfig, TypedFlatConfigItem } from "../src/types";
-import { join, resolve } from "node:path";
 import { execa } from "execa";
 import fg from "fast-glob";
 import fs from "fs-extra";
+import { join, resolve } from "node:path";
 import { afterAll, beforeAll, it } from "vitest";
+import type { OptionsConfig, TypedFlatConfigItem } from "../src/types";
 
 const isWindows = process.platform === "win32";
 const timeout = isWindows ? 300_000 : 60_000;
@@ -109,11 +109,30 @@ export default nirtamir2(
   `,
       );
 
-      await execa("pnpm", ["exec", "eslint", ".", "--fix"], {
-        cwd: target,
-        reject: false,
-        stdio: "pipe",
+      const result = await execa(
+        "pnpm",
+        ["exec", "eslint", ".", "--fix", "--format", "json"],
+        {
+          cwd: target,
+          reject: false,
+          stdio: "pipe",
+        },
+      );
+
+      expect([0, 1], result.stderr || result.stdout).toContain(result.exitCode);
+      const lintResults: unknown = JSON.parse(result.stdout);
+      if (!Array.isArray(lintResults))
+        throw new TypeError("Expected ESLint JSON results");
+      for (const lintResult of lintResults)
+        expect(lintResult).toMatchObject({ fatalErrorCount: 0 });
+      const anchorDiagnostic = expect.objectContaining({
+        ruleId: "jsx-a11y/anchor-is-valid",
       });
+      const tsxResult = expect.objectContaining({
+        filePath: join(target, "tsx.tsx"),
+        messages: expect.arrayContaining([anchorDiagnostic]),
+      });
+      expect(lintResults).toEqual(expect.arrayContaining([tsxResult]));
 
       const files = await fg("**/*", {
         ignore: ["node_modules", "eslint.config.js"],
@@ -123,13 +142,8 @@ export default nirtamir2(
       await Promise.all(
         files.map(async (file) => {
           const content = await fs.readFile(join(target, file), "utf8");
-          const source = await fs.readFile(join(from, file), "utf8");
           const outputPath = join(output, file);
-          if (content === source) {
-            if (fs.existsSync(outputPath)) await fs.remove(outputPath);
-            return;
-          }
-          await expect.soft(content).toMatchFileSnapshot(join(output, file));
+          await expect.soft(content).toMatchFileSnapshot(outputPath);
         }),
       );
     },

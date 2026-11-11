@@ -112,7 +112,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "base.default": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 443,
+      "migratedRuleCount": 459,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -145,7 +145,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "base.editor": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 443,
+      "migratedRuleCount": 459,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -178,7 +178,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "base.suffix": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 322,
+      "migratedRuleCount": 338,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -637,7 +637,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "security": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 14,
+      "migratedRuleCount": 15,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -658,7 +658,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "Type-aware classname-components rules are omitted because Oxlint JS plugins cannot use TypeScript parser services (https://oxc.rs/docs/guide/usage/linter/js-plugins.html)."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 36,
+      "migratedRuleCount": 39,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -700,7 +700,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "Type-aware classname-components rules are omitted because Oxlint JS plugins cannot use TypeScript parser services (https://oxc.rs/docs/guide/usage/linter/js-plugins.html)."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 36,
+      "migratedRuleCount": 39,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -736,7 +736,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "stylistic": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 70,
+      "migratedRuleCount": 71,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -844,7 +844,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "stylistic.lessOpinionated": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 68,
+      "migratedRuleCount": 69,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -862,7 +862,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "stylistic.lessOpinionated.noJsx": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 54,
+      "migratedRuleCount": 55,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -880,7 +880,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "stylistic.noJsx": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 56,
+      "migratedRuleCount": 57,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -1421,6 +1421,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-duplicate-type-constituents",
           "@typescript-eslint/no-floating-promises",
           "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-generated-empty-object-type",
           "@typescript-eslint/no-implied-eval",
           "@typescript-eslint/no-meaningless-void-operator",
           "@typescript-eslint/no-misused-promises",
@@ -1438,6 +1439,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-unsafe-argument",
           "@typescript-eslint/no-unsafe-assignment",
           "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-assignment",
           "@typescript-eslint/no-unsafe-enum-comparison",
           "@typescript-eslint/no-unsafe-member-access",
           "@typescript-eslint/no-unsafe-return",
@@ -1508,6 +1510,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-duplicate-type-constituents",
           "@typescript-eslint/no-floating-promises",
           "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-generated-empty-object-type",
           "@typescript-eslint/no-implied-eval",
           "@typescript-eslint/no-meaningless-void-operator",
           "@typescript-eslint/no-misused-promises",
@@ -1525,6 +1528,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-unsafe-argument",
           "@typescript-eslint/no-unsafe-assignment",
           "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-assignment",
           "@typescript-eslint/no-unsafe-enum-comparison",
           "@typescript-eslint/no-unsafe-member-access",
           "@typescript-eslint/no-unsafe-return",
@@ -1576,7 +1580,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 179,
+      "migratedRuleCount": 181,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1603,7 +1607,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 179,
+      "migratedRuleCount": 181,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1630,7 +1634,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 174,
+      "migratedRuleCount": 176,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1657,7 +1661,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 174,
+      "migratedRuleCount": 176,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1703,6 +1707,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-duplicate-type-constituents",
           "@typescript-eslint/no-floating-promises",
           "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-generated-empty-object-type",
           "@typescript-eslint/no-implied-eval",
           "@typescript-eslint/no-meaningless-void-operator",
           "@typescript-eslint/no-misused-promises",
@@ -1720,6 +1725,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-unsafe-argument",
           "@typescript-eslint/no-unsafe-assignment",
           "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-assignment",
           "@typescript-eslint/no-unsafe-enum-comparison",
           "@typescript-eslint/no-unsafe-member-access",
           "@typescript-eslint/no-unsafe-return",
@@ -1790,6 +1796,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-duplicate-type-constituents",
           "@typescript-eslint/no-floating-promises",
           "@typescript-eslint/no-for-in-array",
+          "@typescript-eslint/no-generated-empty-object-type",
           "@typescript-eslint/no-implied-eval",
           "@typescript-eslint/no-meaningless-void-operator",
           "@typescript-eslint/no-misused-promises",
@@ -1807,6 +1814,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
           "@typescript-eslint/no-unsafe-argument",
           "@typescript-eslint/no-unsafe-assignment",
           "@typescript-eslint/no-unsafe-call",
+          "@typescript-eslint/no-unsafe-enum-assignment",
           "@typescript-eslint/no-unsafe-enum-comparison",
           "@typescript-eslint/no-unsafe-member-access",
           "@typescript-eslint/no-unsafe-return",
@@ -1858,7 +1866,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 180,
+      "migratedRuleCount": 182,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1885,7 +1893,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 180,
+      "migratedRuleCount": 182,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1912,7 +1920,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 175,
+      "migratedRuleCount": 177,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1939,7 +1947,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
         "eslint-plugin-expect-type and eslint-plugin-sort-destructure-keys-typescript are omitted because JavaScript plugins cannot access TypeScript parser services in Oxlint."
       ],
       "jsPlugins": true,
-      "migratedRuleCount": 175,
+      "migratedRuleCount": 177,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [
@@ -1964,7 +1972,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "unicorn.allRecommended": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 342,
+      "migratedRuleCount": 379,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -1984,7 +1992,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     "unicorn.selected": {
       "adaptations": [],
       "jsPlugins": true,
-      "migratedRuleCount": 20,
+      "migratedRuleCount": 21,
       "skippedRules": {
         "js-plugins": [],
         "not-implemented": [],
@@ -2523,7 +2531,7 @@ export const oxlintCompatibilityReport: OxlintCompatibilityReport = {
     }
   },
   "versions": {
-    "migrate": "1.79.0",
-    "oxlint": "1.79.0"
+    "migrate": "1.93.0",
+    "oxlint": "1.93.0"
   }
 };

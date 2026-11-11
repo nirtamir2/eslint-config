@@ -246,9 +246,8 @@ function restoreOverrideScope(
 
   return {
     ...override,
-    ...(scope.excludeFiles == null
-      ? { excludeFiles: undefined }
-      : { excludeFiles: [...scope.excludeFiles] }),
+    excludeFiles:
+      scope.excludeFiles == null ? undefined : [...scope.excludeFiles],
     files: [...scope.files],
   };
 }
@@ -269,10 +268,9 @@ export function restoreMigrationScopes(
 
 function normalizeRuleValue(value: unknown): unknown {
   const disabledRuleValues = new Set<unknown>([0, "allow", "off"]);
-  if (Array.isArray(value) && disabledRuleValues.has(value[0])) {
-    return "off";
-  }
-  return value;
+  return Array.isArray(value) && disabledRuleValues.has(value[0])
+    ? "off"
+    : value;
 }
 
 function normalizeRules(
@@ -375,15 +373,13 @@ export function sortGeneratedValue(
       : entries;
   }
 
-  if (value != null && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value)
-        .toSorted(([left], [right]) => left.localeCompare(right))
-        .map(([key, entry]) => [key, sortGeneratedValue(entry, key)]),
-    );
-  }
-
-  return value;
+  return value != null && typeof value === "object"
+    ? Object.fromEntries(
+        Object.entries(value)
+          .toSorted(([left], [right]) => left.localeCompare(right))
+          .map(([key, entry]) => [key, sortGeneratedValue(entry, key)]),
+      )
+    : value;
 }
 
 export function normalizeOxlintConfig(

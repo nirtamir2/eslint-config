@@ -20,7 +20,7 @@ function replaceScope(
   replacement: ReadonlyArray<string>,
 ): Array<string> {
   return patterns.flatMap((pattern) =>
-    pattern === placeholder ? replacement : [pattern],
+    pattern === placeholder ? replacement : pattern,
   );
 }
 

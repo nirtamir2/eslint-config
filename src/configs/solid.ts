@@ -1,3 +1,6 @@
+import { fixupConfigRules } from "@eslint/compat";
+import { compat } from "../compat";
+import { GLOB_JSX, GLOB_TSX } from "../globs";
 import type {
   OptionsFiles,
   OptionsHasTypeScript,
@@ -5,9 +8,6 @@ import type {
   OptionsTypeScriptWithTypes,
   TypedFlatConfigItem,
 } from "../types";
-import { fixupConfigRules } from "@eslint/compat";
-import { compat } from "../compat";
-import { GLOB_JSX, GLOB_TSX } from "../globs";
 import { ensurePackages, interopDefault, toArray } from "../utils";
 import { a11y } from "./a11y";
 import { classnameComponents } from "./classname-components";
@@ -29,9 +29,7 @@ export async function solid(
 
   await ensurePackages([
     "eslint-plugin-solid",
-    ...(withReact
-      ? ["@eslint-react/eslint-plugin"]
-      : ["@stylistic/eslint-plugin"]),
+    withReact ? "@eslint-react/eslint-plugin" : "@stylistic/eslint-plugin",
   ]);
 
   const tsconfigPath = options.tsconfigPath

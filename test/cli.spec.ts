@@ -1,30 +1,27 @@
+import { execa } from "execa";
+import fs from "fs-extra";
 import { join } from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { execa } from "execa";
-import fs from "fs-extra";
 import { afterAll, beforeEach, expect, it } from "vitest";
 
 const CLI_PATH = fileURLToPath(new URL("../src/cli/index.ts", import.meta.url));
-const genPath = fileURLToPath(new URL(`../.temp/${randomString()}`, import.meta.url));
+const genPath = fileURLToPath(
+  new URL(`../.temp/${randomString()}`, import.meta.url),
+);
 
 function randomString() {
   // eslint-disable-next-line sonarjs/pseudo-random
   return Math.random().toString(36).slice(2);
 }
 
-async function run(
-  parameters: Array<string> = [],
-  environment = {
-    SKIP_PROMPT: "1",
-    NO_COLOR: "1",
-  },
-) {
-  return await execa("pnpm", ["exec", "tsx", CLI_PATH, ...parameters], {
+async function run() {
+  return await execa("pnpm", ["exec", "tsx", CLI_PATH], {
     cwd: genPath,
     env: {
       ...process.env,
-      ...environment,
+      SKIP_PROMPT: "1",
+      NO_COLOR: "1",
     },
   });
 }
@@ -63,7 +60,10 @@ it("package.json updated", async () => {
 });
 
 it("esm eslint.config.js", async () => {
-  const packageContent = await fs.readFile(join(genPath, "package.json"), "utf8");
+  const packageContent = await fs.readFile(
+    join(genPath, "package.json"),
+    "utf8",
+  );
   await fs.writeFile(
     join(genPath, "package.json"),
     JSON.stringify({ ...JSON.parse(packageContent), type: "module" }, null, 2),

@@ -13,49 +13,48 @@ export async function updatePackageJson(result: PromptResult) {
 
   const pathPackageJSON = path.join(cwd, "package.json");
 
-  p.log.step(c.cyan(`Bumping @nirtamir2/eslint-config to v${packageJson.version}`));
+  p.log.step(
+    c.cyan(`Bumping @nirtamir2/eslint-config to v${packageJson.version}`),
+  );
 
   const packageContent = await fsp.readFile(pathPackageJSON, "utf8");
   const package_: Record<string, any> = JSON.parse(packageContent);
 
   package_.devDependencies ??= {};
-  package_.devDependencies["@nirtamir2/eslint-config"] = `^${packageJson.version}`;
+  package_.devDependencies["@nirtamir2/eslint-config"] =
+    `^${packageJson.version}`;
   package_.devDependencies.eslint ??= packageJson.devDependencies.eslint
     .replace("npm:eslint-ts-patch@", "")
     .replace(ESLINT_TS_PATCH_SUFFIX_PATTERN, "");
 
   const addedPackages: Array<string> = [];
 
-  if (result.extra.length > 0) {
-    for (const item of result.extra) {
-      switch (item) {
-        case "formatter": {
-          for (const f of [
-            "eslint-plugin-format",
-            result.frameworks.includes("astro")
-              ? "prettier-plugin-astro"
-              : null,
-          ] as const) {
-            if (!f) continue;
-            package_.devDependencies[f] = packageJson.devDependencies[f];
-            addedPackages.push(f);
-          }
-          break;
+  for (const item of result.extra) {
+    switch (item) {
+      case "formatter": {
+        for (const f of [
+          "eslint-plugin-format",
+          result.frameworks.includes("astro") ? "prettier-plugin-astro" : null,
+        ] as const) {
+          if (!f) continue;
+          package_.devDependencies[f] = packageJson.devDependencies[f];
+          addedPackages.push(f);
         }
-        case "perfectionist": {
-          for (const f of ["eslint-plugin-perfectionist"] as const) {
-            package_.devDependencies[f] = packageJson.devDependencies[f];
-            addedPackages.push(f);
-          }
-          break;
+        break;
+      }
+      case "perfectionist": {
+        for (const f of ["eslint-plugin-perfectionist"] as const) {
+          package_.devDependencies[f] = packageJson.devDependencies[f];
+          addedPackages.push(f);
         }
-        case "unocss": {
-          for (const f of ["@unocss/eslint-plugin"] as const) {
-            package_.devDependencies[f] = packageJson.devDependencies[f];
-            addedPackages.push(f);
-          }
-          break;
+        break;
+      }
+      case "unocss": {
+        for (const f of ["@unocss/eslint-plugin"] as const) {
+          package_.devDependencies[f] = packageJson.devDependencies[f];
+          addedPackages.push(f);
         }
+        break;
       }
     }
   }
