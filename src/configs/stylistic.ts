@@ -1,9 +1,9 @@
+import { pluginAntfu } from "../plugins";
 import type {
   OptionsOverrides,
   StylisticConfig,
   TypedFlatConfigItem,
 } from "../types";
-import { pluginAntfu } from "../plugins";
 import { interopDefault } from "../utils";
 
 export const StylisticConfigDefaults: StylisticConfig = {
@@ -60,7 +60,8 @@ export async function stylistic(
       rules: {
         ...config.rules,
 
-        ...(!experimental && { "antfu/consistent-list-newline": "error" }),
+        "antfu/consistent-list-newline": "error",
+        "antfu/reasonable-newline": "error",
 
         "antfu/consistent-chaining": "error",
 
@@ -74,7 +75,10 @@ export async function stylistic(
               "antfu/top-level-function": "error",
             }),
 
-        "style/generator-star-spacing": ["error", { after: true, before: false }],
+        "style/generator-star-spacing": [
+          "error",
+          { after: true, before: false },
+        ],
         "style/yield-star-spacing": ["error", { after: true, before: false }],
 
         ...overrides,

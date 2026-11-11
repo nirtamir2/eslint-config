@@ -8,6 +8,8 @@ export default defineConfig({
       "**/_fixtures/**",
       "**/stuff/**",
     ],
+    maxWorkers: 2,
+    maxConcurrency: 2,
     testTimeout: 60_000,
   },
 });

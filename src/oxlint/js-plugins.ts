@@ -39,8 +39,9 @@ function pluginName(specifier: string): string {
   if (canonicalName) return canonicalName;
   if (specifier.startsWith("@")) {
     const [scope, packageName = ""] = specifier.split("/", 2);
-    if (packageName === "eslint-plugin") return scope.slice(1);
-    return `${scope}/${packageName.replace(/^eslint-plugin-/u, "")}`;
+    return packageName === "eslint-plugin"
+      ? scope.slice(1)
+      : `${scope}/${packageName.replace(/^eslint-plugin-/u, "")}`;
   }
   return specifier.replace(/^eslint-plugin-/u, "");
 }
@@ -48,8 +49,9 @@ function pluginName(specifier: string): string {
 function resolveEntries(
   entries: OxlintConfig["jsPlugins"],
 ): OxlintConfig["jsPlugins"] {
-  if (entries == null) return entries;
-  return entries.map((entry) => resolveEntry(entry));
+  return entries == null
+    ? entries
+    : entries.map((entry) => resolveEntry(entry));
 }
 
 /**

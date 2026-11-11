@@ -2,9 +2,7 @@ import { ESLint } from "eslint";
 import { describe, expect, it } from "vitest";
 import { nirtamir2 } from "../src";
 
-type FactoryOptions = NonNullable<Parameters<typeof nirtamir2>[0]>;
-
-async function createESLint(options: FactoryOptions = {}) {
+async function createESLint() {
   const configs = await nirtamir2(
     {
       formatters: false,
@@ -12,7 +10,6 @@ async function createESLint(options: FactoryOptions = {}) {
       react: true,
       stylistic: false,
       typescript: false,
-      ...options,
     },
     {
       files: ["**/*.tsx"],

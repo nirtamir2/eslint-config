@@ -764,6 +764,21 @@ describe("generated Oxlint config compatibility", () => {
     timeout,
   );
 
+  it(
+    "enables native plugins for custom test overrides",
+    async () => {
+      const config = createConfig({
+        test: { overrides: { "vitest/no-identical-title": "off" } },
+      });
+      const result = await runOxlint(config, ["test/duplicate-title.test.ts"]);
+      expect(
+        findDiagnostic(result.output, "no-identical-title"),
+      ).toBeUndefined();
+      expect(result.output.number_of_files).toBe(1);
+    },
+    timeout,
+  );
+
   it("applies the Vitest rules to the shared test globs", () => {
     const config = createConfig({ test: true });
     const vitestOverride = config.overrides?.find((override) =>
@@ -927,7 +942,7 @@ async function runOxlint(
   }
 
   if (!Array.isArray(output.diagnostics))
-    throw new Error(formatProcessFailure(processResult));
+    throw new TypeError(formatProcessFailure(processResult));
   if (processResult.exitCode === 1 && output.diagnostics.length === 0)
     throw new Error(formatProcessFailure(processResult));
 

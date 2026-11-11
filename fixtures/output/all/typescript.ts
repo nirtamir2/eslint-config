@@ -20,8 +20,8 @@ for (const person of people) {
 }
 
 // Define a generic function
-function identity<T>(argument: T): T {
-  return argument;
+function identity<T>(arg: T): T {
+  return arg;
 }
 
 // Use the generic function with type inference
@@ -73,8 +73,8 @@ class Dog extends Animal {
 const dog = new Dog("Buddy");
 dog.bark();
 
-const function_ = (): string => {
+const fn = (): string => {
   return `hello1`;
 };
 
-log(car1, car2, favoriteFruit, numericValue, function_());
+log(car1, car2, favoriteFruit, numericValue, fn());

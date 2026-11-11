@@ -1,17 +1,16 @@
-import type { TypedFlatConfigItem } from "../types";
 import { GLOB_SRC } from "../globs";
 import { pluginUnicorn } from "../plugins";
+import type { TypedFlatConfigItem } from "../types";
 
 export interface OptionsUnicornExtended {
   allRecommended?: boolean;
   overrides?: TypedFlatConfigItem["rules"];
 }
 
-export async function unicorn(options: OptionsUnicornExtended = {}): Promise<Array<TypedFlatConfigItem>> {
-  const {
-    allRecommended = true,
-    overrides = {},
-  } = options;
+export async function unicorn(
+  options: OptionsUnicornExtended = {},
+): Promise<Array<TypedFlatConfigItem>> {
+  const { allRecommended = true, overrides = {} } = options;
   return [
     {
       name: "nirtamir2/unicorn/setup",
@@ -24,7 +23,7 @@ export async function unicorn(options: OptionsUnicornExtended = {}): Promise<Arr
       name: "nirtamir2/unicorn/rules",
       rules: {
         ...(allRecommended
-          ? pluginUnicorn.configs["flat/recommended"].rules
+          ? pluginUnicorn.configs.recommended.rules
           : {
               "unicorn/consistent-empty-array-spread": "error",
               "unicorn/error-message": "error",
@@ -45,9 +44,11 @@ export async function unicorn(options: OptionsUnicornExtended = {}): Promise<Arr
         // Nirtamir2 overrides
         "unicorn/consistent-destructuring": "warn",
         "unicorn/filename-case": 0,
+        "unicorn/name-replacements": 0,
+        // Conflicts with conventional JSDoc/TSDoc blocks enforced by the jsdoc and tsdoc configs.
+        "unicorn/no-asterisk-prefix-in-documentation-comments": 0,
         "unicorn/no-null": 0,
         "unicorn/numeric-separators-style": 0,
-        "unicorn/prevent-abbreviations": 0,
         ...overrides,
       },
     },

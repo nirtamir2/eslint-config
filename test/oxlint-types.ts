@@ -59,8 +59,7 @@ const options = {
   zod: { overrides: rules },
 } satisfies OxlintOptions;
 
-const config: OxlintConfig = oxlint(options, recommended, { rules });
-void config;
+export const config: OxlintConfig = oxlint(options, recommended, { rules });
 
 // @ts-expect-error ESLint-only option
 oxlint({ markdown: true });

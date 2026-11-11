@@ -246,11 +246,11 @@ async function assertInstalledJsPluginResolvesFromConsumer(
 }
 
 function isForbiddenRuntimeImport(specifier: string): boolean {
-  if (specifier === "eslint-config-flat-gitignore") return false;
   return (
-    specifier === "@oxlint/migrate" ||
-    specifier.startsWith("@oxlint/migrate/") ||
-    (!specifier.startsWith(".") && specifier.includes("eslint"))
+    specifier !== "eslint-config-flat-gitignore" &&
+    (specifier === "@oxlint/migrate" ||
+      specifier.startsWith("@oxlint/migrate/") ||
+      (!specifier.startsWith(".") && specifier.includes("eslint")))
   );
 }
 

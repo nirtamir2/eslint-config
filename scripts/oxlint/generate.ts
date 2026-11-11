@@ -603,7 +603,6 @@ function createAliasedFallbackConfig(
 function omitSourcePlugin(
   source: Array<TypedFlatConfigItem>,
   pluginName: string,
-  rulePrefix: string = pluginName,
 ): Array<TypedFlatConfigItem> {
   return source.map((config) => ({
     ...config,
@@ -615,7 +614,7 @@ function omitSourcePlugin(
     ...(config.rules != null && {
       rules: Object.fromEntries(
         Object.entries(config.rules).filter(
-          ([rule]) => !rule.startsWith(`${rulePrefix}/`),
+          ([rule]) => !rule.startsWith(`${pluginName}/`),
         ),
       ),
     }),
@@ -658,7 +657,7 @@ function selectSourceRules(
         selectedRules.has(rule),
       ),
     );
-    return Object.keys(rules).length > 0 ? [{ ...config, rules }] : [];
+    return Object.keys(rules).length > 0 ? { ...config, rules } : [];
   });
 }
 
@@ -679,7 +678,7 @@ function selectChangedSourceRules(
       Object.entries(config.rules ?? {}).flatMap(([rule, value]) =>
         JSON.stringify(value) === JSON.stringify(baselineRules[rule])
           ? []
-          : [rule],
+          : rule,
       ),
     ),
   );

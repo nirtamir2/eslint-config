@@ -1,10 +1,10 @@
-import type { Awaitable, TypedFlatConfigItem } from "./types";
+import { isPackageExists } from "local-pkg";
 import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { fileURLToPath } from "node:url";
-import { isPackageExists } from "local-pkg";
+import type { Awaitable, TypedFlatConfigItem } from "./types";
 
 export const parserPlain = {
   meta: {
@@ -97,8 +97,7 @@ export function renamePluginInConfigs(
     if (clone.plugins) {
       clone.plugins = Object.fromEntries(
         Object.entries(clone.plugins).map(([key, value]) => {
-          if (key in map) return [map[key], value];
-          return [key, value];
+          return [key in map ? map[key] : key, value];
         }),
       );
     }
@@ -182,7 +181,4 @@ export async function ensurePackages(packages: Array<string | undefined>) {
     );
 }
 
-export {
-  isInEditorEnv,
-  isInGitHooksOrLintStaged,
-} from "./editor-environment";
+export { isInEditorEnv, isInGitHooksOrLintStaged } from "./editor-environment";

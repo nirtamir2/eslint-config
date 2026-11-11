@@ -1,6 +1,6 @@
-import type { TypedFlatConfigItem } from "../src/types";
 import { it } from "vitest";
 import { nirtamir2 } from "../src/factory";
+import type { TypedFlatConfigItem } from "../src/types";
 
 type FactoryOptions = NonNullable<Parameters<typeof nirtamir2>[0]>;
 
@@ -95,11 +95,7 @@ function serializeConfigs(
 
     if (config.rules) {
       clone.rules = Object.entries(config.rules).map(([rule, value]) => {
-        if (value === "off" || value === 0) {
-          return `- ${rule}`;
-        }
-
-        return rule;
+        return value === "off" || value === 0 ? `- ${rule}` : rule;
       });
     }
 

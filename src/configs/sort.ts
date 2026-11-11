@@ -52,6 +52,7 @@ export async function sortPackageJson(): Promise<Array<TypedFlatConfigItem>> {
               "icon",
               "files",
               "engines",
+              "devEngines",
               "activationEvents",
               "contributes",
               "scripts",
